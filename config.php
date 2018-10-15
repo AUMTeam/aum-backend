@@ -12,3 +12,5 @@ $config = [
     'password' => "",
     'database' => "my_aum"
 ];
+
+$printDebug = new PrintDebug(true);

@@ -16,8 +16,6 @@ include_once "lib/libDatabase/include.php";
 include_once "lib/libExceptionRequest/include.php";
 include_once "lib/libPrintDebug/PrintDebug.php";
 
-$printDebug = new PrintDebug(true);
-
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
     if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
         //Necessary to comunicate the allowed methods through the OPTIONS method
