@@ -47,9 +47,6 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
     //$db = new MySQLDatabaseWrapper($config);
 
     try{
-        //Checks if the request has the JSON
-        //if(!isset($_POST['json']))
-            //throw new InvalidRequestException("Request data not found");
 
         //Decodes JSON if present
         $request = json_decode(file_get_contents("php://input"), true);
@@ -84,7 +81,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 //The only action which token is not needed
                 goto bypass_header_check;
             else
-                throw new NoTokenException("");
+                //No token found
+                throw new NoTokenException("Token can't be omitted here");
         else{
             //Checks if token is active or valid
             $result = $db->query("SELECT user_id FROM users WHERE token = '{$headers['X-Auth-Header']}'");
@@ -98,6 +96,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         if(!file_exists(__DIR__ . "/modules/$module/$action.php"))
             throw new NotImplementedException("Module $module/$action not implemented");
 
+        //Initializing essentials variables for actions
         $init = function() { return [];};
         $exec = function (array $data, array $data_init) : array {
             return [
@@ -107,6 +106,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             ];
         };
 
+        //Bringing the action which we wanted
         require_once __DIR__ . "/modules/$module/$action.php";
 
         //Made for init data
@@ -119,21 +119,26 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         $response = $exec($request_data, $data_init);
 
     }catch (ExceptionRequest $invalidRequestException){
+        //Simple error
         $response = $invalidRequestException->getErrorResponse();
     }catch (Exception $exception){
+        //Fatal error
         $response = [
             'response_data' => [],
-            'dev_message' => [
-                'message' => $exception->getMessage(),
-                'stack_trace' => $exception->getTrace(),
-            ],
-            'message' => "Internal Server Error",
             'status_code' => 500
         ];
+
+        //DEBUG ENVIRONMENT ONLY
+        if($printDebug->isDebug()){
+            $response['dev_message'] = [
+                'message' => $exception->getMessage(),
+                'stack_trace' => $exception->getTrace(),
+            ];
+            $response['message'] = "Internal Server Error";
+        }
     }
 
-    end_request:
-
+    //Here ends the request with HTTP Code and JSON-ifying of a response
     http_response_code($response['status_code']);
     echo json_encode($response);
     exit;
