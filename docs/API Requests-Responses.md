@@ -36,13 +36,13 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 }
 ```
 
-* Utente bloccato. L'utente è stato bloccato dall'amministratore. Di conseguenza, non ha più accesso alla piattaforma (temporaneo/permanente). L'utente deve contattare l'amministratore.
+* Utente bloccato. L'utente è stato bloccato dall'amministratore. Di conseguenza, non ha più accesso alla piattaforma (temporaneo/permanente). L'utente deve contattare l'amministratore. (UNUSED?)
 ```json
 {
     "response_data":{
         "error_code":104
     },
-    "status_code":404
+    "status_code":423
 }
 ```
 
@@ -97,7 +97,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 }
 ```
 
-* Login fallito. L'utente è stato bloccato dall'amministratore.
+* Login fallito. L'utente è stato bloccato dall'amministratore. (UNUSED?)
 ```json
 {
     "response_data":{
@@ -143,6 +143,8 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 ```
 
 ## user/info
+
+*NOTA: La risposta è prototipata. Azione soggetta a cambiamenti.*
 
 Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguarda l'utente appartenente al token inviato.
 
