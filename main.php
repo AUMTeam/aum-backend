@@ -11,10 +11,10 @@ date_default_timezone_set('Europe/Rome');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header");
 
-include_once "config.php";
-include_once "lib/libDatabase/include.php";
-include_once "lib/libExceptionRequest/include.php";
-include_once "lib/libPrintDebug/PrintDebug.php";
+include_once "./lib/libDatabase/include.php";
+include_once "./lib/libExceptionRequest/include.php";
+include_once "./lib/libPrintDebug/PrintDebug.php";
+include_once "./config.php";
 
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
     if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
@@ -88,6 +88,14 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             $result = $db->query("SELECT user_id FROM users WHERE token = '{$headers['X-Auth-Header']}'");
             if(is_bool($result) or count($result) == 0)
                 throw new InvalidTokenException("Token is not valid");
+
+            $token = $headers['X-Auth-Header'];
+
+            //$first_time = substr($token,4,10);
+            $finish_time = substr($token,18,10);
+
+            if(time() > hexdec($finish_time))
+                throw new InvalidTokenException("Token is not valid anymore. Please remake login");
         }
 
         $token = $headers['X-Auth-Header'];

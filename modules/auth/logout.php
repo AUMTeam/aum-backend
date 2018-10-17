@@ -9,17 +9,12 @@
 $init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    //TODO LOGOUT REAL CODE
 
     global $db;
     global $token;
 
-    $user_id = $db->query("SELECT user_id FROM users WHERE token = '$token'");
-
-    if(is_bool($user_id) || is_null($user_id))
-        throw new UserNotFoundException("User not found");
-
-    $db->query("UPDATE users SET token = '' WHERE user_id = $user_id");
+    //One-step token erasing
+    $db->query("UPDATE users SET token = null WHERE token = '$token'");
 
     return [
         "response_data" => [],
