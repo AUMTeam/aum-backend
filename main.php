@@ -90,6 +90,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 throw new InvalidTokenException("Token is not valid");
         }
 
+        $token = $headers['X-Auth-Header'];
+
         bypass_header_check:
 
         //Checks if you can find the module

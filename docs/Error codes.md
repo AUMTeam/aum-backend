@@ -17,6 +17,7 @@ Lista codici errore. I codici errore possono essere trovati qua:
 * `101` = `ERROR_GLOBAL_INVALID_TOKEN` - Il token identificativo è invalido
 * `102` = `ERROR_GLOBAL_NOT_IMPLEMENTED` - L'azione richiesta non è stata implementata
 * `103` = `ERROR_GLOBAL_BLOCKED_USER` - L'utente è stato bloccato dall'amministratore (unused?)
+* `104` = `ERROR_GLOBAL_USER_NOT_FOUND` - L'utente non è stato trovato
 
 ## `auth/*` module
 
