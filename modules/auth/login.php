@@ -6,39 +6,7 @@
  * Time: 15:11
  */
 
-$init = function (array $data) : array {
-    return [
-        'generateToken' => function() : string {
-            //Get now's timestamp
-            $now = time();
-            //Get end's timestamp
-            $finish = dechex($now + 86400);
-            $now = dechex($now);
-
-            $token = bin2hex(random_bytes(2));
-
-            $temp = "";
-            //STRING MUST BE 10 CHARACTERS FIXED
-            if(strlen($now)<10){
-                for($i=0;$i<(10-strlen($now));$i++)
-                    $temp = "$temp"."0";
-            }
-
-            $token = "$token$temp$now";
-
-            $temp="";
-            if(strlen($finish)<10){
-                for($i=0;$i<(10-strlen($finish));$i++)
-                    $temp = "$temp"."0";
-            }
-
-            //Finishing generating token
-            $token = "$token" . bin2hex(random_bytes(2)) . "$temp$finish" . bin2hex(random_bytes(4));
-
-            return $token;
-        }
-    ];
-};
+$init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
 
@@ -57,9 +25,8 @@ $exec = function (array $data, array $data_init) : array {
 
     $user_id = $result[0]['user_id'];
 
-    //$token = sha1(random_bytes(64));
+    $token = sha1(random_bytes(64));
 
-    $token = $data_init['generateToken']();
     $db->query("UPDATE users SET token = '$token' WHERE user_id = $user_id");
 
     return [

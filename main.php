@@ -11,9 +11,12 @@ date_default_timezone_set('Europe/Rome');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header");
 
+//Import important libraries
 include_once "./lib/libDatabase/include.php";
 include_once "./lib/libExceptionRequest/include.php";
 include_once "./lib/libPrintDebug/PrintDebug.php";
+
+//Import configuration data
 include_once "./config.php";
 
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
@@ -85,16 +88,11 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 throw new NoTokenException("Token can't be omitted here");
         else{
             //Checks if token is active or valid
-            $result = $db->query("SELECT user_id FROM users WHERE token = '{$headers['X-Auth-Header']}'");
+            $result = $db->query("SELECT token_expire FROM users WHERE token = '{$headers['X-Auth-Header']}'");
             if(is_bool($result) or count($result) == 0)
                 throw new InvalidTokenException("Token is not valid");
 
-            $token = $headers['X-Auth-Header'];
-
-            //$first_time = substr($token,4,10);
-            $finish_time = substr($token,18,10);
-
-            if(time() > hexdec($finish_time))
+            if(time() > $result[0]['token_expire'])
                 throw new InvalidTokenException("Token is not valid anymore. Please remake login");
         }
 
@@ -127,6 +125,10 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
 
         //Get the response you need
         $response = $exec($request_data, $data_init);
+
+        //Write the new token expire
+        $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
+        $db->query("UPDATE users SET token_expire = $new_expire WHERE token = '$token'");
 
     }catch (ExceptionRequest $invalidRequestException){
         //Simple error

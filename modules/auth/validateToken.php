@@ -6,12 +6,22 @@
  * Time: 15:11
  */
 
-$init = function (array $data) : array { return []; };
+$init = function (array $data) : array {
+
+    global $db;
+    global $token;
+
+    //Take token validity
+    return [
+        "result" => $db->query("SELECT token_expire FROM users WHERE token = '$token'")
+    ];
+};
 
 $exec = function (array $data, array $data_init) : array {
-    //Token is already checked by main. Just return an empty object and an OK status.
     return [
-        "response_data" => [],
+        "response_data" => [
+            "token_validity" => $data_init['result'][0]['token_expire']
+        ],
         "status_code" => 200
     ];
 };
