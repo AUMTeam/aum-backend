@@ -20,7 +20,7 @@ $init = function (array $data) : array {
 $exec = function (array $data, array $data_init) : array {
     return [
         "response_data" => [
-            "token_validity" => $data_init['result'][0]['token_expire']
+            "token_expire" => $data_init['result'][0]['token_expire']
         ],
         "status_code" => 200
     ];
