@@ -58,12 +58,27 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         if($request == null or $request == false)
             throw new InvalidRequestException("Request is not a JSON");
 
+        //BETA: Module/Action on URL
+        $url_data = explode("/", $_SERVER['REQUEST_URI']);
+        if(count($url_data) == 4)
+        {
+            $module = $url_data[2];
+            $action = $url_data[3];
+            goto module_action_got;
+        }
+
         //Checks if fields are empty or absent
         if(!isset($request['module']) or $request['module'] == "")
             throw new InvalidRequestException("Module can't be left blank");
 
         if(!isset($request['action']) or $request['action'] == "")
             throw new InvalidRequestException("Action can't be left blank");
+
+        //Saving data on easy variables
+        $module = $request['module'];
+        $action = $request['action'];
+
+        module_action_got:
 
         if(!isset($request['request_data']) or is_null($request['request_data'])){
             $addon = "";
@@ -73,8 +88,6 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         }
 
         //Saving data on easy variables
-        $module = $request['module'];
-        $action = $request['action'];
         $request_data = $request['request_data'];
 
         //Checks if token is on the header
@@ -93,7 +106,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 throw new InvalidTokenException("Token is not valid");
 
             if(time() > $result[0]['token_expire'])
-                throw new InvalidTokenException("Token is not valid anymore. Please remake login");
+                throw new InvalidTokenException("Token is not valid anymore. Please remake login. " . $printDebug->getDebugString($result[0]['token_expire']));
         }
 
         $token = $headers['X-Auth-Header'];
@@ -126,9 +139,14 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         //Get the response you need
         $response = $exec($request_data, $data_init);
 
-        //Write the new token expire
-        $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
-        $db->query("UPDATE users SET token_expire = $new_expire WHERE token = '$token'");
+        if(isset($token) || isset($response['response_data']['token'])){
+            //Take the new generated token if you generated one
+            if(isset($response['response_data']['token']))
+                $token = $response['response_data']['token'];
+            //Write the new token expire
+            $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
+            $db->query("UPDATE users SET token_expire = $new_expire WHERE token = '$token'");
+        }
 
     }catch (ExceptionRequest $invalidRequestException){
         //Simple error
