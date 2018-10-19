@@ -118,7 +118,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             throw new NotImplementedException("Module $module/$action not implemented");
 
         //Initializing essentials variables for actions
-        $init = function() { return [];};
+        $init = function() { return []; };
         $exec = function (array $data, array $data_init) : array {
             return [
                 "response_data" => [],
