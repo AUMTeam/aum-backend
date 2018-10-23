@@ -19,7 +19,7 @@ $exec = function (array $data, array $data_init) : array {
     if(is_bool($user_data) || is_null($user_data))
         throw new UserNotFoundException("User not found");
 
-    $user_data = $db->query("SELECT user_id, name, role_id, area_id FROM users_m WHERE user_id = {$user_data[0]['user_id']}");
+    $user_data = $db->query("SELECT user_id, name, role_id, area_id, email FROM users_m WHERE user_id = {$user_data[0]['user_id']}");
 
     //Don't know if it will be really useful since main checks it but who knows
     if(is_bool($user_data) || is_null($user_data))
@@ -41,6 +41,7 @@ $exec = function (array $data, array $data_init) : array {
 
     //Make a new correct response
     $out = [
+        'email' => $out['email'],
         'role' => $out['role'],
         'area' => $out['area_id'],
         'user_id' => $out['user_id'],
