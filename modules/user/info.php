@@ -14,7 +14,12 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
 
     //Retreive user data
-    $user_data = $db->query("SELECT user_id, name, role_id, area_id FROM users WHERE token = '$token'");
+    $user_data = $db->query("SELECT user_id FROM users_token_m WHERE token = '$token'");
+    //Don't know if it will be really useful since main checks it but who knows
+    if(is_bool($user_data) || is_null($user_data))
+        throw new UserNotFoundException("User not found");
+
+    $user_data = $db->query("SELECT user_id, name, role_id, area_id FROM users_m WHERE user_id = {$user_data[0]['user_id']}");
 
     //Don't know if it will be really useful since main checks it but who knows
     if(is_bool($user_data) || is_null($user_data))
@@ -23,12 +28,16 @@ $exec = function (array $data, array $data_init) : array {
     //Temporary storing
     $out = $user_data[0];
 
+    $roles = [];
+    $temp_roles = explode(";",$out['role_id']);
+    foreach ($temp_roles as $role)
+        $roles[] = $db->query("SELECT role_name FROM roles_m WHERE role_id = $role")[0]['role_name'];
     //Obtaining string for 'role'
-    $out['role'] = $db->query("SELECT role_name FROM roles WHERE role_id = {$out['role_id']}")[0]['role_name'];
+    $out['role'] = $roles;
 
     //Obtaining string for 'area' if needed
     if(!is_null($out['area_id']))
-        $out['area_id'] = $db->query("SELECT area_name FROM areas WHERE area_id = {$out['area_id']}")[0]['area_name'];
+        $out['area_id'] = $db->query("SELECT area_name FROM areas_m WHERE area_id = {$out['area_id']}")[0]['area_name'];
 
     //Make a new correct response
     $out = [

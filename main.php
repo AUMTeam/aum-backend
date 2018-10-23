@@ -101,12 +101,14 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 throw new NoTokenException("Token can't be omitted here");
         else{
             //Checks if token is active or valid
-            $result = $db->query("SELECT token_expire FROM users WHERE token = '{$headers['X-Auth-Header']}'");
+            $result = $db->query("SELECT token_expire FROM users_token_m WHERE token = '{$headers['X-Auth-Header']}'");
             if(is_bool($result) or count($result) == 0)
                 throw new InvalidTokenException("Token is not valid");
 
-            if(time() > $result[0]['token_expire'])
+            if(time() > $result[0]['token_expire']){
+                $db->query("DELETE FROM users_token_m WHERE token = '{$headers['X-Auth-Header']}'");
                 throw new InvalidTokenException("Token is not valid anymore. Please remake login. " . $printDebug->getDebugString($result[0]['token_expire']));
+            }
         }
 
         $token = $headers['X-Auth-Header'];
@@ -144,8 +146,11 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             if(isset($response['response_data']['token']))
                 $token = $response['response_data']['token'];
             //Write the new token expire
-            $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
-            $db->query("UPDATE users SET token_expire = $new_expire WHERE token = '$token'");
+            if($printDebug->isDebug()) // DEBUG PURPOSE ONLY
+                $new_expire = time() + (60 * 1); //Valid for one minute for debugging multiple timeout
+            else
+                $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
+            $db->query("UPDATE users_token_m SET token_expire = $new_expire WHERE token = '$token'");
         }
 
     }catch (ExceptionRequest $invalidRequestException){
