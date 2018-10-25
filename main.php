@@ -81,10 +81,11 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         module_action_got:
 
         if(!isset($request['request_data']) or is_null($request['request_data'])){
-            $addon = "";
-            if(is_null($request['request_data']))
-                $addon = " | Actual: " . json_encode($request['request_data']);
-            throw new InvalidRequestException("Request data can't be left blank$addon");
+            //$addon = "";
+            //if(is_null($request['request_data']))
+                //$addon = " | Actual: " . json_encode($request['request_data']);
+            //throw new InvalidRequestException("Request data can't be left blank$addon");
+            $request['request_data'] = [];
         }
 
         //Saving data on easy variables
@@ -93,7 +94,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         //Checks if token is on the header
         $headers = getallheaders();
         if(!isset($headers['X-Auth-Header']))
-            if($module == "auth" and $action == "login")
+            if(($module == "auth" and $action == "login") or ($module == "data") )
                 //The only action which token is not needed
                 goto bypass_header_check;
             else
@@ -147,7 +148,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 $token = $response['response_data']['token'];
             //Write the new token expire
             if($printDebug->isDebug()) // DEBUG PURPOSE ONLY
-                $new_expire = time() + (60 * 1); //Valid for one minute for debugging multiple timeout
+                $new_expire = time() + (60 * 30); //Valid for one minute for debugging multiple timeout
             else
                 $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
             $db->query("UPDATE users_token_m SET token_expire = $new_expire WHERE token = '$token'");
