@@ -6,6 +6,14 @@
  * Time: 16:32
  */
 
+//DB mode (SQLite3 or MySQL)
+$db_usage = "SQLITE3"; //Uncomment this for SQLite3 usage
+//$db_mode = "MYSQL"; //Uncomment this for MYSQL usage
+
+//SQLite3 mode DB name
+$sqlite3_name = "./db/main.db_";
+
+//MySQL mode configuration
 $config = [
     'server' => "",
     'username' => "",
@@ -13,4 +21,5 @@ $config = [
     'database' => "my_aum"
 ];
 
-$printDebug = new PrintDebug(true);
+//Flag for debug/release mode
+$release_mode = false;

@@ -6,10 +6,13 @@
  * Time: 15:11
  */
 
+$version = "0.10b";
+
 date_default_timezone_set('Europe/Rome');
 
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header");
+header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
+header("Content-Encoding: gzip");
 
 //Import important libraries
 include_once "./lib/libDatabase/include.php";
@@ -19,12 +22,22 @@ include_once "./lib/libPrintDebug/PrintDebug.php";
 //Import configuration data
 include_once "./config.php";
 
+//Initializing debug mode
+$printDebug = new PrintDebug(!$release_mode);
+
+//GZIP compression
+if(!ob_start("ob_gzhandler")) ob_start();
+
+//Reporting server version
+header("Server-Version: $version");
+
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
     if($_SERVER['REQUEST_METHOD'] === 'OPTIONS'){
         //Necessary to comunicate the allowed methods through the OPTIONS method
         http_response_code(200);
         header("Access-Control-Allow-Methods: POST, OPTIONS");
         $printDebug->printDebug("OPTIONS MESSAGE SENT\n");
+        ob_end_flush();
         exit;
     }
     //Easter egg for whom don't use POST method for access
@@ -37,19 +50,36 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             </style>
         </head>
         <body>
-            <img src="./img/not_post_req.jpg">
+            <img src="/img/not_post_req.jpg">
         </body>
     </html>
     ');
+    ob_end_flush();
     exit;
 }else{
 
     header("Content-Type: application/json");
+
+    //Header identification server status
+    if($printDebug->isDebug())
+        header("Server-Mode: Chihiro API");
+    else
+        header("Server-Mode: AUM API");
+
     $response = NULL;
-    $db = new SQLite3DatabaseWrapper("./db/main.db_");
-    //$db = new MySQLDatabaseWrapper($config);
+    $db = NULL;
 
     try{
+        //Set up database connection
+        if($db_usage == "SQLITE3")
+            //SQLite3 usage
+            $db = new SQLite3DatabaseWrapper($sqlite3_name);
+        else if ($db_usage == "MYSQL")
+            //MySQL usage
+            $db = new MySQLDatabaseWrapper($config);
+        else
+            //Invalid string
+            throw new Exception("Invalid DB setup");
 
         //Decodes JSON if present
         $request = json_decode(file_get_contents("php://input"), true);
@@ -60,10 +90,18 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
 
         //BETA: Module/Action on URL
         $url_data = explode("/", $_SERVER['REQUEST_URI']);
-        if(count($url_data) == 4)
+        if(count($url_data) >= 4)
         {
-            $module = $url_data[2];
-            $action = $url_data[3];
+            $main_posi = 0;
+
+            while($url_data[$main_posi] !== "main.php")
+                if($url_data[$main_posi] !== "main.php")
+                    $main_posi++;
+                else
+                    break;
+
+            $module = $url_data[$main_posi+1];
+            $action = $url_data[$main_posi+2];
             goto module_action_got;
         }
 
@@ -158,6 +196,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         //Simple error
         $response = $invalidRequestException->getErrorResponse();
     }catch (Exception $exception){
+        fatal_error:
         //Fatal error
         $response = [
             'response_data' => [],
@@ -177,5 +216,6 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
     //Here ends the request with HTTP Code and JSON-ifying of a response
     http_response_code($response['status_code']);
     echo json_encode($response);
+    ob_end_flush();
     exit;
 }
