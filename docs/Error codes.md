@@ -41,6 +41,7 @@ Lista codici errore. I codici errore possono essere trovati qua:
 * `3006` = `ERROR_COMMIT_INFO_INVALID_REQUEST` - La richiesta per le info del commit è invalida
 * `3007` = `ERROR_COMMIT_APPROVE_INVALID_REQUEST` - La richiesta per l'approvazione del commit è invalida
 * `3008` = `ERROR_COMMIT_UPDATE_NO_UPDATES` - Non vi sono nuovi commit
+* `3008` = `ERROR_COMMIT_LIST_NO_PAGE` - Il numero della pagina non può essere omesso
 
 
 #### PATTERN DOCUMENTAZIONE
