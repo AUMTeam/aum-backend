@@ -11,14 +11,15 @@ $init = function (array $data) : array { return []; };
 $exec = function (array $data, array $data_init) : array {
 
     global $db;
+    global $printDebug;
 
     if(!isset($data['username']))
         throw new InvalidRequestException("'username' field cannot be blank");
 
-    if(!isset($data['hash_pass']))
-        throw new InvalidRequestException("'hash_pass' field cannot be blank");
+    if(!isset($data['password']))
+        throw new InvalidRequestException("'password' field cannot be blank");
 
-    $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}' AND hash_pass = '{$data['hash_pass']}'");
+    $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}' AND hash_pass = '" . strtoupper(hash("sha256",$data['password'])) . "'");
 
     if(is_bool($result) or count($result) == 0)
         throw new InvalidCredentialsException("Credentials are wrong");

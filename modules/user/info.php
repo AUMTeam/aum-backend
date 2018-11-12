@@ -14,11 +14,18 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
 
     //Retreive user data
-    $user_data = $db->query("SELECT user_id FROM users_token_m WHERE token = '$token'");
+    if(isset($data['user_id'])){
+        $user_data[0]['user_id'] = $data['user_id'];
+        goto user_id;
+    }
+    else
+        $user_data = $db->query("SELECT user_id FROM users_token_m WHERE token = '$token'");
+
     //Don't know if it will be really useful since main checks it but who knows
     if(is_bool($user_data) || is_null($user_data))
         throw new UserNotFoundException("User not found");
 
+    user_id:
     $user_data = $db->query("SELECT user_id, name, role_id, area_id, email FROM users_m WHERE user_id = {$user_data[0]['user_id']}");
 
     //Don't know if it will be really useful since main checks it but who knows
@@ -28,7 +35,7 @@ $exec = function (array $data, array $data_init) : array {
     //Temporary storing
     $out = $user_data[0];
 
-    $out['role'] = explode(";",$out['role_id']);
+    $out['role'] = explode(",",$out['role_id']);
 
     foreach ($out['role'] as $posi => $role)
         $out['role'][$posi] = (int) $role;
