@@ -69,6 +69,7 @@ $exec = function (array $data, array $data_init) : array {
             'id' => $entry['commit_id'],
             'description' => $entry['description'],
             'timestamp' => strtotime($entry['timestamp']),
+            'approval_status' => $entry['is_approved'],
             'author' => [
                 'user_id' => $entry['author_user_id'],
                 'username' => $entry['username']

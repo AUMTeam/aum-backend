@@ -21,84 +21,17 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['latest_commit_timestamp']))
         throw new InvalidRequestException("latest_commit_timestamp cannot be blank", 3001);
 
-    if(!isset($data['limit']))
-        throw new InvalidRequestException("limit cannot be blank", 3001);
+    $time = $data['latest_commit_timestamp'];
 
-    $time = date("Y-m-d H:i:s", $data['latest_commit_timestamp']);
-
-    $req = $data;
-
-    $data = $db->query(
-        "SELECT users_m.username, commit_m.*
-        FROM commit_m, users_m
-        WHERE commit_m.author_user_id = users_m.user_id AND commit_m.timestamp > '$time' 
-        ORDER BY commit_m.timestamp DESC"
-    );
-
-    if(is_null($data) || is_bool($data) || count($data) == 0)
-        throw new NotEditedException();
+    $data = $db->query("SELECT MAX(timestamp) as latest_timestamp, COUNT(commit_id) as amount_commit FROM commit_m");
 
     $out = [
-        'count' => 0,
-        'commit_list' => [],
-        'page_total' => 0
+        "commit_count" => $data[0]['amount_commit'],
+        "latest_commit_timestamp" => strtotime($data[0]['latest_timestamp'])
     ];
 
-    $max_page = count($data) / $req['limit'];
-
-    if(is_float($max_page))
-        $max_page = $data_init['functions']['to_int']($max_page) + 1;
-
-    $out['page_total'] = $max_page;
-
-    foreach ($data as $entry)
-        $out['commit_list'][] = [
-            'id' => $entry['commit_id'],
-            'description' => $entry['description'],
-            'timestamp' => strtotime($entry['timestamp']),
-            'author' => [
-                'user_id' => $entry['author_user_id'],
-                'username' => $entry['username']
-            ]
-        ];
-
-    $out['count'] = count($out['commit_list']);
-
-    /*
-    //One-step token erasing
-    $data = $db->query("SELECT * FROM areas_m");
-
-    $out = [];
-
-    foreach ($data as $entry)
-        $out[] = [
-            'area_id' => $entry['area_id'],
-            'area_string' => $entry['area_string']
-        ];
-
-    $out = [
-        'count' => 2,
-        'commit_list' => [
-            [
-                'id' => "oofFoo",
-                'desc' => "A sample of a commit",
-                'timestamp' => 0,
-                'author' => [
-                    'user_id' => 1,
-                    'username' => "Mario"
-                ]
-            ],
-            [
-                'id' => "fooOOF",
-                'desc' => "A sample commit",
-                'timestamp' => 0,
-                'author' => [
-                    'user_id' => 2,
-                    'username' => "Luigi"
-                ]
-            ]
-        ]
-    ];*/
+    if($time == $out['commit_latest'])
+        throw new NotEditedException();
 
     return [
         "response_data" => $out,
