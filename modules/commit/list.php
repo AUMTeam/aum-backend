@@ -47,6 +47,7 @@ $exec = function (array $data, array $data_init) : array {
 
     $out = [
         'count' => 0,
+        'count_total' => count($data),
         'commit_list' => [],
         'page' => $req['page'],
         'page_total' => 0

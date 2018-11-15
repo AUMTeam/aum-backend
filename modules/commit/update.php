@@ -27,11 +27,14 @@ $exec = function (array $data, array $data_init) : array {
 
     $out = [
         "commit_count" => $data[0]['amount_commit'],
-        "latest_commit_timestamp" => strtotime($data[0]['latest_timestamp'])
+        "latest_commit_timestamp" => strtotime($data[0]['latest_timestamp']),
+        //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit_m WHERE '$time' < commit_m.timestamp")[0]['new_commit']
     ];
 
-    if($time == $out['commit_latest'])
-        throw new NotEditedException();
+    $out['updates_found'] = $out['latest_commit_timestamp'] > $time;
+
+    //if($time == $out['commit_latest'])
+        //throw new NotEditedException();
 
     return [
         "response_data" => $out,
