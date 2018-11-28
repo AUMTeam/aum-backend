@@ -2,17 +2,11 @@
 /**
  * Created by PhpStorm.
  * User: User
- * Date: 05/11/2018
- * Time: 19:17
+ * Date: 28/11/2018
+ * Time: 23:18
  */
 
-$init = function (array $data) : array { return [
-    'functions' => [
-        'to_int' => function ($i) : int {
-            return (int) $i;
-        }
-    ]
-]; };
+$init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
 
@@ -38,6 +32,7 @@ $exec = function (array $data, array $data_init) : array {
 
     return [
         "response_data" => get_commit_list_data($data, $db),
+        "message" => "Data atm are same as commit. TODO good implementation",
         "status_code" => 200
     ];
 
