@@ -22,7 +22,7 @@ $exec = function (array $data, array $data_init) : array {
     $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}'");
 
     if(is_bool($result) or count($result) == 0)
-        throw new InvalidCredentialsException("Credentials are wrong");
+        throw new InvalidCredentialsException("Credentials seems be wrong" . $printDebug->getDebugString(" (1)"));
 
     $user_id = $result[0]['user_id'];
 
@@ -31,7 +31,7 @@ $exec = function (array $data, array $data_init) : array {
     $result = $db->query("SELECT user_id FROM users_m WHERE hash_pass = '$hash_pass'");
 
     if(is_bool($result) or count($result) == 0)
-        throw new InvalidCredentialsException("Credentials are wrong");
+        throw new InvalidCredentialsException("Credentials are wrong" . $printDebug->getDebugString(" (2) : $hash_pass"));
 
     $token = sha1(random_bytes(64));
 

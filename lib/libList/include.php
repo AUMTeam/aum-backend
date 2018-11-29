@@ -28,10 +28,12 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
             break;
         case "request":
         case "REQUEST":
+            if($data['sort']['parameter'] == "timestamp")
+                $data['sort']['parameter'] = "request_id";
             $data = $db->query(
-            "SELECT users_m.username, commit_m.*
-             FROM request_m, users_m
-             WHERE request_m.requester = users_m.user_id
+            "SELECT users_m.username, requests_m.*
+             FROM requests_m, users_m
+             WHERE requests_m.requester = users_m.user_id
              ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}"
             );
             $id = "request_id";
@@ -63,7 +65,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
         if ($entry == NULL)
             break;
 
-        $out['list'][] = [
+        $temp = [
             'id' => $entry[$id],
             'description' => $entry['description'],
             'timestamp' => strtotime($entry['timestamp']),
@@ -73,6 +75,11 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
                 'username' => $entry['username']
             ]
         ];
+
+        if(!is_null($temp['description']))
+            $temp['description'] = base64_decode($temp['description']);
+
+        $out['list'][] = $temp;
     }
 
     $out['count'] = count($out['list']);

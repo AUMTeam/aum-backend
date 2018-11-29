@@ -22,4 +22,4 @@ $config = [
 ];
 
 //Flag for debug/release mode
-$release_mode = false;
+$debug_mode = true;

@@ -26,7 +26,7 @@ include_once "./lib/libList/include.php";
 include_once "./config.php";
 
 //Initializing debug mode
-$printDebug = new PrintDebug(!$release_mode);
+$printDebug = new PrintDebug($debug_mode);
 
 //GZIP compression
 if(!ob_start("ob_gzhandler")) ob_start();
@@ -162,7 +162,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             throw new NotImplementedException("Module $module/$action not implemented");
 
         //Initializing essentials variables for actions
-        $init = function() { return []; };
+        $init = function (array $data) { return []; };
         $exec = function (array $data, array $data_init) : array {
             return [
                 "response_data" => [],
