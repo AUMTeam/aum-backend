@@ -19,12 +19,19 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['password']))
         throw new InvalidRequestException("'password' field cannot be blank");
 
-    $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}' AND hash_pass = '" . strtoupper(hash("sha256",$data['password'])) . "'");
+    $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}'");
 
     if(is_bool($result) or count($result) == 0)
         throw new InvalidCredentialsException("Credentials are wrong");
 
     $user_id = $result[0]['user_id'];
+
+    $hash_pass = saltHash($user_id, $data['username'], hash("sha256",$data['password']));
+
+    $result = $db->query("SELECT user_id FROM users_m WHERE hash_pass = '$hash_pass'");
+
+    if(is_bool($result) or count($result) == 0)
+        throw new InvalidCredentialsException("Credentials are wrong");
 
     $token = sha1(random_bytes(64));
 

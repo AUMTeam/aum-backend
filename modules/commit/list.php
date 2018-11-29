@@ -37,7 +37,7 @@ $exec = function (array $data, array $data_init) : array {
         $data['sort']['parameter'] = "timestamp";
 
     return [
-        "response_data" => get_commit_list_data($data, $db),
+        "response_data" => get_list_data("commit", $data, $db),
         "status_code" => 200
     ];
 

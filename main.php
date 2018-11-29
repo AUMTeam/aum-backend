@@ -18,6 +18,9 @@ header("Content-Encoding: gzip");
 include_once "./lib/libDatabase/include.php";
 include_once "./lib/libExceptionRequest/include.php";
 include_once "./lib/libPrintDebug/PrintDebug.php";
+include_once "./lib/libUserInfo/include.php";
+include_once "./lib/libSalt/include.php";
+include_once "./lib/libList/include.php";
 
 //Import configuration data
 include_once "./config.php";
@@ -190,6 +193,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             else
                 $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
             $db->query("UPDATE users_token_m SET token_expire = $new_expire WHERE token = '$token'");
+
+            header("AUM-Session-Expire", date("Y-m-d H:i:s", $new_expire));
         }
 
     }catch (ExceptionRequest $invalidRequestException){

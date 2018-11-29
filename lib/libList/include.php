@@ -10,16 +10,37 @@ function to_int($i) : int {
     return (int) $i;
 }
 
-function get_commit_list_data(array $data, DatabaseWrapper $db){
+function get_list_data(string $type, array $data, DatabaseWrapper $db){
 
     $req = $data;
 
-    $data = $db->query(
-        "SELECT users_m.username, commit_m.*
-        FROM commit_m, users_m
-        WHERE commit_m.author_user_id = users_m.user_id
-        ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}"
-    );
+    switch ($type){
+        case "commit":
+        case "COMMIT":
+            $data = $db->query(
+            "SELECT users_m.username, commit_m.*
+             FROM commit_m, users_m
+             WHERE commit_m.author_user_id = users_m.user_id
+             ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}"
+            );
+            $id = "commit_id";
+            $author = "author_user_id";
+            break;
+        case "request":
+        case "REQUEST":
+            $data = $db->query(
+            "SELECT users_m.username, commit_m.*
+             FROM request_m, users_m
+             WHERE request_m.requester = users_m.user_id
+             ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}"
+            );
+            $id = "request_id";
+            $author = "requester";
+            break;
+        default:
+            throw new Exception("Impossible to use the list");
+
+    }
 
     $out = [
         'count' => 0,
@@ -43,12 +64,12 @@ function get_commit_list_data(array $data, DatabaseWrapper $db){
             break;
 
         $out['list'][] = [
-            'id' => $entry['commit_id'],
+            'id' => $entry[$id],
             'description' => $entry['description'],
             'timestamp' => strtotime($entry['timestamp']),
             'approval_status' => $entry['is_approved'],
             'author' => [
-                'user_id' => $entry['author_user_id'],
+                'user_id' => $entry[$author],
                 'username' => $entry['username']
             ]
         ];

@@ -3,12 +3,6 @@
 define("SQLITE3_MODE", 1);
 define("MYSQL_MODE", 2);
 
-if(!function_exists('mysqli_connect'))
-    throw new Exception("mysqli library not enabled.");
-
-if(!class_exists('SQLite3'))
-    throw new Exception("SQLite3 library not enabled.");
-
 /**
  * Base Abstract Database Wrapper
  * Contains only the mode of the database and the handler
@@ -38,6 +32,9 @@ abstract class DatabaseWrapper{
 class SQLite3DatabaseWrapper extends DatabaseWrapper{
 
     public function __construct(string $filename, array $config = []){
+        if(!class_exists('SQLite3'))
+            throw new Exception("SQLite3 library not enabled.");
+
         $this->mode = 1;
 
         if(isset($config['read_only']) && $config['read_only']) 
@@ -84,6 +81,9 @@ class SQLite3DatabaseWrapper extends DatabaseWrapper{
 class MySQLDatabaseWrapper extends DatabaseWrapper{
 
     public function __construct(array $config){
+        if(!function_exists('mysqli_connect'))
+            throw new Exception("mysqli library not enabled.");
+
         $this->mode = 2;
 
         $this->handler = new mysqli($config['server'], $config['username'], $config['password'], $config['db_name']);
