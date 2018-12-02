@@ -11,7 +11,6 @@ $init = function (array $data) : array { return []; };
 $exec = function (array $data, array $data_init) : array {
 
     global $db;
-    global $printDebug;
 
     if(!isset($data['username']))
         throw new InvalidRequestException("'username' field cannot be blank");
@@ -19,19 +18,14 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['password']))
         throw new InvalidRequestException("'password' field cannot be blank");
 
-    $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}'");
+    $hash_pass = strtoupper(hash("sha256", $data['password']));
+
+    $result = $db->query("SELECT user_id FROM users_m WHERE username = '{$data['username']}' AND old_password = '{$hash_pass}'");
 
     if(is_bool($result) or count($result) == 0)
-        throw new InvalidCredentialsException("Credentials seems be wrong" . $printDebug->getDebugString(" (1)"));
+        throw new InvalidCredentialsException("Credentials are wrong");
 
     $user_id = $result[0]['user_id'];
-
-    $hash_pass = saltHash($user_id, $data['username'], hash("sha256",$data['password']));
-
-    $result = $db->query("SELECT user_id FROM users_m WHERE hash_pass = '$hash_pass'");
-
-    if(is_bool($result) or count($result) == 0)
-        throw new InvalidCredentialsException("Credentials are wrong" . $printDebug->getDebugString(" (2) : $hash_pass"));
 
     $token = sha1(random_bytes(64));
 

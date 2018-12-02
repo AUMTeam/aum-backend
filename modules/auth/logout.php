@@ -14,7 +14,6 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
 
     //One-step token erasing
-    #$db->query("UPDATE users SET token = null WHERE token = '$token'");
     $db->query("DELETE FROM users_token_m WHERE token = '$token'");
 
     return [

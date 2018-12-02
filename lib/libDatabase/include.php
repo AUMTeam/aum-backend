@@ -34,7 +34,7 @@ class SQLite3DatabaseWrapper extends DatabaseWrapper{
     public function __construct(string $filename, array $config = []){
         if(!class_exists('SQLite3'))
             throw new Exception("SQLite3 library not enabled.");
-
+        
         $this->mode = 1;
 
         if(isset($config['read_only']) && $config['read_only']) 

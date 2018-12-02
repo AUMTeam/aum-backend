@@ -6,7 +6,7 @@
  * Time: 15:11
  */
 
-$version = "0.10b";
+$version = "0.12b";
 
 date_default_timezone_set('Europe/Rome');
 
@@ -15,12 +15,13 @@ header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encodi
 header("Content-Encoding: gzip");
 
 //Import important libraries
-include_once "./lib/libDatabase/include.php";
-include_once "./lib/libExceptionRequest/include.php";
-include_once "./lib/libPrintDebug/PrintDebug.php";
-include_once "./lib/libUserInfo/include.php";
-include_once "./lib/libSalt/include.php";
-include_once "./lib/libList/include.php";
+include_once __DIR__ . "/lib/libDatabase/include.php";
+include_once __DIR__ . "/lib/libExceptionRequest/include.php";
+include_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
+
+//small libs for actions
+include_once __DIR__ . "/lib/libList/include.php";
+include_once __DIR__ . "/lib/libUserInfo/include.php";
 
 //Import configuration data
 include_once "./config.php";
@@ -122,10 +123,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         module_action_got:
 
         if(!isset($request['request_data']) or is_null($request['request_data'])){
-            //$addon = "";
-            //if(is_null($request['request_data']))
-                //$addon = " | Actual: " . json_encode($request['request_data']);
-            //throw new InvalidRequestException("Request data can't be left blank$addon");
+            //Preparing an empty object as default request
             $request['request_data'] = [];
         }
 
@@ -153,6 +151,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             }
         }
 
+        //Saving the token on somewhere more easy to retreive later
         $token = $headers['X-Auth-Header'];
 
         bypass_header_check:
@@ -183,18 +182,20 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         //Get the response you need
         $response = $exec($request_data, $data_init);
 
+        //Handling token expiration starts here:
         if(isset($token) || isset($response['response_data']['token'])){
             //Take the new generated token if you generated one
             if(isset($response['response_data']['token']))
                 $token = $response['response_data']['token'];
             //Write the new token expire
             if($printDebug->isDebug()) // DEBUG PURPOSE ONLY
-                $new_expire = time() + (60 * 30); //Valid for one minute for debugging multiple timeout
+                $new_expire = time() + (60 * 30); //Valid for 30 minutes for debugging multiple timeout
             else
                 $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
             $db->query("UPDATE users_token_m SET token_expire = $new_expire WHERE token = '$token'");
 
-            header("AUM-Session-Expire", date("Y-m-d H:i:s", $new_expire));
+            //Token expire time (only for debug purposes)
+            if($printDebug->isDebug()) header("AUM-Session-Expire", date("Y-m-d H:i:s", $new_expire));
         }
 
     }catch (ExceptionRequest $invalidRequestException){

@@ -18,7 +18,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
         case "commit":
         case "COMMIT":
             $data = $db->query(
-            "SELECT users_m.username, commit_m.*
+            "SELECT users_m.username, users_m.name, commit_m.*
              FROM commit_m, users_m
              WHERE commit_m.author_user_id = users_m.user_id
              ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}"
@@ -31,7 +31,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
             if($data['sort']['parameter'] == "timestamp")
                 $data['sort']['parameter'] = "request_id";
             $data = $db->query(
-            "SELECT users_m.username, requests_m.*
+            "SELECT users_m.username, users_m.name, requests_m.*
              FROM requests_m, users_m
              WHERE requests_m.requester = users_m.user_id
              ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}"
@@ -72,7 +72,8 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
             'approval_status' => $entry['is_approved'],
             'author' => [
                 'user_id' => $entry[$author],
-                'username' => $entry['username']
+                'username' => $entry['username'],
+                'name' => $entry['name']
             ]
         ];
 
