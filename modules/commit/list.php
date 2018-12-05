@@ -35,6 +35,28 @@ $exec = function (array $data, array $data_init) : array {
 
     if(!isset($data['sort']['parameter']))
         $data['sort']['parameter'] = "timestamp";
+    else{
+        $data['sort']['parameter'] = strtolower($data['sort']['parameter']);
+        switch ($data['sort']['parameter']){
+            case "id":
+                $data['sort']['parameter'] = "commit_id";
+                break;
+            case "description":
+                $data['sort']['parameter'] = "description";
+                break;
+            case "timestamp":
+                $data['sort']['parameter'] = "timestamp";
+                break;
+            case "author":
+                $data['sort']['parameter'] = "author_user_id";
+                break;
+            case "approval_status":
+                $data['sort']['parameter'] = "is_approved";
+                break;
+            default:
+                throw new InvalidRequestException("Invalid sort parameter");
+        }
+    }
 
     return [
         "response_data" => get_list_data("commit", $data, $db),

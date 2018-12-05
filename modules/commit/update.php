@@ -26,8 +26,8 @@ $exec = function (array $data, array $data_init) : array {
     $data = $db->query("SELECT MAX(timestamp) as latest_timestamp, COUNT(commit_id) as amount_commit FROM commit_m");
 
     $out = [
-        "commit_count" => $data[0]['amount_commit'],
-        "latest_commit_timestamp" => strtotime($data[0]['latest_timestamp']),
+        "count" => $data[0]['amount_commit'],
+        "latest_update_timestamp" => strtotime($data[0]['latest_timestamp']),
         //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit_m WHERE '$time' < commit_m.timestamp")[0]['new_commit']
     ];
 

@@ -15,7 +15,7 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['sort']))
         $data['sort'] = [
             'order' => "DESC",
-            'parameter' => "timestamp"
+            'parameter' => "request_id"
         ];
 
     if(!isset($data['limit']))
@@ -29,6 +29,25 @@ $exec = function (array $data, array $data_init) : array {
 
     if(!isset($data['sort']['parameter']))
         $data['sort']['parameter'] = "timestamp";
+    else{
+        $data['sort']['parameter'] = strtolower($data['sort']['parameter']);
+        switch ($data['sort']['parameter']){
+            case "id":
+                $data['sort']['parameter'] = "request_id";
+                break;
+            case "description":
+                $data['sort']['parameter'] = "description";
+                break;
+            case "author":
+                $data['sort']['parameter'] = "requester";
+                break;
+            case "approval_status":
+                $data['sort']['parameter'] = "is_approved";
+                break;
+            default:
+                throw new InvalidRequestException("Invalid sort parameter");
+        }
+    }
 
     return [
         "response_data" => get_list_data("request", $data, $db),
