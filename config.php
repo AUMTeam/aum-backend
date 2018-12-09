@@ -7,8 +7,8 @@
  */
 
 //DB mode (SQLite3 or MySQL)
-$db_usage = "SQLITE3"; //Uncomment this for SQLite3 usage
-//$db_mode = "MYSQL"; //Uncomment this for MYSQL usage
+//$db_usage = "SQLITE3"; //Uncomment this for SQLite3 usage
+$db_usage = "MYSQL"; //Uncomment this for MYSQL usage
 
 //SQLite3 mode DB name
 $sqlite3_name = "./db/main.db_";
@@ -18,7 +18,7 @@ $config = [
     'server' => "",
     'username' => "",
     'password' => "",
-    'database' => "my_aum"
+    'db_name' => "my_aum"
 ];
 
 //Flag for debug/release mode

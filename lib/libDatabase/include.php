@@ -95,7 +95,7 @@ class MySQLDatabaseWrapper extends DatabaseWrapper{
     public function query(string $query){
         //When a query is not a SELECT, just do return exec
         if(stripos($query, 'SELECT') === false)
-			return $this->handler->exec($query);
+			return $this->handler->query($query);
 			
 		$result = $this->handler->query($query);
 			

@@ -18,10 +18,10 @@ $exec = function (array $data, array $data_init) : array {
 
     global $db;
 
-    if(!isset($data['latest_commit_timestamp']))
-        throw new InvalidRequestException("latest_commit_timestamp cannot be blank", 3001);
+    if(!isset($data['latest_update_timestamp']))
+        throw new InvalidRequestException("latest_update_timestamp cannot be blank", 3001);
 
-    $time = $data['latest_commit_timestamp'];
+    $time = $data['latest_update_timestamp'];
 
     $data = $db->query("SELECT MAX(timestamp) as latest_timestamp, COUNT(request_id) as amount_request FROM requests_m");
 
