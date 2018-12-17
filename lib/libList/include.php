@@ -77,9 +77,6 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db){
             ]
         ];
 
-        if(!is_null($temp['description']))
-            $temp['description'] = base64_decode($temp['description']);
-
         $out['list'][] = $temp;
     }
 

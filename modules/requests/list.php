@@ -15,7 +15,7 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['sort']))
         $data['sort'] = [
             'order' => "DESC",
-            'parameter' => "request_id"
+            'parameter' => "id"
         ];
 
     if(!isset($data['limit']))
@@ -28,7 +28,7 @@ $exec = function (array $data, array $data_init) : array {
         $data['sort']['order'] = "DESC";
 
     if(!isset($data['sort']['parameter']))
-        $data['sort']['parameter'] = "timestamp";
+        $data['sort']['parameter'] = "request_id";
     else{
         $data['sort']['parameter'] = strtolower($data['sort']['parameter']);
         switch ($data['sort']['parameter']){
