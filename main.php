@@ -14,6 +14,32 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
 header("Content-Encoding: gzip");
 
+//Fatal error handling
+function envi_error_catcher($errno, $errstr, $errfile, $errline) {
+
+    global $printDebug;
+
+    $out = [
+        "message" => "A Fatal error was triggered from server."
+    ];
+
+    //Detailed message error on response in case of debug mode
+    if($printDebug->isDebug()){
+        $out['dev_message'] = [
+            "error_number" => $errno,
+            "error_string" => $errstr,
+            "error_line" => $errline,
+            "error_file" => $errfile,
+            "error_message" => "Custom error: [$errno] $errstr. Error on line $errline in $errfile"
+        ];
+    }
+
+    echo json_encode($out);
+
+}
+
+set_error_handler("envi_error_catcher", E_ALL|E_STRICT);
+
 //Import important libraries
 include_once __DIR__ . "/lib/libDatabase/include.php";
 include_once __DIR__ . "/lib/libExceptionRequest/include.php";
@@ -130,15 +156,20 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         //Saving data on easy variables
         $request_data = $request['request_data'];
 
-        //Checks if token is on the header
+        //Getting all headers from request
         $headers = getallheaders();
+
+        //Ignoring token check only when special entrypoints are called
+        if(($module == "auth" and $action == "login") or ($module == "data") ){
+            $token = null;
+            //The only action which token is not needed
+            goto bypass_header_check;
+        }
+
+        //Checks if token is on the header
         if(!isset($headers['X-Auth-Header']))
-            if(($module == "auth" and $action == "login") or ($module == "data") )
-                //The only action which token is not needed
-                goto bypass_header_check;
-            else
-                //No token found
-                throw new NoTokenException("Token can't be omitted here");
+            //No token found
+            throw new NoTokenException("Token can't be omitted here");
         else{
             //Checks if token is active or valid
             $result = $db->query("SELECT token_expire FROM users_token_m WHERE token = '{$headers['X-Auth-Header']}'");
@@ -147,7 +178,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
 
             if(time() > $result[0]['token_expire']){
                 $db->query("DELETE FROM users_token_m WHERE token = '{$headers['X-Auth-Header']}'");
-                throw new InvalidTokenException("Token is not valid anymore. Please remake login. " . $printDebug->getDebugString($result[0]['token_expire']));
+                throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
             }
         }
 
