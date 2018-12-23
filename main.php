@@ -6,7 +6,11 @@
  * Time: 15:11
  */
 
-$version = "0.12b";
+$version = "0.20b";
+$warnings = [];
+
+if(!file_exists(__DIR__ . "/log/"))
+    mkdir(__DIR__ . "/log/");
 
 date_default_timezone_set('Europe/Rome');
 
@@ -14,31 +18,12 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
 header("Content-Encoding: gzip");
 
-//Fatal error handling
-function envi_error_catcher($errno, $errstr, $errfile, $errline) {
+include_once __DIR__ . "/lib/libCatcher/include.php";
 
-    global $printDebug;
-
-    $out = [
-        "message" => "A Fatal error was triggered from server."
-    ];
-
-    //Detailed message error on response in case of debug mode
-    if($printDebug->isDebug()){
-        $out['dev_message'] = [
-            "error_number" => $errno,
-            "error_string" => $errstr,
-            "error_line" => $errline,
-            "error_file" => $errfile,
-            "error_message" => "Custom error: [$errno] $errstr. Error on line $errline in $errfile"
-        ];
-    }
-
-    echo json_encode($out);
-
-}
-
-set_error_handler("envi_error_catcher", E_ALL|E_STRICT);
+register_shutdown_function("envi_shutdown_catcher");
+set_error_handler("envi_error_catcher", E_STRICT);    //Catch on PHP Fatal error
+set_error_handler("envi_warning_catcher", E_WARNING); //Catch on PHP Warning
+set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
 
 //Import important libraries
 include_once __DIR__ . "/lib/libDatabase/include.php";
@@ -218,11 +203,13 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             //Take the new generated token if you generated one
             if(isset($response['response_data']['token']))
                 $token = $response['response_data']['token'];
+
             //Write the new token expire
             if($printDebug->isDebug()) // DEBUG PURPOSE ONLY
                 $new_expire = time() + (60 * 30); //Valid for 30 minutes for debugging multiple timeout
             else
                 $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
+
             $db->query("UPDATE users_token_m SET token_expire = $new_expire WHERE token = '$token'");
 
             //Token expire time (only for debug purposes)
@@ -249,6 +236,10 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             $response['message'] = "Internal Server Error";
         }
     }
+
+    //Get the warnings on a response
+    if(count($warnings) > 0)
+        $response['warnings'] = $warnings;
 
     //Here ends the request with HTTP Code and JSON-ifying of a response
     http_response_code($response['status_code']);
