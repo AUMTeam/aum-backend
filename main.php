@@ -219,8 +219,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
 
             $db->query("UPDATE users_token_m SET token_expire = $new_expire WHERE token = '$token'");
 
-            //Token expire time (only for debug purposes)
-            if($printDebug->isDebug()) header("AUM-Session-Expire", date("Y-m-d H:i:s", $new_expire));
+            if($printDebug->isDebug()) $response['response_data']['debug']['expire'] = $new_expire;
         }
 
     }catch (ExceptionRequest $invalidRequestException){
@@ -246,7 +245,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
 
     //Get the warnings on a response
     if(count($warnings) > 0)
-        $response['warnings'] = $warnings;
+        $response['response_data']['debug']['warnings'] = $warnings;
 
     //Here ends the request with HTTP Code and JSON-ifying of a response
     http_response_code($response['status_code']);
