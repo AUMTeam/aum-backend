@@ -87,7 +87,7 @@ class SQLite3DatabaseWrapper extends DatabaseWrapper{
     }
 
     public function __toString(){
-        return "Database Wrapper : " + $this->getMode();
+        return "Database Wrapper : " . $this->getMode();
     }
 
     public function __destruct() {
@@ -111,7 +111,7 @@ class MySQLDatabaseWrapper extends DatabaseWrapper{
         $this->handler = new mysqli($config['server'], $config['username'], $config['password'], $config['db_name']);
     
         if($this->handler->connect_error)
-            throw new Exception("Connection failed. Follows error: " + $this->handler->connect_error);
+            throw new Exception("Connection failed. Follows error: " . $this->handler->connect_error);
     }
 
     public function query($query){
@@ -127,7 +127,7 @@ class MySQLDatabaseWrapper extends DatabaseWrapper{
 			
 		if($result == false)
             //return false;
-            throw new Exception($this->handler->lastErrorMsg());
+            throw new Exception($this->handler->error);
 
 		$out = [];
 			
@@ -138,7 +138,7 @@ class MySQLDatabaseWrapper extends DatabaseWrapper{
     }
 
     public function __toString(){
-        return "Database Wrapper : " + $this->getMode();
+        return "Database Wrapper : " . $this->getMode();
     }
 
     public function __destruct() {

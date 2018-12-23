@@ -152,12 +152,19 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
         }
 
         //Checks if token is on the header
-        if(!isset($headers['X-Auth-Header']))
+        if(!isset($headers['X-Auth-Header']) && !isset($headers['x-auth-header']))
             //No token found
-            throw new NoTokenException("Token can't be omitted here");
+            throw new NoTokenException("Token can't be omitted here" . $printDebug->getDebugString(json_encode($headers)));
         else{
+
+            //Saving the token on somewhere more easy to retreive later
+            if(isset($headers['X-Auth-Header']))
+                $token = $headers['X-Auth-Header'];
+            else
+                $token = $headers['x-auth-header'];
+
             //Checks if token is active or valid
-            $result = $db->query("SELECT token_expire FROM users_token_m WHERE token = '{$headers['X-Auth-Header']}'");
+            $result = $db->query("SELECT token_expire FROM users_token_m WHERE token = '{$token}'");
             if(is_bool($result) or count($result) == 0)
                 throw new InvalidTokenException("Token is not valid");
 
