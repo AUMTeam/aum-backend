@@ -8,7 +8,7 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
 
     //One-step token erasing
-    $db->query("DELETE FROM users_token_m WHERE token = '$token'");
+    $db->query("DELETE FROM users_token WHERE token = '$token'");
 
     return [
         "response_data" => [],

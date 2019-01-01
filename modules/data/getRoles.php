@@ -7,7 +7,7 @@ $exec = function (array $data, array $data_init) : array {
     global $db;
 
     //One-step token erasing
-    $data = $db->query("SELECT * FROM roles_m");
+    $data = $db->query("SELECT * FROM roles");
 
     $out = [];
 

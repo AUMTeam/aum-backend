@@ -7,14 +7,14 @@ function getUserData(DatabaseWrapper $db, string $token, array $data = []) : arr
         goto user_id;
     }
     else
-        $user_data = $db->query("SELECT user_id FROM users_token_m WHERE token = '$token'");
+        $user_data = $db->query("SELECT user_id FROM users_token WHERE token = '$token'");
 
     //Don't know if it will be really useful since main checks it but who knows
     if(is_bool($user_data) || is_null($user_data))
         throw new UserNotFoundException("User not found");
 
     user_id:
-    $user_data = $db->query("SELECT user_id, name, role_id, area_id, email FROM users_m WHERE user_id = {$user_data[0]['user_id']}");
+    $user_data = $db->query("SELECT user_id, name, role_id, area_id, email FROM users WHERE user_id = {$user_data[0]['user_id']}");
 
     //Don't know if it will be really useful since main checks it but who knows
     if(is_bool($user_data) || is_null($user_data))
@@ -30,7 +30,7 @@ function getUserData(DatabaseWrapper $db, string $token, array $data = []) : arr
 
     //Obtaining string for 'area' if needed
     if(!is_null($out['area_id']))
-        $out['area_id'] = $db->query("SELECT area_name FROM areas_m WHERE area_id = {$out['area_id']}")[0]['area_name'];
+        $out['area_id'] = $db->query("SELECT area_name FROM areas WHERE area_id = {$out['area_id']}")[0]['area_name'];
 
     //Make a new correct response
     $out = [

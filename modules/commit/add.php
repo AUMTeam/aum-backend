@@ -28,7 +28,7 @@ $exec = function (array $data, array $data_init) : array {
 
     $user_id = getUserData($db, $token)['user_id'];
 
-    $db->query("INSERT INTO commit_m(description, author_user_id) VALUES (\"{$data['description']}\",$user_id)");
+    $db->query("INSERT INTO commit(description, author_user_id) VALUES (\"{$data['description']}\",$user_id)");
 
     return [
         "response_data" => [],

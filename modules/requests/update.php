@@ -17,12 +17,12 @@ $exec = function (array $data, array $data_init) : array {
 
     $time = $data['latest_update_timestamp'];
 
-    $data = $db->query("SELECT MAX(timestamp) as latest_timestamp, COUNT(request_id) as amount_request FROM requests_m");
+    $data = $db->query("SELECT MAX(timestamp) as latest_timestamp, COUNT(request_id) as amount_request FROM requests");
 
     $out = [
         "count" => $data[0]['amount_request'],
         "latest_update_timestamp" => strtotime($data[0]['latest_timestamp']),
-        //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit_m WHERE '$time' < commit_m.timestamp")[0]['new_commit']
+        //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit WHERE '$time' < commit.timestamp")[0]['new_commit']
     ];
 
     $out['updates_found'] = $out['latest_update_timestamp'] > $time;
