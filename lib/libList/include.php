@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 28/11/2018
- * Time: 23:15
- */
 
 function to_int($i) : int {
     return (int) $i;

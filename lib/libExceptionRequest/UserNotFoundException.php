@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/17
- * Time: 15:36
- */
 
 class UserNotFoundException extends ExceptionRequest
 {

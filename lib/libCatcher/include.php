@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 23/12/2018
- * Time: 10:54
- */
 
 include_once "./../../config.php";
 

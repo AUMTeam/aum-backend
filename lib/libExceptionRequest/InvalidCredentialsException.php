@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/12
- * Time: 21:17
- */
 
 class InvalidCredentialsException extends ExceptionRequest
 {

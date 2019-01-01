@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/10
- * Time: 15:26
- */
 
 class InvalidRequestException extends ExceptionRequest {
 

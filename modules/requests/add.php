@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 29/11/2018
- * Time: 20:43
- */
 
 $init = function (array $data) : array { return [
     // Source: https://stackoverflow.com/questions/15737408/php-find-all-occurrences-of-a-substring-in-a-string

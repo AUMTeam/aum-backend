@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/12
- * Time: 19:10
- */
 
 class PrintDebug
 {

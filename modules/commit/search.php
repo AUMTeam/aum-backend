@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 10/12/2018
- * Time: 13:40
- */
 
 $init = function (array $data) : array { return []; };
 

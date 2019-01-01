@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/10
- * Time: 16:32
- */
 
 //DB mode (SQLite3 or MySQL)
 //$db_usage = "SQLITE3"; //Uncomment this for SQLite3 usage

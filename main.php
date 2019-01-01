@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/10
- * Time: 15:11
- */
-
 $version = "0.20b";
 $warnings = [];
 

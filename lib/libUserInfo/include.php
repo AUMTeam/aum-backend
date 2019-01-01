@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 29/11/2018
- * Time: 20:36
- */
 
 function getUserData(DatabaseWrapper $db, string $token, array $data = []) : array {
     //Retreive user data

@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 28/11/2018
- * Time: 23:21
- */
 
 function saltHash(int $user_id, string $username, string $password /** password is already an hash */) : string {
 
