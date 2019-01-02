@@ -7,7 +7,7 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
 
     //Checks fields integrity
-    if(!isset($data['commit_id']))
+    if(!isset($data['id']))
         throw new InvalidRequestException("Commit ID cannot be omitted", 3007);
     if(!isset($data['approve_flag']) || ($data['approve_flag'] != -1 && $data['approve_flag'] != 1))     //1: Approved / -1: Rejected
         throw new InvalidRequestException("Invalid approved flag!", 3007);
@@ -19,13 +19,13 @@ $exec = function (array $data, array $data_init) : array {
         throw new InvalidRequestException("The current user is not authorized to perform this action!", 103, 401);    //TODO: New error code?
 
     //Check if commit_id is valid and whether the commit has already been approved
-    $query = $db->query("SELECT is_approved FROM commit WHERE commit_id={$data['commit_id']}");
+    $query = $db->query("SELECT is_approved FROM commit WHERE commit_id={$data['id']}");
     if (count($query) == 0)
         throw new InvalidRequestException("Commit_id doesn't refer to a valid commit!", 3007);
     else if ($query[0]['is_approved'] != 0)
         throw new InvalidRequestException("Commit already approved!", 3007);
 
-    $db->query("UPDATE commit SET is_approved = {$data['approve_flag']} WHERE commit_id={$data['commit_id']}");
+    $db->query("UPDATE commit SET is_approved = {$data['approve_flag']} WHERE commit_id={$data['id']}");
 
     return [
         "response_data" => [],
