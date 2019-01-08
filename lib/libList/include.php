@@ -42,8 +42,11 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     if(is_float($max_page))
         $max_page = to_int($max_page) + 1;
 
+    //The page count starts from 0: lower the max_page value
+    $max_page = $max_page - 1;
+    
     //Verify if the chosen page number is above the total number of pages: in that case, output the latest available page
-    $page = $req['page'];
+    $page = (int) $req['page'];
     if ($page > $max_page) $page = $max_page;
 
     //Prepopulate the response array
