@@ -1,7 +1,6 @@
 <?php
 
 $init = function (array $data) : array {
-
     global $db;
     global $token;
 
@@ -12,6 +11,8 @@ $init = function (array $data) : array {
 };
 
 $exec = function (array $data, array $data_init) : array {
+    
+    //Return the token's expiration date
     return [
         "response_data" => [
             "token_expire" => $data_init['result'][0]['token_expire']

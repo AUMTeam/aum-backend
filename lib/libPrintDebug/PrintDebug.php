@@ -1,11 +1,12 @@
 <?php
 
-class PrintDebug
-{
+/**
+ * Class used for debug purposes, enabled only in developer builds
+ */
+class PrintDebug {
     private $debug_flag;
 
-    public function __construct(bool $is_debug = false)
-    {
+    public function __construct(bool $is_debug = false) {
         $this->debug_flag = $is_debug;
     }
 

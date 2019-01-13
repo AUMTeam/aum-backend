@@ -1,30 +1,28 @@
 <?php
 
-function getUserData(DatabaseWrapper $db, string $token, array $data = []) : array {
-    //Retreive user data
-    if(isset($data['user_id'])){
-        $user_data[0]['user_id'] = $data['user_id'];
-        goto user_id;
-    }
-    else
-        $user_data = $db->query("SELECT user_id FROM users_token WHERE token = '$token'");
 
-    //Don't know if it will be really useful since main checks it but who knows
+function getUserData(DatabaseWrapper $db, string $token, array $data = []) : array {
+    //Keep selected user_id if it's present, else extract it starting from the token
+    if(isset($data['user_id']))
+        $user_data[0]['user_id'] = $data['user_id'];
+    else
+        $user_data = $db->query("SELECT user_id FROM users_token WHERE token = '$token'");  //FIXME: Duplicated
+
+    //TODO: Needed? (And others)
     if(is_bool($user_data) || is_null($user_data))
         throw new UserNotFoundException("User not found");
 
-    user_id:
+    //Retrive data from the DB
     $user_data = $db->query("SELECT user_id, name, role_id, area_id, email FROM users WHERE user_id = {$user_data[0]['user_id']}");
 
-    //Don't know if it will be really useful since main checks it but who knows
     if(is_bool($user_data) || is_null($user_data))
         throw new UserNotFoundException("User not found");
 
     //Temporary storing
     $out = $user_data[0];
 
+    //Print user roles one by one (FIXME: Will change soon)
     $out['role'] = explode(",",$out['role_id']);
-
     foreach ($out['role'] as $posi => $role)
         $out['role'][$posi] = (int) $role;
 

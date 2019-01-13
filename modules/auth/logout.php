@@ -3,11 +3,10 @@
 $init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-
     global $db;
     global $token;
 
-    //One-step token erasing
+    //Erase the token from the DB
     $db->query("DELETE FROM users_token WHERE token = '$token'");
 
     return [

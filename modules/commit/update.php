@@ -9,14 +9,15 @@ $init = function (array $data) : array { return [
 ]; };
 
 $exec = function (array $data, array $data_init) : array {
-
     global $db;
 
+    //Check parameter presence
     if(!isset($data['latest_update_timestamp']))
         throw new InvalidRequestException("latest_update_timestamp cannot be blank", 3001);
 
     $time = $data['latest_update_timestamp'];
 
+    //Get the last added commit' timestamp (TODO: last_modified)
     $data = $db->query("SELECT MAX(timestamp) as latest_timestamp, COUNT(commit_id) as amount_commit FROM commit");
 
     $out = [
@@ -24,11 +25,8 @@ $exec = function (array $data, array $data_init) : array {
         "latest_update_timestamp" => strtotime($data[0]['latest_timestamp']),
         //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit WHERE '$time' < commit.timestamp")[0]['new_commit']
     ];
-
+    //Boolean condition
     $out['updates_found'] = $out['latest_update_timestamp'] > $time;
-
-    //if($time == $out['commit_latest'])
-        //throw new NotEditedException();
 
     return [
         "response_data" => $out,
