@@ -15,7 +15,7 @@ $exec = function (array $data, array $data_init) : array {
     foreach ($data as $entry)
         $out[] = [
             'area_id' => $entry['area_id'],
-            'area_string' => $entry['area_string']
+            'area_tring' => $entry['area_name']
         ];
 
     return [

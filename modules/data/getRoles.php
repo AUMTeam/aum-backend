@@ -15,7 +15,7 @@ $exec = function (array $data, array $data_init) : array {
     foreach ($data as $entry)
         $out[] = [
             'role_id' => $entry['role_id'],
-            'role_string' => $entry['role_string']
+            'role_string' => $entry['role_name']
         ];
 
     return [

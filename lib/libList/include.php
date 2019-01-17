@@ -12,9 +12,9 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     //The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%
     switch ($type){
         case "commit":
-            $query = "SELECT users.username, users.name, commit.*
-            FROM commit, users
-            WHERE commit.author_user_id = users.user_id AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
+            $query = "SELECT users.username, users.name, commits.*
+            FROM commits, users
+            WHERE commits.author_user_id = users.user_id AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
             
             //If the user is part of the tech area or is a programmer, select only users in the same area
             if ($cur_user_role[0] == 2 || $cur_user_role[4]) {  // Tech Area
@@ -27,18 +27,17 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
             $data = $db->query($query);
 
             $id = "commit_id";
-            $author = "author_user_id";
             break;
         case "request":
             $query = "SELECT users.username, users.name, requests.*
             FROM requests, users
-            WHERE requests.requester = users.user_id AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'
+            WHERE requests.author_user_id = users.user_id AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'
             ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
             //If the user is part of the tech area or is a programmer, select only users in the same area
             if ($cur_user_role[0] == 2 || $cur_user_role[4]) {  // Tech Area
                 $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
-                $query = $query . " AND (SELECT area_id FROM users WHERE requester = user_id) = {$area}";
+                $query = $query . " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
             }
 
             //Append the last part of the query and execute it
@@ -46,7 +45,6 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
             $data = $db->query($query);
             
             $id = "request_id";
-            $author = "requester";
             break;
         default:
             throw new Exception("Impossible to use the list");
@@ -87,7 +85,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
             'timestamp' => strtotime($entry['timestamp']),
             'approval_status' => $entry['is_approved'],
             'author' => [
-                'user_id' => $entry[$author],
+                'user_id' => $entry['author_user_id'],
                 'username' => $entry['username'],
                 'name' => $entry['name']
             ]
