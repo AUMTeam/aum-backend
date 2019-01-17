@@ -6,7 +6,7 @@ $init = function (array $data) : array {
 
     //Take token validity
     return [
-        "result" => $db->query("SELECT token_expire FROM users_tokens WHERE token = '$token'")
+        "result" => $db->query("SELECT token_expire FROM users_tokens_v2 WHERE token = '$token'")
     ];
 };
 

@@ -18,7 +18,7 @@ $exec = function (array $data, array $data_init) : array {
     $time = $data['latest_update_timestamp'];
 
     //Get the last added request' timestamp (TODO: commit count)
-    $data = $db->query("SELECT MAX(modified_date) as latest_timestamp, COUNT(request_id) as amount_request FROM requests");
+    $data = $db->query("SELECT MAX(modified_date) as latest_timestamp, COUNT(request_id) as amount_request FROM requests_v2");
 
     $out = [
         "count" => $data[0]['amount_request'],

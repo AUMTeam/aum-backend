@@ -157,12 +157,12 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
                 $token = $headers['x-auth-header'];
 
             //Checks if token is active or valid
-            $result = $db->query("SELECT token_expire FROM users_tokens WHERE token = '{$token}'");
+            $result = $db->query("SELECT token_expire FROM users_tokens_v2 WHERE token = '{$token}'");
             if(is_bool($result) or count($result) == 0)
                 throw new InvalidTokenException("Token is not valid");
 
             if(time() > $result[0]['token_expire']){
-                $db->query("DELETE FROM users_tokens WHERE token = '{$headers['X-Auth-Header']}'");
+                $db->query("DELETE FROM users_tokens_v2 WHERE token = '{$headers['X-Auth-Header']}'");
                 throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
             }
         }
@@ -210,7 +210,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')){
             else
                 $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
 
-            $db->query("UPDATE users_tokens SET token_expire = $new_expire WHERE token = '$token'");
+            $db->query("UPDATE users_tokens_v2 SET token_expire = $new_expire WHERE token = '$token'");
 
             if($printDebug->isDebug()) $response['response_data']['debug']['expire'] = $new_expire;
         }

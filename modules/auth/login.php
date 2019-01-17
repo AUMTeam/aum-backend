@@ -27,13 +27,13 @@ $exec = function (array $data, array $data_init) : array {
 
     #$db->query("UPDATE users SET token = '$token' WHERE user_id = $user_id");
     //Get the current user's token list
-    $tokens = $db->query("SELECT token, token_expire FROM users_tokens WHERE user_id = $user_id ORDER BY token_expire ASC");
+    $tokens = $db->query("SELECT token, token_expire FROM users_tokens_v2 WHERE user_id = $user_id ORDER BY token_expire ASC");
 
     //If there are more than 5 tokens, overwrite one of them (max 5 sessions are allowed); else add it to the list
     if(count($tokens) >= 5)
-        $db->query("UPDATE users_tokens SET token = '$token' WHERE token_expire = {$tokens[0]['token_expire']} AND user_id = $user_id");
+        $db->query("UPDATE users_tokens_v2 SET token = '$token' WHERE token_expire = {$tokens[0]['token_expire']} AND user_id = $user_id");
     else
-        $db->query("INSERT INTO users_tokens(user_id,token) VALUES($user_id,'$token')");
+        $db->query("INSERT INTO users_tokens_v2(user_id,token) VALUES($user_id,'$token')");
 
     return [
         "response_data" => [
