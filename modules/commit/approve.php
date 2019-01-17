@@ -19,13 +19,17 @@ $exec = function (array $data, array $data_init) : array {
         throw new InvalidRequestException("The current user is not authorized to perform this action!", 103, 401);    //TODO: New error code?
 
     //Check if commit_id is valid and whether the commit has already been approved
-    $query = $db->query("SELECT is_approved FROM commit WHERE commit_id={$data['id']}");
+    $query = $db->query("SELECT is_approved FROM commits WHERE commit_id={$data['id']}");
     if (count($query) == 0)
         throw new InvalidRequestException("Commit_id doesn't refer to a valid commit!", 3007);
     else if ($query[0]['is_approved'] != 0)
         throw new InvalidRequestException("Commit already approved!", 3007);
 
-    $db->query("UPDATE commit SET is_approved = {$data['approve_flag']} WHERE commit_id={$data['id']}");
+    $approvation_comment = NULL;
+    if (isset($data['approvation_comment'])) $approvation_comment = $data['approvation_comment'];
+
+
+    $db->query("UPDATE commits SET is_approved = {$data['approve_flag']}, approvation_comment = {$approvation_comment}, approver_user_id={$user_id}  WHERE commit_id={$data['id']}");
 
     return [
         "response_data" => [],

@@ -25,7 +25,11 @@ $exec = function (array $data, array $data_init) : array {
     else if ($query[0]['is_approved'] != 0)
         throw new InvalidRequestException("Commit already approved!", 3007);
 
-    $db->query("UPDATE requests SET is_approved = {$data['approve_flag']} WHERE request_id={$data['id']}");
+        $approvation_comment = NULL;
+        if (isset($data['approvation_comment'])) $approvation_comment = $data['approvation_comment'];
+    
+    
+        $db->query("UPDATE requests SET is_approved = {$data['approve_flag']}, approvation_comment = {$approvation_comment}, approver_user_id={$user_id}  WHERE commit_id={$data['id']}");
 
     return [
         "response_data" => [],
