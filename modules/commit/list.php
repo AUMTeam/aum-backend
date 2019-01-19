@@ -23,7 +23,7 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['sort']) || !isset($data['sort']['parameter']))
         $data['sort'] = [
             'order' => "DESC",
-            'parameter' => "timestamp"
+            'parameter' => "creation_date"
         ];
     //Else convert the parameter name from the API one to the DB one
     else {
@@ -61,10 +61,12 @@ $exec = function (array $data, array $data_init) : array {
     //Convert the attribute name from the API one to the DB one
     $data['filter']['attribute'] = translateName($data['filter']['attribute']);
 
-    $user_id = getUserData($db, $token)['user_id'];
+    $user_info = getUserData($db, $token);
+    $user_id = $user_info['user_id'];
+    $role_id = $user_info['role'];
 
     return [
-        "response_data" => get_list_data("commit", $data, $db, $user_id),
+        "response_data" => get_list_data("commit", $data, $db, $user_id, $role_id),
         "status_code" => 200,
     ];
 };
@@ -76,7 +78,7 @@ function translateName($attribute) : string {
         case "description":
             return "description";
         case "timestamp":
-            return "timestamp";
+            return "creation_date";
         case "author":
             return "author_user_id";
         case "approval_status":
