@@ -1,10 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/10
- * Time: 16:32
- */
+
+//Version of the server
+$version = "0.30b";
 
 //DB mode (SQLite3 or MySQL)
 //$db_usage = "SQLITE3"; //Uncomment this for SQLite3 usage
@@ -22,4 +19,7 @@ $config = [
 ];
 
 //Flag for debug/release mode
-$debug_mode = true;
+$debug_mode = false;
+
+//Flag for maintenance mode
+$maintenance_state = false;

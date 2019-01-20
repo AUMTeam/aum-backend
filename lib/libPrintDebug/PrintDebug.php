@@ -1,17 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/12
- * Time: 19:10
- */
 
-class PrintDebug
-{
+/**
+ * Class used for debug purposes, enabled only in developer builds
+ */
+class PrintDebug {
     private $debug_flag;
 
-    public function __construct(bool $is_debug = false)
-    {
+    public function __construct(bool $is_debug = false) {
         $this->debug_flag = $is_debug;
     }
 

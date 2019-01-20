@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: User
- * Date: 29/11/2018
- * Time: 20:19
- */
 
 $init = function (array $data) : array { return [
     // Source: https://stackoverflow.com/questions/15737408/php-find-all-occurrences-of-a-substring-in-a-string
@@ -34,7 +28,7 @@ $exec = function (array $data, array $data_init) : array {
 
     $user_id = getUserData($db, $token)['user_id'];
 
-    $db->query("INSERT INTO commit_m(description, author_user_id) VALUES (\"{$data['description']}\",$user_id)");
+    $db->query("INSERT INTO commit(description, author_user_id) VALUES (\"{$data['description']}\",$user_id)");
 
     return [
         "response_data" => [],

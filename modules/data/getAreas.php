@@ -1,26 +1,21 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Utente
- * Date: 2018/10/25
- * Time: 21:07
- */
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Get the list of areas present in the DB (id + desc)
+ */
 $exec = function (array $data, array $data_init) : array {
-
     global $db;
 
-    //One-step token erasing
-    $data = $db->query("SELECT * FROM areas_m");
+    $data = $db->query("SELECT * FROM areas");
 
     $out = [];
 
     foreach ($data as $entry)
         $out[] = [
             'area_id' => $entry['area_id'],
-            'area_string' => $entry['area_string']
+            'area_tring' => $entry['area_name']
         ];
 
     return [
