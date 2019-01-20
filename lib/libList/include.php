@@ -82,6 +82,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
             'id' => $entry[$id],
             'description' => $entry['description'],
             'timestamp' => strtotime($entry['creation_date']),
+            'update_timestamp' => strtotime($entry['modified_date']),
             'approval_status' => $entry['is_approved'],
             'author' => [
                 'user_id' => $entry['author_user_id'],
