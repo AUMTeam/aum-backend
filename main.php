@@ -12,7 +12,7 @@ header("Content-Encoding: gzip");
 
 include_once __DIR__ . "/lib/libCatcher/include.php";
 
-register_shutdown_function("envi_shutdown_catcher");
+//register_shutdown_function("envi_shutdown_catcher");
 set_error_handler("envi_error_catcher", E_STRICT);    //Catch on PHP Fatal error
 set_error_handler("envi_warning_catcher", E_WARNING); //Catch on PHP Warning
 set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
