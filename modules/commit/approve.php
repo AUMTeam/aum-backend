@@ -19,7 +19,7 @@ $exec = function (array $data, array $data_init) : array {
 
 
     if (!in_array(2, $role_id))
-        throw new InvalidRequestException("The current user is not authorized to perform this action $role_id $role_id[0]!", 103, 401);    //TODO: New error code?
+        throw new InvalidRequestException("The current user is not authorized to perform this action!", 103, 401);    //TODO: New error code?
 
     //Check if commit_id is valid and whether the commit has already been approved
     $query = $db->query("SELECT is_approved FROM commits WHERE commit_id={$data['id']}");
