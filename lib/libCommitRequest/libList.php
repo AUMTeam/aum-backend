@@ -1,7 +1,7 @@
 <?php
 
-//Passing by reference!
-function validateInput(&$data) {
+//Validate the user input
+function validateInput(&$data) {    //Passing by reference!
     //Check is fundamental fields are present
     if(!isset($data['limit']))
         throw new InvalidRequestException("limit cannot be blank", 3000);
@@ -10,13 +10,13 @@ function validateInput(&$data) {
         throw new InvalidRequestException("page cannot be blank", 3000);
 
     //If no sorting option was chosen, sort the commits by timestamp (descending)
-    if(!isset($data['sort']) || !isset($data['sort']['parameter']))
+    if(!isset($data['sort']) || !isset($data['sort']['parameter'])) {
         $data['sort'] = [
             'order' => "DESC",
             'parameter' => "modified_date"
         ];
     //Else convert the parameter name from the API one to the DB one
-    else {
+    } else {
         $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']));
         if(!isset($data['sort']['order'])) $data['sort']['order'] = "DESC";
     }
@@ -42,12 +42,13 @@ function validateInput(&$data) {
 
         if (strlen($data['filter']['valueMatches']) == 0)
             throw new InvalidRequestException("filter parameter must have at least length one byte");
+        else
+            //Convert the attribute name from the API one to the DB one
+            $data['filter']['attribute'] = translateName($data['filter']['attribute']);
     }
-
-    //Convert the attribute name from the API one to the DB one
-    $data['filter']['attribute'] = translateName($data['filter']['attribute']);
 }
 
+//Translates the names from the API one to the DB one
 function translateName($attribute) : string {
     switch($attribute) {
         case "id":
@@ -60,6 +61,8 @@ function translateName($attribute) : string {
             return "modified_date";
         case "author":
             return "author_user_id";
+        case "reviewrer":
+            return "approver_user_id";
         case "approval_status":
             return "is_approved";
         default:
@@ -68,12 +71,9 @@ function translateName($attribute) : string {
 }
 
 function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user_id, $cur_user_role) {
-    $req = $data;
     $type = strtolower($type);
-    $msg = is_int($cur_user_role[0]);
 
     //Execute the query based on $type parameter
-
     switch ($type) {
         case "commit":
             $id = "commit_id";
@@ -87,52 +87,63 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
 
     //The real table names are actually plural
     $table = $type . "s";
+    //Calculate the starting commit ID (number of commits per page * number of page)
+    $startID = $data['limit'] * $data['page'];
 
     //Base query
     $query = "SELECT users.username, users.name, $table.*
         FROM $table, users
-        WHERE $table.author_user_id = users.user_id";
+        WHERE $id>=$startID AND $table.author_user_id = users.user_id"; //Ex: WHERE commits.commit_id>=0
 
-    //Filter parameters set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
+    //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
     if (isset($data['filter']['attribute']))
-        $query .= "AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
+        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
 
     //If the user is part of the tech area (2) or is a programmer (4), select only users in the same area
-    if ($cur_user_role[0] == 2 || $cur_user_role[0] == 4) {
+    if (in_array(2, $cur_user_role) || in_array(4, $cur_user_role)) {
         $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
-        $query = $query . " AND (SELECT area_id FROM users WHERE author_id = user_id) = {$area}";
+        $query .= " AND (SELECT area_id FROM users WHERE author_id = user_id) = {$area}";
     }
-    //Append the last part of the query and executes it
+    //Order part
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
-    $data = $db->query($query);
+    //Limit the query to the number of elements requested
+    $query .= " LIMIT {$data['limit']}";
 
-    
+    $queryResult = $db->query($query);
+
+
+    //Get the total number of commits
+    $query = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
+    $queryIniz = substr($query, 0, strpos($query, "WHERE") + 6);    //Strip 'commit_id=$startID' part
+    $queryFin = substr($query, strpos($query, "AND") + 3);
+
+    $countQuery = "SELECT COUNT(*) AS 'count' " . $queryIniz . $queryFin;
+    $countTotal = (int) $db->query($countQuery)[0]['count'];
+
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
-    $max_page = count($data) / $req['limit'];
+    $max_page = $countTotal / $data['limit'];
     if(is_float($max_page))
         $max_page = (int) $max_page + 1;
 
-    //The page count starts from 0: lower the max_page value
+    //The page count starts from 0: lower the max_page value by one
     $max_page = $max_page - 1;
     
     //Verify if the chosen page number is above the total number of pages: in that case, output the latest available page
-    $page = (int) $req['page'];
+    $page = (int) $data['page'];
     if ($page > $max_page) $page = $max_page;
 
     //Prepopulate the response array
     $out = [
-        'count' => 0,
-        'count_total' => count($data),
+        'count' => count($queryResult),
+        'count_total' => $countTotal,
         'list' => [],
         'page' => $page,
         'page_total' => $max_page,
-        'msg' => $msg
     ];
 
-    //Populate the response array with the commit elements of the chosen page
-    for ($i=($page * $req['limit']); $i<(($page+1) * $req['limit']); $i++) {
-        $entry = $data[$i];
+    //Populate the response array with each commit element of the chosen page
+    foreach ($queryResult as $entry) {
 
         if ($entry == NULL)
             break;
@@ -152,8 +163,6 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
 
         $out['list'][] = $temp;
     }
-
-    $out['count'] = count($out['list']);
 
     return $out;
 }
