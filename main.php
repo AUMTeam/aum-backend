@@ -23,7 +23,7 @@ include_once __DIR__ . "/lib/libExceptionRequest/include.php";
 include_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
 
 //small libs for actions
-include_once __DIR__ . "/lib/libList/include.php";
+//include_once __DIR__ . "/lib/libList/include.php";
 include_once __DIR__ . "/lib/libUserInfo/include.php";
 
 //Import configuration data
