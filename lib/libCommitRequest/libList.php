@@ -13,7 +13,7 @@ function validateInput(&$data) {    //Passing by reference!
     if(!isset($data['sort']) || !isset($data['sort']['parameter'])) {
         $data['sort'] = [
             'order' => "DESC",
-            'parameter' => "modified_date"
+            'parameter' => "approvation_date"
         ];
     //Else convert the parameter name from the API one to the DB one
     } else {
@@ -58,13 +58,17 @@ function translateName($attribute) : string {
         case "timestamp":
             return "creation_date";
         case "update_timestamp":
-            return "modified_date";
+            return "approvation_date";
         case "author":
             return "author_user_id";
         case "reviewrer":
             return "approver_user_id";
         case "approval_status":
             return "is_approved";
+        case "component":
+            return "component_id";
+        case "branch":
+            return "branch_id";
         default:
             throw new InvalidRequestException("Invalid parameter '$attribute'");
     }
@@ -91,9 +95,11 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     $startID = $data['limit'] * $data['page'];
 
     //Base query
-    $query = "SELECT users.username, users.name, $table.*
-        FROM $table, users
-        WHERE $id>=$startID AND $table.author_user_id = users.user_id"; //Ex: WHERE commits.commit_id>=0
+    $query = "SELECT author.username as au_username, author.name as au_name,
+        approver.username as ap_username, approver.name as ap_name, $table.*
+        FROM $table, users as author, users as approver
+        WHERE $id>=$startID AND $table.author_user_id = author.user_id 
+        AND $table.approver_user_id = approver.user_id "; //Ex: WHERE commits.commit_id>=0
 
     //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
     if (isset($data['filter']['attribute']))
@@ -102,7 +108,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     //If the user is part of the tech area (2) or is a programmer (4), select only users in the same area
     if (in_array(2, $cur_user_role) || in_array(4, $cur_user_role)) {
         $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
-        $query .= " AND (SELECT area_id FROM users WHERE author_id = user_id) = {$area}";
+        $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
     }
     //Order part
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
@@ -152,12 +158,17 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
             'id' => $entry[$id],
             'description' => $entry['description'],
             'timestamp' => strtotime($entry['creation_date']),
-            'update_timestamp' => strtotime($entry['modified_date']),
+            'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
             'approval_status' => $entry['is_approved'],
             'author' => [
                 'user_id' => $entry['author_user_id'],
-                'username' => $entry['username'],
-                'name' => $entry['name']
+                'username' => $entry['au_username'],
+                'name' => $entry['au_name']
+            ],
+            'approver' => [
+                'user_id' => $entry['approver_user_id'],
+                'username' => $entry['ap_username'],
+                'name' => $entry['ap_name']
             ]
         ];
 
