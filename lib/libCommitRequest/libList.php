@@ -17,7 +17,7 @@ function validateInput(&$data) {    //Passing by reference!
         ];
     //Else convert the parameter name from the API one to the DB one
     } else {
-        $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']));
+        $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $type);
         if(!isset($data['sort']['order'])) $data['sort']['order'] = "DESC";
     }
 
@@ -44,15 +44,15 @@ function validateInput(&$data) {    //Passing by reference!
             throw new InvalidRequestException("filter parameter must have at least length one byte");
         else
             //Convert the attribute name from the API one to the DB one
-            $data['filter']['attribute'] = translateName($data['filter']['attribute']);
+            $data['filter']['attribute'] = translateName($data['filter']['attribute'], $type);
     }
 }
 
 //Translates the names from the API one to the DB one
-function translateName($attribute) : string {
+function translateName($attribute, $type) : string {
     switch($attribute) {
         case "id":
-            return "commit_id";
+            return $type;
         case "description":
             return "description";
         case "timestamp":
