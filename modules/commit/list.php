@@ -14,7 +14,7 @@ $exec = function (array $data, array $data_init) : array {
 
     require_once __DIR__ . "/../../lib/libCommitRequest/libList.php";
 
-    validateInput($data);
+    validateInput($data, "commit");
 
     $user_info = getUserData($db, $token);
     $user_id = $user_info['user_id'];

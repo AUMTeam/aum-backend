@@ -1,7 +1,7 @@
 <?php
 
 //Validate the user input
-function validateInput(&$data) {    //Passing by reference!
+function validateInput(&$data, $type) {    //Passing by reference!
     //Check is fundamental fields are present
     if(!isset($data['limit']))
         throw new InvalidRequestException("limit cannot be blank", 3000);
@@ -52,7 +52,7 @@ function validateInput(&$data) {    //Passing by reference!
 function translateName($attribute, $type) : string {
     switch($attribute) {
         case "id":
-            return $type;
+            return $type . "_id";
         case "description":
             return "description";
         case "timestamp":
@@ -92,14 +92,14 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     //The real table names are actually plural
     $table = $type . "s";
     //Calculate the starting commit ID (number of commits per page * number of page)
-    $startID = $data['limit'] * $data['page'];
+    $offset = $data['limit'] * $data['page'];
 
     //Base query
     $query = "SELECT author.username as au_username, author.name as au_name,
         approver.username as ap_username, approver.name as ap_name, $table.*
         FROM $table, users as author, users as approver
-        WHERE $id>=$startID AND $table.author_user_id = author.user_id 
-        AND $table.approver_user_id = approver.user_id "; //Ex: WHERE commits.commit_id>=0
+        WHERE $table.author_user_id = author.user_id 
+        AND $table.approver_user_id = approver.user_id"; //Ex: WHERE commits.commit_id>=0
 
     //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
     if (isset($data['filter']['attribute']))
@@ -113,18 +113,17 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     //Order part
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
-    //Limit the query to the number of elements requested
-    $query .= " LIMIT {$data['limit']}";
+    //Limit the query from the offset to the number of elements requested
+    $query .= " LIMIT $offset, {$data['limit']}";
 
     $queryResult = $db->query($query);
 
 
-    //Get the total number of commits
-    $query = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
-    $queryIniz = substr($query, 0, strpos($query, "WHERE") + 6);    //Strip 'commit_id=$startID' part
-    $queryFin = substr($query, strpos($query, "AND") + 3);
+    //--Get the total number of commits
+    $countQuery = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
+    $countQuery = substr($countQuery, 0, strpos($countQuery, 'LIMIT'));  //Strip LIMIT part
 
-    $countQuery = "SELECT COUNT(*) AS 'count' " . $queryIniz . $queryFin;
+    $countQuery = "SELECT COUNT(*) AS 'count' " . $countQuery;           //Add COUNT in SELECT
     $countTotal = (int) $db->query($countQuery)[0]['count'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
