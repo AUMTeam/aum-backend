@@ -5,29 +5,27 @@ if(!file_exists(__DIR__ . "/log/"))
     mkdir(__DIR__ . "/log/");
 
 date_default_timezone_set('Europe/Rome');
-
+//Set basic headers
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
 header("Content-Encoding: gzip");
+header("Server-Version: $version");
 
-include_once __DIR__ . "/lib/libCatcher/include.php";
-
+//Set the error reporting system
+require_once __DIR__ . "/lib/libCatcher/include.php";
 //register_shutdown_function("envi_shutdown_catcher");
 set_error_handler("envi_error_catcher", E_STRICT);    //Catch on PHP Fatal error
 set_error_handler("envi_warning_catcher", E_WARNING); //Catch on PHP Warning
 set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
 
 //Import important libraries
-include_once __DIR__ . "/lib/libDatabase/include.php";
-include_once __DIR__ . "/lib/libExceptionRequest/include.php";
-include_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
+require_once __DIR__ . "/lib/libDatabase/include.php";
+require_once __DIR__ . "/lib/libExceptionRequest/include.php";
+require_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
+require_once __DIR__ . "/config.php";
 
 //small libs for actions
-//include_once __DIR__ . "/lib/libList/include.php";
-include_once __DIR__ . "/lib/libUserInfo/include.php";
-
-//Import configuration data
-include_once "./config.php";
+require_once __DIR__ . "/lib/libUserInfo/include.php";
 
 //Initializing debug mode
 $printDebug = new PrintDebug($debug_mode);
@@ -35,34 +33,27 @@ $printDebug = new PrintDebug($debug_mode);
 //GZIP compression
 if(!ob_start("ob_gzhandler")) ob_start();
 
-//Reporting server version
-header("Server-Version: $version");
-
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
+    //OPTIONS Method -> communicate the allowed methods
     if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-        //Necessary to comunicate the allowed methods through the OPTIONS method
         http_response_code(200);
         header("Access-Control-Allow-Methods: POST, OPTIONS");
         $printDebug->printDebug("OPTIONS MESSAGE SENT\n");
-        ob_end_flush();
-        exit;
+    } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        //Other Methods (typically GET) -> show an easter egg if in debug mode
+        http_response_code(405);
+        $printDebug->printDebug('
+        <html>
+            <head>
+                <title>405 Method NOT Supported - AUM</title>
+            </head>
+            <body>
+                <img style="width:100%; height:auto;" src="/img/not_post_req.jpg">
+            </body>
+        </html>
+        ');
     }
-    //Easter egg for whom don't use POST method for access
-    http_response_code(405);
-    $printDebug->printDebug('
-    <html>
-        <head>
-            <style>
-                img { width: 100%; height: auto; }
-            </style>
-        </head>
-        <body>
-            <img src="/img/not_post_req.jpg">
-        </body>
-    </html>
-    ');
-    ob_end_flush();
-    exit;
+//POST Method
 } else {
     header("Content-Type: application/json");
 
@@ -76,7 +67,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
         $response = NULL;
         $db = NULL;
 
-        try{
+        try {
             //Set up database connection
             if($db_usage == "SQLITE3")
                 //SQLite3 usage
@@ -90,6 +81,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 //Invalid string
                 throw new Exception("Invalid DB setup");
 
+            //**JSON Parsing**
             //Decodes JSON if present
             $request = json_decode(file_get_contents("php://input"), true);
 
@@ -97,81 +89,73 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             if($request == null or $request == false)
                 throw new InvalidRequestException("Request is not a JSON");
 
-            //BETA: Module/Action on URL
+
+            //Module and Action can be specified either in the URL (main.php/module/action) or JSON elements (module=; action=)
+            $module = null;
+            $action = null;
+            $token = null;
+            $request_data = [];
+
+            //#1: Handle module and action on URL
             $url_data = explode("/", $_SERVER['REQUEST_URI']);
-            if(count($url_data) >= 4)
-            {
+            if(count($url_data) >= 4 + (count(explode("/", __DIR__)) - 3)) {    //Base dir is '/membri/aum/'. The 'count' thing is done is cases where main.php is not in the root dir
                 $main_posi = 0;
 
                 while($url_data[$main_posi] !== "main.php")
-                    if($url_data[$main_posi] !== "main.php")
-                        $main_posi++;
-                    else
-                        break;
+                    $main_posi++;
 
-                $module = $url_data[$main_posi+1];
-                $action = $url_data[$main_posi+2];
-                goto module_action_got;
+            //Save data on variables
+            $module = $url_data[$main_posi+1];
+            $action = $url_data[$main_posi+2];
+
+            //#2: Handle module and action in JSON (or fail if they're not present)
+            } else {
+                //Checks if fields are empty or absent
+                if(!isset($request['module']) or $request['module'] == "")
+                    throw new InvalidRequestException("Module can't be left blank");
+                if(!isset($request['action']) or $request['action'] == "")
+                    throw new InvalidRequestException("Action can't be left blank");
+
+                //Save data on variables
+                $module = $request['module'];
+                $action = $request['action'];
             }
 
-            //Checks if fields are empty or absent
-            if(!isset($request['module']) or $request['module'] == "")
-                throw new InvalidRequestException("Module can't be left blank");
-
-            if(!isset($request['action']) or $request['action'] == "")
-                throw new InvalidRequestException("Action can't be left blank");
-
-            //Saving data on easy variables
-            $module = $request['module'];
-            $action = $request['action'];
-
-            module_action_got:
-
+            //Save the payload if present
             if(!isset($request['request_data']) or is_null($request['request_data'])){
                 //Preparing an empty object as default request
                 $request['request_data'] = [];
             }
-
-            //Saving data on easy variables
             $request_data = $request['request_data'];
 
             //Getting all headers from request
             $headers = getallheaders();
 
+            //Saving the token on somewhere more easy to retreive later
+            if(isset($headers['X-Auth-Header']))
+                $token = $headers['X-Auth-Header'];
+            else if(isset($headers['X-Auth-Header']))
+                $token = $headers['x-auth-header'];
+
+
             //Ignoring token check only when special entrypoints are called
-            if(($module == "auth" and $action == "login") or ($module == "data") ){
-                $token = null;
-                //The only action which token is not needed
-                goto bypass_header_check;
-            }
+            if(!(($module == "auth" and $action == "login") or ($module == "data"))) {
+                //Checks if token is on the header
+                if($token == null)
+                    //No token found
+                    throw new NoTokenException("Token can't be omitted here");
+                else {
+                    //Checks if token is active or valid
+                    $result = $db->query("SELECT token_expire FROM users_tokens WHERE token = '{$token}'");
+                    if(is_bool($result) or count($result) == 0)
+                        throw new InvalidTokenException("Token is not valid");
 
-            //Checks if token is on the header
-            if(!isset($headers['X-Auth-Header']) && !isset($headers['x-auth-header']))
-                //No token found
-                throw new NoTokenException("Token can't be omitted here" . $printDebug->getDebugString(json_encode($headers)));
-            else{
-
-                //Saving the token on somewhere more easy to retreive later
-                if(isset($headers['X-Auth-Header']))
-                    $token = $headers['X-Auth-Header'];
-                else
-                    $token = $headers['x-auth-header'];
-
-                //Checks if token is active or valid
-                $result = $db->query("SELECT token_expire FROM users_tokens WHERE token = '{$token}'");
-                if(is_bool($result) or count($result) == 0)
-                    throw new InvalidTokenException("Token is not valid");
-
-                if(time() > $result[0]['token_expire']){
-                    $db->query("DELETE FROM users_tokens WHERE token = '{$headers['X-Auth-Header']}'");
-                    throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
+                    if(time() > $result[0]['token_expire']) {
+                        $db->query("DELETE FROM users_tokens WHERE token = '{$token}'");
+                        throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
+                    }
                 }
             }
-
-            //Saving the token on somewhere more easy to retreive later
-            $token = $headers['X-Auth-Header'];
-
-            bypass_header_check:
 
             //Checks if you can find the module
             if(!file_exists(__DIR__ . "/modules/$module/$action.php"))
@@ -251,6 +235,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     //Here ends the request with HTTP Code and JSON-ifying of a response
     http_response_code($response['status_code']);
     echo json_encode($response);
-    ob_end_flush();
-    exit;
 }
+
+//Terminate the server for all the methods
+ob_end_flush();
+exit;

@@ -35,6 +35,6 @@ foreach ($dir as $file) {
         case "..":
             break;
         default:
-            include_once __DIR__ . "/$file";
+            require_once __DIR__ . "/$file";
     }
 }
