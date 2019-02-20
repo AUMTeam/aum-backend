@@ -1,7 +1,7 @@
 <?php
 
 //Validate the user input
-function validateInput(&$data, $type) {    //Passing by reference!
+function validateInput(&$data, $type) {
     //Check is fundamental fields are present
     if(!isset($data['limit']))
         throw new InvalidRequestException("limit cannot be blank", 3000);
@@ -99,7 +99,7 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
         approver.username as ap_username, approver.name as ap_name, $table.*
         FROM $table, users as author, users as approver
         WHERE $table.author_user_id = author.user_id 
-        AND $table.approver_user_id = approver.user_id"; //Ex: WHERE commits.commit_id>=0
+        AND $table.approver_user_id = approver.user_id";
 
     //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
     if (isset($data['filter']['attribute']))

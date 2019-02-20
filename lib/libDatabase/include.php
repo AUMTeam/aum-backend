@@ -2,21 +2,23 @@
 
 define("SQLITE3_MODE", 1);
 define("MYSQL_MODE", 2);
+define("PDO_MODE", 3);
 
 /**
  * Base Abstract Database Wrapper
  * Contains only the mode of the database and the handler
  */
-abstract class DatabaseWrapper{
-
+abstract class DatabaseWrapper {
     protected $mode;
     protected $handler;
 
-    public function __construct(int $mode){
+    public function __construct(int $mode) {
         $this->mode = $mode;
     }
 
-    public function getMode() : string{
+    public abstract function query(string $query);
+
+    public function getMode() : string {
         switch ($this->mode) {
             case 1:
                 return "SQLite3 Mode";
@@ -26,12 +28,13 @@ abstract class DatabaseWrapper{
                 return "You are not supposed to see this. Bug found";
         }
     }
-
+    public function toString() : string {
+        return "Database Wrapper : " . $this->getMode();
+    }
 }
 
 class SQLite3DatabaseWrapper extends DatabaseWrapper{
-
-    public function __construct(string $filename, array $config = []){
+    public function __construct(string $filename, array $config = []) {
         if(!class_exists('SQLite3'))
             throw new Exception("SQLite3 library not enabled.");
         
@@ -46,7 +49,7 @@ class SQLite3DatabaseWrapper extends DatabaseWrapper{
         $this->handler->busyTimeout(5000);
     }
 
-    public function query(string $query){
+    public function query(string $query) {
         //When a query is not a SELECT, just do return exec
         if(stripos($query, 'SELECT') === false)
 			return $this->handler->exec($query);
@@ -65,10 +68,6 @@ class SQLite3DatabaseWrapper extends DatabaseWrapper{
 		return $out;
     }
 
-    public function __toString() : string{
-        return "Database Wrapper : " . $this->getMode();
-    }
-
     public function __destruct() {
         $this->handler->close();
     }
@@ -78,9 +77,8 @@ class SQLite3DatabaseWrapper extends DatabaseWrapper{
 /**
  * Class for MySQL handling implementation
  */
-class MySQLDatabaseWrapper extends DatabaseWrapper{
-
-    public function __construct(array $config){
+class MySQLDatabaseWrapper extends DatabaseWrapper {
+    public function __construct(array $config) {
         if(!function_exists('mysqli_connect'))
             throw new Exception("mysqli library not enabled.");
 
@@ -92,7 +90,7 @@ class MySQLDatabaseWrapper extends DatabaseWrapper{
             throw new Exception("Connection failed. Follows error: " . $this->handler->connect_error);
     }
 
-    public function query(string $query){
+    public function query(string $query) {
         //When a query is not a SELECT, just do return exec
         if(stripos($query, 'SELECT') === false)
 			return $this->handler->query($query);
@@ -111,12 +109,37 @@ class MySQLDatabaseWrapper extends DatabaseWrapper{
 		return $out;
     }
 
-    public function __toString() : string{
-        return "Database Wrapper : " . $this->getMode();
-    }
-
     public function __destruct() {
         $this->handler->close();
     }
+}
 
+class PDODatabaseWrapper extends DatabaseWrapper {
+    public function __construct(array $config) {
+        try {
+            $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING];
+
+            $this->handler = new PDO("{$config['db_type']}:host={$config['server']};dbname={$config['db_name']}", $config['username'], $config['password'], $options);
+        } catch (PDOException $e) {
+            throw new Exception("Error connecting to the database using PDO: " . $e->getMessage());
+        }
+    }
+
+    public function query(string $query) {
+        try {
+            $result = $this->handler->query($query);
+            $out = [];
+
+            foreach($result as $row)
+                $out[] = $row;
+
+            return $out;
+        } catch (PDOException $e) {
+            throw new Exception("Error in executing query '$query' : ". $e->getMessage());
+        }
+    }
+
+    public function __destruct() {
+        $this->handler = null;
+    }
 }

@@ -84,6 +84,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             else if ($db_usage == "MYSQL")
                 //MySQL usage
                 $db = new MySQLDatabaseWrapper($config);
+            else if ($db_usage == "PDO")
+                $db = new PDODatabaseWrapper($config);
             else
                 //Invalid string
                 throw new Exception("Invalid DB setup");
