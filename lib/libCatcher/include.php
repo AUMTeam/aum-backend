@@ -1,6 +1,6 @@
 <?php
 
-include_once "./../../config.php";
+include_once __DIR__ .  "/../../config.php";
 
 if(!isset($printDebug))
     $printDebug = new class(!$debug_mode){

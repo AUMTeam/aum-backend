@@ -23,7 +23,7 @@ include_once __DIR__ . "/lib/libExceptionRequest/include.php";
 include_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
 
 //small libs for actions
-include_once __DIR__ . "/lib/libList/include.php";
+//include_once __DIR__ . "/lib/libList/include.php";
 include_once __DIR__ . "/lib/libUserInfo/include.php";
 
 //Import configuration data
@@ -84,6 +84,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             else if ($db_usage == "MYSQL")
                 //MySQL usage
                 $db = new MySQLDatabaseWrapper($config);
+            else if ($db_usage == "PDO")
+                $db = new PDODatabaseWrapper($config);
             else
                 //Invalid string
                 throw new Exception("Invalid DB setup");

@@ -204,3 +204,131 @@ Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguard
     "status_code":404
 }
 ```
+
+## commit/approve
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"approve",
+    "request_data":{
+        "id":1,
+        "approve_flag":1
+    }
+}
+```
+
+#### Risposte
+
+* Commit approvato correttamente
+```json
+{
+    "response_data":{},
+    "status_code":200
+}
+```
+
+* L'utente non è autorizzato ad eseguire questa azione
+```json
+{
+    "response_data":{
+        "error_code":103
+    },
+    "message":"The current user is not authorized to perform this action!",
+    "status_code":401
+}
+```
+
+* L'ID del commit non è valido
+```json
+{
+    "response_data":{
+        "error_code":3007
+    },
+    "message":"Commit_id doesn't refer to a valid commit!",
+    "status_code":400
+}
+```
+
+* Il commit è già stato approvato
+```json
+{
+    "response_data":{
+        "error_code":3007
+    },
+    "message":"Commit already approved!",
+    "status_code":400
+}
+```
+
+## commit/list
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"list",
+    "request_data":{
+        "limit":1,
+        "page":1,
+        "sort":{
+            "parameter":"",
+            "order":""
+        },
+        "filter":{
+            "attribute":"",
+            "valueMatches":"",
+            "valueDifferentFrom":"",
+        }
+    }
+}
+```
+
+#### Risposte
+
+```json
+{
+    "response_data": {
+        "count": 5,
+        "count_total": 35,
+        "list": [
+            {
+                "approval_status": "0",
+                "author": {
+                    "name": "Test of Client user",
+                    "user_id": "3",
+                    "username": "client.test"
+                },
+                "description": "Self-enabling systematic analyzer",
+                "id": "27",
+                "timestamp": 1520488563
+            },
+        ],
+        "page": 6,
+        "page_total": 6
+    },
+    "status_code": 200
+}
+```
+
+#commit/update
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"update",
+    "request_data":{
+        "latest_update_timestamp":
+    }
+}
+```
+
+#### Risposte
+
+```json
+{
+    "response_data": {
+        "updates_found":true
+    },
+    "status_code": 200
+}
+```
