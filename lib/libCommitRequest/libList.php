@@ -105,11 +105,15 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     if (isset($data['filter']['attribute']))
         $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
 
-    //If the user is part of the tech area (2) or is a programmer (4), select only users in the same area
-    if (in_array(2, $cur_user_role) || in_array(4, $cur_user_role)) {
+    //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
+    if (in_array(2, $cur_user_role)) {
         $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
+    //If the user is a programmer (4), show only his commits
+    } else if (in_array(4, $cur_user_role)) {
+        $query .= " AND author_user_id = ${cur_user_id}";
     }
+
     //Order part
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 

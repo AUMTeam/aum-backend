@@ -11,7 +11,7 @@ function approve(DatabaseWrapper $db, $data, $user, $type) {
     $user_id = $user['user_id'];
     $role_id = $user['role'];
 
-
+    //Only Tech Area users (role: 2) are authorized to approve commits/requests
     if (!in_array(2, $role_id))
         throw new InvalidRequestException("The current user is not authorized to perform this action $role_id $role_id[0]!", 103, 401);    //TODO: New error code?
 
