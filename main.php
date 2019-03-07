@@ -22,6 +22,7 @@ set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
 require_once __DIR__ . "/lib/libDatabase/include.php";
 require_once __DIR__ . "/lib/libExceptionRequest/include.php";
 require_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
+require_once __DIR__ . "/lib/libMail/include.php";
 require_once __DIR__ . "/config.php";
 
 //small libs for actions
