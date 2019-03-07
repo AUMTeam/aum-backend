@@ -68,18 +68,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
         $db = NULL;
 
         try {
-            //Set up database connection
-            if($db_usage == "SQLITE3")
-                //SQLite3 usage
-                $db = new SQLite3DatabaseWrapper($sqlite3_name);
-            else if ($db_usage == "MYSQL")
-                //MySQL usage
-                $db = new MySQLDatabaseWrapper($config);
-            else if ($db_usage == "PDO")
-                $db = new PDODatabaseWrapper($config);
-            else
-                //Invalid string
-                throw new Exception("Invalid DB setup");
+            $db = new DatabaseWrapper($db_type, $config);
 
             //**JSON Parsing**
             //Decodes JSON if present
