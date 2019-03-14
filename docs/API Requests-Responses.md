@@ -1,5 +1,7 @@
 # Request/Response pattern
 
+In tutte le richieste, salvo quella di login, è necessario specificare il token nell'header **X-Auth-Header**.
+
 ## Errori globali
 
 Gli errori globali possono apparire in ogni azione (salvo alcune per svariate eccezioni).
@@ -47,7 +49,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```
 
 ## auth/login
-### Accedere utilizzando username e password. Il token in questa richiesta non è obbligatorio.
+### Accedere utilizzando username e password. Il token in questa richiesta non è richiesto.
 
 #### Richiesta
 ```json
@@ -68,7 +70,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 {
     "response_data":{
         "success":true,
-        "token":"<random hashed bytes>",
+        "token":"<random hashed SHA1 bytes>",
         "user_id":1
     },
     "status_code":200
@@ -110,7 +112,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 
 ## auth/validateToken
 
-Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere di fare l'accesso. Il token deve essere presente nell'header.
+Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere di fare l'accesso. Il token deve essere presente nell'header "X-Auth-Header".
 
 #### Richiesta
 ```json
@@ -144,8 +146,6 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 
 ## user/info
 
-*NOTA: La risposta è prototipata. Azione soggetta a cambiamenti.*
-
 Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguarda l'utente appartenente al token inviato.
 
 #### Richiesta
@@ -168,8 +168,6 @@ Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguard
         "user_data":{
             "user_id":1,
             "name":"Mario",
-            "surname":"Mario",
-            "url_propic":"https://<url>",
             "creation_date":"10-10-2018 15:14:59",
             "access_level":"developer",
             "last_access":"10-10-2018 15:15:00"
@@ -204,3 +202,245 @@ Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguard
     "status_code":404
 }
 ```
+
+## commit/approve
+
+Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: Non Approvato)
+
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"approve",
+    "request_data":{
+        "id":1,
+        "approve_flag":1
+    }
+}
+```
+
+#### Risposte
+
+* Commit approvato correttamente
+```json
+{
+    "response_data":{},
+    "status_code":200
+}
+```
+
+* L'utente non è autorizzato ad eseguire questa azione
+```json
+{
+    "response_data":{
+        "error_code":103
+    },
+    "message":"The current user is not authorized to perform this action!",
+    "status_code":401
+}
+```
+
+* L'ID del commit non è valido
+```json
+{
+    "response_data":{
+        "error_code":3007
+    },
+    "message":"Commit_id doesn't refer to a valid commit!",
+    "status_code":400
+}
+```
+
+* Il commit è già stato approvato
+```json
+{
+    "response_data":{
+        "error_code":3007
+    },
+    "message":"Commit already approved!",
+    "status_code":400
+}
+```
+
+## commit/list
+
+Restituisce la lista dei commit presenti nel database sotto forma di pagine. E' necessario specificare *limit* (numero di elementi per pagina) e *page* (numero di pagina).
+
+Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id (id dei commit), description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, reviewer, approval_status, component, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo l'id dei commit.
+
+E' poi possibile impostare (facoltativamente) un **filtro** di ricerca. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
+
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"list",
+    "request_data":{
+        "limit":5,
+        "page":6,
+        "sort":{
+            "parameter":"id",
+            "order":"DESC"
+        },
+        "filter":{
+            "attribute":"",
+            "valueMatches":"",
+            "valueDifferentFrom":"",
+        }
+    }
+}
+```
+
+#### Risposte
+
+*count* contiene il conteggio degli elementi nella risposta. *count_total* contiene il numero totale di elementi presenti nel database.
+
+```json
+{
+    "response_data": {
+        "count": 5,
+        "count_total": 35,
+        "list": [
+            {
+                "approval_status": "0",
+                "author": {
+                    "name": "Test of Client user",
+                    "user_id": "3",
+                    "username": "client.test"
+                },
+                "description": "Self-enabling systematic analyzer",
+                "id": "27",
+                "timestamp": 1520488563
+            },
+            [...]
+        ],
+        "page": 6,
+        "page_total": 6
+    },
+    "status_code": 200
+}
+```
+
+#commit/update
+
+Utilizzato per richiedere se vi sono nuovi commit data una certa data.
+E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggiornamento ricevuto.
+
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"update",
+    "request_data":{
+        "latest_update_timestamp":"..."
+    }
+}
+```
+
+#### Risposte
+
+* Aggiornamenti trovati
+
+```json
+{
+    "response_data": {
+        "updates_found":true
+    },
+    "status_code": 200
+}
+```
+
+* Aggiornamenti non trovati
+
+```json
+{
+    "response_data": {
+        "updates_found":false
+    },
+    "status_code": 200
+}
+```
+
+#commit/add
+
+Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori.
+
+#### Richiesta
+```json
+{
+    "module":"commit",
+    "access":"add",
+    "request_data":{
+        "description":"description string",
+        "component":4,
+        "branch":1
+    }
+}
+```
+
+#### Risposte
+
+* Inserimento andato a buon fine
+
+```json
+{
+    "response_data": {},
+    "status_code": 200
+}
+```
+
+* Almeno un campo è mancante
+```json
+{
+    "response_data":{
+        "error_code":1001
+    },
+    "message":"Richiesta invalida",
+    "status_code":400
+}
+```
+
+#request/add
+
+Utilizzato per aggiungere una nuova richiesta di invio al database.
+*install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio.
+
+Tutti i campi tranne *commits* sono obbligatori.
+
+#### Richiesta
+```json
+{
+    "module":"request",
+    "access":"add",
+    "request_data":{
+        "description":"description string",
+        "install_type":1,
+        "install_link":"ftp://site.com",
+        "dest_clients":[1,2,3],
+        "commits":[34,56,23],
+        "component":4,
+        "branch":1
+    }
+}
+```
+
+#### Risposte
+
+* Inserimento andato a buon fine
+
+```json
+{
+    "response_data": {},
+    "status_code": 200
+}
+```
+
+* Almeno un campo è mancante
+```json
+{
+    "response_data":{
+        "error_code":1001
+    },
+    "message":"Richiesta invalida",
+    "status_code":400
+}
