@@ -131,12 +131,15 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     $countTotal = (int) $db->query($countQuery)[0]['count'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
-    $max_page = $countTotal / $data['limit'];
-    if(is_float($max_page))
-        $max_page = (int) $max_page + 1;
+    if ($countTotal > 0) {
+        $max_page = $countTotal / $data['limit'];
+        if(is_float($max_page))
+            $max_page = (int) $max_page + 1;
 
-    //The page count starts from 0: lower the max_page value by one
-    $max_page = $max_page - 1;
+        //The page count starts from 0: lower the max_page value by one
+        $max_page = $max_page - 1;
+    } else      //No elements were found
+        $max_page = 0;
     
     //Verify if the chosen page number is above the total number of pages: in that case, output the latest available page
     $page = (int) $data['page'];
