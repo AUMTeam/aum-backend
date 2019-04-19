@@ -4,7 +4,7 @@ class DatabaseWrapper {
     private $handler;
 
     public function __construct(string $db_type, array $config) {
-        $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING];
+        $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
 
         try {
             if (array_key_exists("db_name", $config)) {
@@ -19,7 +19,7 @@ class DatabaseWrapper {
         }
     }
 
-    public function query(string $query) {
+    public function query(string $query) : array {
         try {
             $result = $this->handler->query($query);
             $out = [];
@@ -31,6 +31,29 @@ class DatabaseWrapper {
         } catch (PDOException $e) {
             throw new Exception("Error in executing query '$query' : ". $e->getMessage());
         }
+    }
+
+    //Executes a parametrized query (Can throw PDOException)
+    public function preparedQuery(string $query, array $params) : array {
+        $out = [];
+        $stmt = $this->handler->prepare($query);
+
+        for($i=0;$i<count($params); $i++) {
+            $type = PDO::PARAM_STR;
+
+            if (is_int($params[$i]))
+                $type = PDO::PARAM_INT;
+
+            $stmt->bindParam($i + 1, $params[$i], $type);
+        }
+
+        //Execute the query
+        $stmt->execute($params);
+
+        if (strpos($query, "SELECT") !== false)
+            $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return $out;
     }
 
     public function __destruct() {

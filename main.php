@@ -4,13 +4,6 @@ $warnings = [];
 if(!file_exists(__DIR__ . "/log/"))
     mkdir(__DIR__ . "/log/");
 
-date_default_timezone_set('Europe/Rome');
-//Set basic headers
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
-header("Content-Encoding: gzip");
-header("Server-Version: $version");
-
 //Set the error reporting system
 require_once __DIR__ . "/lib/libCatcher/include.php";
 //register_shutdown_function("envi_shutdown_catcher");
@@ -26,6 +19,13 @@ require_once __DIR__ . "/config.php";
 
 //small libs for actions
 require_once __DIR__ . "/lib/libUserInfo/include.php";
+
+date_default_timezone_set('Europe/Rome');
+//Set basic headers
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
+header("Content-Encoding: gzip");
+header("Server-Version: $version");
 
 //Initializing debug mode
 $printDebug = new PrintDebug($debug_mode);
@@ -135,12 +135,12 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                     throw new NoTokenException("Token can't be omitted here");
                 else {
                     //Checks if token is active or valid
-                    $result = $db->query("SELECT token_expire FROM users_tokens WHERE token = '{$token}'");
+                    $result = $db->preparedQuery("SELECT token_expire FROM users_tokens WHERE token=?", [$token]);
                     if(is_bool($result) or count($result) == 0)
                         throw new InvalidTokenException("Token is not valid");
 
                     if(time() > $result[0]['token_expire']) {
-                        $db->query("DELETE FROM users_tokens WHERE token = '{$token}'");
+                        $db->preparedQuery("DELETE FROM users_tokens WHERE token=?", [$token]);
                         throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
                     }
                 }
@@ -184,7 +184,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 else
                     $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
 
-                $db->query("UPDATE users_tokens SET token_expire = $new_expire WHERE token = '$token'");
+                $db->preparedQuery("UPDATE users_tokens SET token_expire=? WHERE token=?", [$new_expire, $token]);
 
                 if($printDebug->isDebug()) $response['response_data']['debug']['expire'] = $new_expire;
             }

@@ -20,11 +20,10 @@ function getUpdates(DatabaseWrapper $db, $data, $type) {
 
     $time = $data['latest_update_timestamp'];
 
-    //Get the last added commit' timestamp (TODO: commit count)
+    //Get the last added commit' timestamp (TODO: commit count) query is safe here (and preparedQuery could not be used anyway)
     $data = $db->query("SELECT MAX(approvation_date) as latest_timestamp, COUNT($id) as amount FROM $type");
 
     $out = [
-        "query" => $query,
         "count" => $data[0]['amount'],
         "latest_update_timestamp" => strtotime($data[0]['latest_timestamp']),
         //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit WHERE '$time' < commit.timestamp")[0]['new_commit']

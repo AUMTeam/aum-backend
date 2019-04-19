@@ -31,7 +31,7 @@ $exec = function (array $data, array $data_init) : array {
 
     $user_id = getUserData($db, $token)['user_id'];
 
-    $db->query("INSERT INTO requests(description, requester, destination_client) VALUES (\"{$data['description']}\",$user_id, {$data['destination_client']})");
+    $db->preparedQuery("INSERT INTO requests(description, requester, destination_client) VALUES (?, ?, ?)", [$data['description'], $user_id, $data['destination_client']]);
 
     return [
         "response_data" => [],
