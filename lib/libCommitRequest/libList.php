@@ -97,9 +97,9 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     //Base query
     $query = "SELECT author.username as au_username, author.name as au_name,
         approver.username as ap_username, approver.name as ap_name, $table.*
-        FROM $table, users as author, users as approver
-        WHERE $table.author_user_id = author.user_id 
-        AND $table.approver_user_id = approver.user_id";
+        FROM $table
+            JOIN users as author ON $table.author_user_id = author.user_id
+            LEFT JOIN users as approver ON $table.approver_user_id = approver.user_id";
 
     //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
     if (isset($data['filter']['attribute']))
@@ -109,8 +109,8 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     if (in_array(2, $cur_user_role)) {
         $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
-    //If the user is a programmer (4), show only his commits
-    } else if (in_array(4, $cur_user_role)) {
+    //If the user is (only) a programmer (1), show only his commits
+    } else if (in_array(1, $cur_user_role)) {
         $query .= " AND author_user_id = ${cur_user_id}";
     }
 
@@ -131,12 +131,15 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
     $countTotal = (int) $db->query($countQuery)[0]['count'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
-    $max_page = $countTotal / $data['limit'];
-    if(is_float($max_page))
-        $max_page = (int) $max_page + 1;
+    if ($countTotal > 0) {
+        $max_page = $countTotal / $data['limit'];
+        if(is_float($max_page))
+            $max_page = (int) $max_page + 1;
 
-    //The page count starts from 0: lower the max_page value by one
-    $max_page = $max_page - 1;
+        //The page count starts from 0: lower the max_page value by one
+        $max_page = $max_page - 1;
+    } else      //No elements were found
+        $max_page = 0;
     
     //Verify if the chosen page number is above the total number of pages: in that case, output the latest available page
     $page = (int) $data['page'];

@@ -119,7 +119,7 @@ class PDODatabaseWrapper extends DatabaseWrapper {
         try {
             $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING];
 
-            $this->handler = new PDO("{$config['db_type']}:host={$config['server']};dbname={$config['db_name']}", $config['username'], $config['password'], $options);
+            $this->handler = new PDO("{$config['db_type']}:host={$config['server']};dbname={$config['db_name']};charset=utf8", $config['username'], $config['password'], $options);
         } catch (PDOException $e) {
             throw new Exception("Error connecting to the database using PDO: " . $e->getMessage());
         }
@@ -127,13 +127,18 @@ class PDODatabaseWrapper extends DatabaseWrapper {
 
     public function query(string $query) {
         try {
-            $result = $this->handler->query($query);
-            $out = [];
+            //$query = $this->handler->quote($query);
+            if (strpos("SELECT", $query) !== true) {
+                $result = $this->handler->query($query);
+                $out = [];
 
-            foreach($result as $row)
-                $out[] = $row;
+                while($row = $result->fetch())
+                    $out[] = $row;
 
-            return $out;
+                return $out;
+            }
+            else
+                $this->handler->exec($query);
         } catch (PDOException $e) {
             throw new Exception("Error in executing query '$query' : ". $e->getMessage());
         }

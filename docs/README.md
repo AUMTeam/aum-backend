@@ -1,5 +1,5 @@
 # API STRUTTURA AUM COOPERATIVA
-## Cosa ci serve?
+## A cosa ci serve?
 Serve a comunicare con il server per vari cambiamenti di dati o accessi avvenuti tramite client (nel nostro caso web-application).
 
 ## Struttura dati richiesta e risposta
@@ -112,7 +112,8 @@ Per l’implementazione di un’azione bisogna tenere in mente il seguente patte
 I nomi dei moduli sono le cartelle che contengono i codici delle azioni possibili fare per il server. In codice PHP si traduce in:
 ```php
 <?php
-include_once “./modules/$module/$action.php”;
+
+require_once “./modules/$module/$action.php”;
 ```
 
 Affinché sia possibile usufruire dell’entrypoint `multi.php` dobbiamo rendere le azioni più modulari possibile. E questo è possibile grazie alle funzioni anonime salvate in una variabile.
