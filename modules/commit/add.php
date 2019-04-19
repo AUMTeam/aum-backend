@@ -14,21 +14,20 @@ $init = function (array $data) : array { return [
 ]; };
 
 $exec = function (array $data, array $data_init) : array {
-
     global $db;
     global $token;
 
-    if(!isset($data['description']))
-        throw new InvalidRequestException("description comment be blank", 3000);
+    //Check if all the fields are in place
+    if(!isset($data['description']) || !isset($data['component']) || !isset($data['branch']))
+        throw new InvalidRequestException("Invalid request", 3000);
     else
         str_replace('"', '\"', $data['description'], count($data_init['strpos_all']($data['description'],'"')));
 
-    //if(!isset($data['destination_client']))
-        //throw new InvalidRequestException("destination_client cannot be blank", 3000);
+    //Get the current user's id, which is the author's id
+    $author_user_id = getUserData($db, $token)['user_id'];
 
-    $user_id = getUserData($db, $token)['user_id'];
-
-    $db->preparedQuery("INSERT INTO commits(description, author_user_id) VALUES (?, ?)", [$data['description'], $user_id]);
+    //Add the commit into the database
+    $db->preparedQuery("INSERT INTO commits(description, component_id, branch_id, author_user_id) VALUES (?, ?, ?, ?)", [$data['description'], $data['component'], $data['branch'], $author_user_id]);
 
     return [
         "response_data" => [],

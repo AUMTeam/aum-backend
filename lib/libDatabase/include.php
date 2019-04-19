@@ -21,13 +21,18 @@ class DatabaseWrapper {
 
     public function query(string $query) : array {
         try {
-            $result = $this->handler->query($query);
-            $out = [];
+            //$query = $this->handler->quote($query);
+            if (strpos("SELECT", $query) !== true) {
+                $result = $this->handler->query($query);
+                $out = [];
 
-            foreach($result as $row)
-                $out[] = $row;
+                while($row = $result->fetch())
+                    $out[] = $row;
 
-            return $out;
+                return $out;
+            }
+            else
+                $this->handler->exec($query);
         } catch (PDOException $e) {
             throw new Exception("Error in executing query '$query' : ". $e->getMessage());
         }
