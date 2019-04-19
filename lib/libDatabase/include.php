@@ -39,12 +39,17 @@ class DatabaseWrapper {
         $stmt = $this->handler->prepare($query);
 
         for($i=0;$i<count($params); $i++) {
-            $type = PDO::PARAM_STR;
+            $elem = $params[$i];
+            $type;
 
-            if (is_int($params[$i]))
+            if (is_string($elem) || is_float($elem))    //PARAM_FLOAT is not supported
+                $type = PDO::PARAM_STR;
+            else if (is_int($elem))
                 $type = PDO::PARAM_INT;
+            else if (is_bool($elem))
+                $type = PDO::PARAM_BOOL;
 
-            $stmt->bindParam($i + 1, $params[$i], $type);
+            $stmt->bindParam($i+1, $elem, $type);
         }
 
         //Execute the query
