@@ -128,11 +128,11 @@ class PDODatabaseWrapper extends DatabaseWrapper {
     public function query(string $query) {
         try {
             //$query = $this->handler->quote($query);
-            if (strpos("SELECT", $query) !== true) {
+            if (strpos($query, "SELECT") !== false) {
                 $result = $this->handler->query($query);
                 $out = [];
 
-                while($row = $result->fetch())
+                while($row = $result->fetch(PDO::FETCH_ASSOC))
                     $out[] = $row;
 
                 return $out;

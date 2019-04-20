@@ -101,20 +101,23 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
             JOIN users as author ON $table.author_user_id = author.user_id
             LEFT JOIN users as approver ON $table.approver_user_id = approver.user_id";
 
-    //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
-    if (isset($data['filter']['attribute']))
-        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
-
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
     if (in_array(2, $cur_user_role)) {
         $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
-        $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
+        $query .= " WHERE (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
     //If the user is (only) a programmer (1), show only his commits
-    } else if (in_array(1, $cur_user_role)) {
-        $query .= " AND author_user_id = ${cur_user_id}";
-    }
-
-    //Order part
+    } else if (in_array(1, $cur_user_role))
+        $query .= " WHERE author_user_id = ${cur_user_id}";
+    
+    if (in_array(1, $cur_user_role) || in_array(2, $cur_user_role)) {
+        //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
+        if (isset($data['filter']['attribute'])) {
+            $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
+        }
+    } else if (isset($data['filter']['attribute']))
+        $query .= " WHERE {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
+    
+        //Order part
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
