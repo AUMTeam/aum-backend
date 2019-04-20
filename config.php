@@ -22,6 +22,8 @@ $config = [
 
 //Flag for debug/release mode
 $debug_mode = true;
+if($debug_mode == false && !file_exists(__DIR__ . "/log/"))
+    mkdir(__DIR__ . "/log/");
 
 //Flag for maintenance mode
 $maintenance_state = false;
