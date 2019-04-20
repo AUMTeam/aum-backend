@@ -9,11 +9,10 @@ $init = function (array $data) : array { return [
 ]; };
 
 $exec = function (array $data, array $data_init) : array {
-    global $db;
     require_once __DIR__ . "/../../lib/libCommitRequest/libUpdate.php";
 
     return [
-        "response_data" => getUpdates($db, $data, "commit"),
+        "response_data" => getUpdates($data, "commits"),
         "status_code" => 200
     ];
 };

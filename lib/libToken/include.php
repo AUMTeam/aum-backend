@@ -1,6 +1,6 @@
 <?php
 
-function checkToken() {
+function getTokenExpire() {
     global $db;
     global $token;
 
@@ -12,6 +12,8 @@ function checkToken() {
         $db->query("DELETE FROM users_tokens WHERE token = '{$token}'");
         throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
     }
+
+    return $result[0]['token_expire'];
 }
 
 function increaseTokenExpire() {

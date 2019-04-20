@@ -1,6 +1,8 @@
 <?php
 
-function approve(DatabaseWrapper $db, $data, $user, $type) {
+function approve($data, $user, $type) {
+    global $db;
+    
     //Checks fields integrity
     if(!isset($data['id']))
         throw new InvalidRequestException("Commit ID cannot be omitted", 3007);
@@ -11,22 +13,21 @@ function approve(DatabaseWrapper $db, $data, $user, $type) {
     $user_id = $user['user_id'];
     $role_id = $user['role'];
 
-    //Only Tech Area users (role: 2) are authorized to approve commits/requests
-    if (!in_array(2, $role_id))
-        throw new InvalidRequestException("The current user is not authorized to perform this action $role_id $role_id[0]!", 103, 401);    //TODO: New error code?
+    //Only Tech Area users (role: 2) and Power Users (role: 5) are authorized to approve commits/requests
+    if (!in_array(2, $role_id) || !in_array(5, $role_id))
+        throw new InvalidRequestException("The current user is not authorized to perform this action!", 103, 401);    //TODO: New error code?
 
     $id;
     switch ($type) {
-        case "commit":
+        case "commits":
             $id = "commit_id";
             break;
-        case "request":
+        case "requests":
             $id = "request_id";
             break;
         default:
             throw new Exception("Impossible to use the endpoint");
     }
-    $type .= "s";
 
     //Check if commit_id is valid and whether the commit has already been approved
     $query = $db->query("SELECT is_approved FROM $type WHERE $id={$data['id']}");

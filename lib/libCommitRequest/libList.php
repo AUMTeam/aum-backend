@@ -52,7 +52,10 @@ function validateInput(&$data, $type) {
 function translateName($attribute, $type) : string {
     switch($attribute) {
         case "id":
-            return $type . "_id";
+            if ($type == "commits")
+                return "commit_id";
+            else
+                return "request_id";
         case "description":
             return "description";
         case "timestamp":
@@ -74,32 +77,31 @@ function translateName($attribute, $type) : string {
     }
 }
 
-function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user_id, $cur_user_role) {
+function get_list_data(string $type, array $data, $cur_user_id, $cur_user_role) {
+    global $db;
     $type = strtolower($type);
 
     //Execute the query based on $type parameter
     switch ($type) {
-        case "commit":
+        case "commits":
             $id = "commit_id";
             break;
-        case "request":
+        case "requests":
             $id = "request_id";
             break;
         default:
             throw new Exception("Impossible to use the list");
     }
 
-    //The real table names are actually plural
-    $table = $type . "s";
     //Calculate the starting commit ID (number of commits per page * number of page)
     $offset = $data['limit'] * $data['page'];
 
     //Base query
     $query = "SELECT author.username as au_username, author.name as au_name,
-        approver.username as ap_username, approver.name as ap_name, $table.*
-        FROM $table
-            JOIN users as author ON $table.author_user_id = author.user_id
-            LEFT JOIN users as approver ON $table.approver_user_id = approver.user_id";
+        approver.username as ap_username, approver.name as ap_name, $type.*
+        FROM $type
+            JOIN users as author ON $type.author_user_id = author.user_id
+            LEFT JOIN users as approver ON $type.approver_user_id = approver.user_id";
 
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
     if (in_array(2, $cur_user_role)) {

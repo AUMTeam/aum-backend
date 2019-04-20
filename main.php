@@ -143,7 +143,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                     //No token found
                     throw new NoTokenException("Token can't be omitted here");
                 else
-                    checkToken();
+                    getTokenExpire();   //We aren't interested in the return value
             }
 
             //Checks if you can find the module

@@ -1,7 +1,9 @@
 <?php
 
 
-function getUserData(DatabaseWrapper $db, string $token, array $data = []) : array {
+function getUserData(string $token, array $data = []) : array {
+    global $db;
+    
     //Keep selected user_id if it's present, else extract it starting from the token
     if(isset($data['user_id']))
         $user_data[0]['user_id'] = $data['user_id'];
