@@ -1,18 +1,25 @@
 <?php
 
-function getSubject() : string {
-    return "Valutazione Avvenuta";
-}
+class ApprovedMail extends AbstractMail {
+    private $commitTitle;
 
-function getMsg() : string {
-    return "
-    <html>
-        <head>
-            <title>". getSubject() ."</title>
-        </head>
-        <body>
-            <h2>Nuovo commit è stato valutato</h2>
-            <p id='info'></p>
-        </body>
-    </html>";
+    public function __construct(string $from, string $to, string $commit_id) {
+        parent::__construct();
+        $this->commitTitle = $db->query("SELECT description FROM commits WHERE commit_id=$commit_id")[0]['description'];
+    }
+
+    public function getSubject() : string {
+        return "AUM - Commit Approvato da " . $to;
+    }
+
+    public function getTitle() : string {
+        return "Un tuo commit è stato approvato!";
+    }
+    
+    public function getContent() : string {
+        return "
+            <h4>Contenuto:</h4>
+            <p>Titolo: <i>$commitTitle</i><br>
+               Approvato da: <i>$to</i></p>";
+    }
 }

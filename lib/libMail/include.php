@@ -3,26 +3,36 @@
 define("TYPE_APPROVED", 1);
 define("TYPE_NEW_COMMIT", 2);
 
-function send(DatabaseWrapper $db, $from_user_token, $to_user_id, $type) {
-    $from = getUserData($db, $from_user_token);
-    $to = getUserData($db, null, array(user_id=>$to_user_id));
+foreach (scandir(__DIR__) as $file) {
+    switch ($file){
+        case ".":
+        case "..":
+        case "include.php":
+            break;
+        default:
+            if (strpos($file, ".php"))
+                require_once __DIR__ . "/" . $file;
+            break;
+    }
+}
+
+function send($from_user_token, $to_user_id, $commit_id, $type) {
+    global $db;
+    $from = getUserData($db, $from_user_token)[0]['user_real_name'];
+    $to = getUserData($db, null, array(user_id=>$to_user_id))[0]['user_real_name'];
+    $mail;
 
     switch($type) {
         case TYPE_APPROVED:
-            require_once "approved.php";
-        case TYPE_NEW_COMMTI:
-            require_once "newCommit.php";
+            $mail = new ApprovedMail($from, $to, $commit_id);
+        case TYPE_NEW_COMMIT:
+            $mail = new NewCommitMail($from, $to, $commit_id);
         default:
             throw new Exception("ERRORE: Tipo non riconosciuto!");
     }
 
     $subject = getSubject();
-
     $message = getMsg();
-    $pre = substr($message, strpos($message, "'fo'>") + 4);
-    $post = substr($message, strpos($message, "<p>"));
-
-    $message = $pre . " Info di Test " . $post;
 
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";

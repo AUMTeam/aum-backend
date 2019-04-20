@@ -25,3 +25,6 @@ $debug_mode = true;
 
 //Flag for maintenance mode
 $maintenance_state = false;
+
+//URL to the Front-End, used in mails
+$gui_url = "https://coopcisf.github.io/aum-frontend/";
