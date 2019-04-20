@@ -12,11 +12,10 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['password']))
         throw new InvalidRequestException("'password' field cannot be blank");
 
-    //Compute the hash of the password and verify if the user is present in the DB TODO: Verify
-    $hash_pass = strtoupper(hash("sha256", $data['password']));
-    $result = $db->query("SELECT user_id FROM users WHERE username = '{$data['username']}' AND hash_pass = '{$hash_pass}'");
+    //Compute the hash of the password and verify if the user is present in the DB
+    $result = $db->query("SELECT user_id, hash_pass FROM users WHERE username='{$data['username']}'");
 
-    if(is_bool($result) or count($result) == 0)
+    if(count($result) == 0 || !password_verify($data['password'], $result[0]['hash_pass']))
         throw new InvalidCredentialsException("Credentials are wrong");
 
     //Get the ID of the user
@@ -25,7 +24,6 @@ $exec = function (array $data, array $data_init) : array {
     //Generate a random access token
     $token = sha1(random_bytes(64));
 
-    #$db->query("UPDATE users SET token = '$token' WHERE user_id = $user_id");
     //Get the current user's token list
     $tokens = $db->query("SELECT token, token_expire FROM users_tokens WHERE user_id = $user_id ORDER BY token_expire ASC");
 
