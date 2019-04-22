@@ -1,12 +1,6 @@
 <?php
 
-$init = function (array $data) : array { return [
-    'functions' => [
-        'to_int' => function ($i) : int {
-            return (int) $i;
-        }
-    ]
-]; };
+$init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
     require_once __DIR__ . "/../../lib/libCommitRequest/libUpdate.php";
