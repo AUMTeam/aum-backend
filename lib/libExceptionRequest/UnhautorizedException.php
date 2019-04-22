@@ -2,7 +2,7 @@
 
 class UnauthorizedException extends ExceptionRequest {
 
-    public function __construct(string $message, int $error_code = 104, int $status_code = 400) {
+    public function __construct(string $message, int $error_code = 104, int $status_code = 403) {
         if (is_null($message))
             $message = "Unauthorized!";
         
