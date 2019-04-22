@@ -19,7 +19,7 @@ $exec = function (array $data, array $data_init) : array {
         //throw new InvalidRequestException("Error: missing role_id parameter!");
         $type = "requests";
 
-    $user_info = getUserData($token);
+    $user_info = getMyInfo($token);
     $user_id = $user_info['user_id'];
     $role_id = $user_info['role'];
 

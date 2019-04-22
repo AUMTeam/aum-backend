@@ -146,7 +146,7 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 
 ## user/info
 
-Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguarda l'utente appartenente al token inviato.
+Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornate le informazioni dell'utente proprietario del token inviato nella richiesta. 
 
 #### Richiesta
 ```json
@@ -168,25 +168,9 @@ Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguard
         "user_data":{
             "user_id":1,
             "name":"Mario",
-            "creation_date":"10-10-2018 15:14:59",
-            "access_level":"developer",
-            "last_access":"10-10-2018 15:15:00"
-        }
-    },
-    "status_code":200
-}
-```
-
-* Utente trovato.
-```json
-{
-    "response_data":{
-        "user_data":{
-            "user_id":2,
-            "name":"Luigi",
-            "surname":"Mario",
-            "url_propic":"https://<url>",
-            "last_access":"10-10-2018 15:15:00"
+            "email":"test@example.com",
+            "role":[1,2,3],
+            "area":1
         }
     },
     "status_code":200

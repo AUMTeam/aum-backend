@@ -6,7 +6,7 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
     require_once __DIR__ . "/../../lib/libCommitRequest/libApprove.php";
 
-    $user = getUserData($token);
+    $user = getMyInfo($token);
     approve($data, $user, "requests");
 
     return [
