@@ -15,8 +15,9 @@ $exec = function (array $data, array $data_init) : array {
         else
             $type = "requests";
 
-    } else
-        throw new InvalidRequestException("Error: missing role_id parameter!");
+    } else  //Fallback for now to 'requests' TODO: Remove this
+        //throw new InvalidRequestException("Error: missing role_id parameter!");
+        $type = "requests";
 
     $user_info = getUserData($token);
     $user_id = $user_info['user_id'];
