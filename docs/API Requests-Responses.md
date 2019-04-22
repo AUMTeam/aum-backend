@@ -384,7 +384,7 @@ Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obblig
 }
 ```
 
-#request/add
+## request/add
 
 Utilizzato per aggiungere una nuova richiesta di invio al database.
 *install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio.
@@ -428,12 +428,14 @@ Tutti i campi tranne *commits* sono obbligatori.
     "message":"Richiesta invalida",
     "status_code":400
 }
+```
 
 ## request/list
 
 Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role_id' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 #### Richiesta
+
 ```json
 {
     "module":"request",
@@ -458,6 +460,7 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
 #### Risposte
 
 ##### Risposta con role_id=4
+
 **Soggetto a variazioni**
 ```json
 {
@@ -483,6 +486,7 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
 ```
 
 ##### Risposta con role_id!=4
+
 ```json
 {
     "response_data": {
@@ -506,5 +510,57 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
         "page_total": 6
     },
     "status_code": 200
+}
+```
+
+## requests/send
+
+Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio revisioni possono effettuare tale azione.
+
+#### Richiesta
+
+```json
+{
+	"module":"requests",
+	"action":"send",
+	"request_data": {
+		"id":4
+		}
+}
+```
+
+#### Risposta
+
+Invio andato a buon fine 
+```json
+{
+  "response_data": [],
+  "status_code": 200
+}
+```
+
+## requests/install
+
+Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
+
+#### Richiesta
+```json
+
+	"module":"requests",
+	"action":"install",
+	"request_data": {
+		"id":4,
+		"feedback":"Test Feedback"
+		}
+}
+```
+
+#### Risposta
+
+Inserimento andato a buon fine
+```json
+{
+  "response_data": [],
+  "status_code": 200
 }
 ```

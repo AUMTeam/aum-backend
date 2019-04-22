@@ -169,9 +169,9 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
 }
 
 function getClientQuery(int $cur_user_id) : string {
-    return "SELECT requests.request_id as 'id', approvation_date, description, install_type, install_date, comment, install_link, component_id, branch_id 
+    return "SELECT requests.request_id as 'id', approvation_date, description, install_type, install_date, comment, install_link, branch_id 
         FROM requests_clients, requests
-        WHERE requests_clients.request_id=requests.request_id AND is_approved=1 AND client_user_id=$cur_user_id";
+        WHERE requests_clients.request_id=requests.request_id AND is_approved=2 AND client_user_id=$cur_user_id";
 }
 
 function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role) : string {
@@ -189,7 +189,7 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role) :
     if (in_array(2, $cur_user_role)) {
         $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
-    //If the user is (only) a programmer (1), show only his commits
+    //If the user is a programmer (1), show only his commits
     } else if (in_array(1, $cur_user_role))
         $query .= " AND author_user_id = ${cur_user_id}";
 
