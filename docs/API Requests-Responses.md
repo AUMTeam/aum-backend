@@ -444,3 +444,83 @@ Tutti i campi tranne *commits* sono obbligatori.
     "message":"Richiesta invalida",
     "status_code":400
 }
+
+## request/list
+
+Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role_id' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+
+#### Richiesta
+```json
+{
+    "module":"request",
+    "access":"list",
+    "role_id":4,
+    "request_data":{
+        "limit":5,
+        "page":6,
+        "sort":{
+            "parameter":"id",
+            "order":"DESC"
+        },
+        "filter":{
+            "attribute":"",
+            "valueMatches":"",
+            "valueDifferentFrom":"",
+        }
+    }
+}
+```
+
+#### Risposte
+
+##### Risposta con role_id=4
+**Soggetto a variazioni**
+```json
+{
+  "response_data": {
+    "count": 1,
+    "count_total": 1,
+    "list": [
+      {
+        "id": "4",
+        "description": "Assimilated intangible functionalities",
+        "timestamp": "2019-03-14 16:02:36",
+        "install_type": "0",
+        "install_link": "https://example.com",
+        "install_date": "2019-03-18 13:52:25",
+        "install_comment": null
+      }
+    ],
+    "page": 0,
+    "page_total": 0
+  },
+  "status_code": 200
+}
+```
+
+##### Risposta con role_id!=4
+```json
+{
+    "response_data": {
+        "count": 5,
+        "count_total": 35,
+        "list": [
+            {
+                "approval_status": "0",
+                "author": {
+                    "name": "Test of Client user",
+                    "user_id": "3",
+                    "username": "client.test"
+                },
+                "description": "Self-enabling systematic analyzer",
+                "id": "27",
+                "timestamp": 1520488563
+            },
+            [...]
+        ],
+        "page": 6,
+        "page_total": 6
+    },
+    "status_code": 200
+}
+```
