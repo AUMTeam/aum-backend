@@ -1,27 +1,30 @@
 <?php
 
-$init = function (array $data) : array { return [
-    'functions' => [
-        'to_int' => function ($i) : int {
-            return (int) $i;
-        }
-    ]
-]; };
+$init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    global $db;
     global $token;
-
+    $type;
     require_once __DIR__ . "/../../lib/libCommitRequest/libList.php";
 
-    validateInput($data, "request");
+    if (isset($data['role_id'])) {
+        $role = $data['role_id'];
 
-    $user_info = getUserData($db, $token);
+        if ($role == 4)
+            $type = "client";
+        else
+            $type = "requests";
+
+    } else  //Fallback for now to 'requests' TODO: Remove this
+        //throw new InvalidRequestException("Error: missing role_id parameter!");
+        $type = "requests";
+
+    $user_info = getMyInfo($token);
     $user_id = $user_info['user_id'];
     $role_id = $user_info['role'];
 
     return [
-        "response_data" => get_list_data("request", $data, $db, $user_id, $role_id),
+        "response_data" => get_list($type, $data, $user_id, $role_id),
         "status_code" => 200,
     ];
 };

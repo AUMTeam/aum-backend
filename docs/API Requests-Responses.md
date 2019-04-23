@@ -146,7 +146,7 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 
 ## user/info
 
-Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguarda l'utente appartenente al token inviato.
+Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornate le informazioni dell'utente proprietario del token inviato nella richiesta. 
 
 #### Richiesta
 ```json
@@ -168,25 +168,9 @@ Ottenere i dati di un'utente. La risposta sarà più completa per quanto riguard
         "user_data":{
             "user_id":1,
             "name":"Mario",
-            "creation_date":"10-10-2018 15:14:59",
-            "access_level":"developer",
-            "last_access":"10-10-2018 15:15:00"
-        }
-    },
-    "status_code":200
-}
-```
-
-* Utente trovato.
-```json
-{
-    "response_data":{
-        "user_data":{
-            "user_id":2,
-            "name":"Luigi",
-            "surname":"Mario",
-            "url_propic":"https://<url>",
-            "last_access":"10-10-2018 15:15:00"
+            "email":"test@example.com",
+            "role":[1,2,3],
+            "area":1
         }
     },
     "status_code":200
@@ -400,7 +384,7 @@ Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obblig
 }
 ```
 
-#request/add
+## request/add
 
 Utilizzato per aggiungere una nuova richiesta di invio al database.
 *install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio.
@@ -444,3 +428,139 @@ Tutti i campi tranne *commits* sono obbligatori.
     "message":"Richiesta invalida",
     "status_code":400
 }
+```
+
+## request/list
+
+Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role_id' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+
+#### Richiesta
+
+```json
+{
+    "module":"request",
+    "access":"list",
+    "role_id":4,
+    "request_data":{
+        "limit":5,
+        "page":6,
+        "sort":{
+            "parameter":"id",
+            "order":"DESC"
+        },
+        "filter":{
+            "attribute":"",
+            "valueMatches":"",
+            "valueDifferentFrom":"",
+        }
+    }
+}
+```
+
+#### Risposte
+
+##### Risposta con role_id=4
+
+**Soggetto a variazioni**
+```json
+{
+  "response_data": {
+    "count": 1,
+    "count_total": 1,
+    "list": [
+      {
+        "id": "4",
+        "description": "Assimilated intangible functionalities",
+        "timestamp": "2019-03-14 16:02:36",
+        "install_type": "0",
+        "install_link": "https://example.com",
+        "install_date": "2019-03-18 13:52:25",
+        "install_comment": null
+      }
+    ],
+    "page": 0,
+    "page_total": 0
+  },
+  "status_code": 200
+}
+```
+
+##### Risposta con role_id!=4
+
+```json
+{
+    "response_data": {
+        "count": 5,
+        "count_total": 35,
+        "list": [
+            {
+                "approval_status": "0",
+                "author": {
+                    "name": "Test of Client user",
+                    "user_id": "3",
+                    "username": "client.test"
+                },
+                "description": "Self-enabling systematic analyzer",
+                "id": "27",
+                "timestamp": 1520488563
+            },
+            [...]
+        ],
+        "page": 6,
+        "page_total": 6
+    },
+    "status_code": 200
+}
+```
+
+## requests/send
+
+Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio revisioni possono effettuare tale azione.
+
+#### Richiesta
+
+```json
+{
+	"module":"requests",
+	"action":"send",
+	"request_data": {
+		"id":4
+		}
+}
+```
+
+#### Risposta
+
+Invio andato a buon fine 
+```json
+{
+  "response_data": [],
+  "status_code": 200
+}
+```
+
+## requests/install
+
+Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
+
+#### Richiesta
+```json
+
+	"module":"requests",
+	"action":"install",
+	"request_data": {
+		"id":4,
+		"feedback":"Test Feedback"
+		}
+}
+```
+
+#### Risposta
+
+Inserimento andato a buon fine
+```json
+{
+  "response_data": [],
+  "status_code": 200
+}
+```

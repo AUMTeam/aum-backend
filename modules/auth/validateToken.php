@@ -1,21 +1,12 @@
 <?php
 
-$init = function (array $data) : array {
-    global $db;
-    global $token;
-
-    //Take token validity
-    return [
-        "result" => $db->preparedQuery("SELECT token_expire FROM users_tokens WHERE token=", [$token])
-    ];
-};
+$init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    
     //Return the token's expiration date
     return [
         "response_data" => [
-            "token_expire" => $data_init['result'][0]['token_expire']
+            "token_expire" => getTokenExpire()
         ],
         "status_code" => 200
     ];

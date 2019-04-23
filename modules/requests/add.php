@@ -14,7 +14,6 @@ $init = function (array $data) : array { return [
 ]; };
 
 $exec = function (array $data, array $data_init) : array {
-    global $db;
     global $token;
 
     //Check if all the fields are in place
@@ -27,7 +26,7 @@ $exec = function (array $data, array $data_init) : array {
     }
     
     //Get the current user's id, which is the author's id
-    $author_user_id = getUserData($db, $token)['user_id'];
+    $author_user_id = getMyInfo($token)['user_id'];
 
     //Add the request into the database, and consequently get the ID of the just added request
     $db->query("INSERT INTO requests(description, install_type, install_link, author_user_id, component_id, branch_id) VALUES 

@@ -24,7 +24,7 @@ $exec = function (array $data, array $data_init) : array {
         str_replace('"', '\"', $data['description'], count($data_init['strpos_all']($data['description'],'"')));
 
     //Get the current user's id, which is the author's id
-    $author_user_id = getUserData($db, $token)['user_id'];
+    $author_user_id = getMyInfo($token)['user_id'];
 
     //Add the commit into the database
     $db->preparedQuery("INSERT INTO commits(description, component_id, branch_id, author_user_id) VALUES (?, ?, ?, ?)", [$data['description'], $data['component'], $data['branch'], $author_user_id]);
