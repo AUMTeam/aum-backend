@@ -13,7 +13,7 @@ $exec = function (array $data, array $data_init) : array {
         throw new InvalidRequestException("'password' field cannot be blank");
 
     //Compute the hash of the password and verify if the user is present in the DB
-    $result = $db->query("SELECT user_id, hash_pass FROM users WHERE username='{$data['username']}'");
+    $result = $db->preparedQuery("SELECT user_id, hash_pass FROM users WHERE username=?", [$data['username']]);
 
     if(count($result) == 0 || !password_verify($data['password'], $result[0]['hash_pass']))
         throw new InvalidCredentialsException("Credentials are wrong");

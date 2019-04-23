@@ -4,7 +4,7 @@ class DatabaseWrapper {
     private $handler;
 
     public function __construct(string $db_type, array $config) {
-        $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION];
+        $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false];
 
         try {
             if (array_key_exists("db_name", $config)) {
@@ -15,13 +15,12 @@ class DatabaseWrapper {
                 }
             }
         } catch (PDOException $e) {
-            throw new Exception("Error connecting to the database using PDO: " . $e->getMessage());
+            throw new InvalidRequestException("Error connecting to the database using PDO: " . $e->getMessage());
         }
     }
 
     public function query(string $query) : array {
         try {
-            //$query = $this->handler->quote($query);
             if (strpos($query, "SELECT") !== false) {
                 $result = $this->handler->query($query);
                 $out = [];
@@ -43,19 +42,22 @@ class DatabaseWrapper {
         $out = [];
         $stmt = $this->handler->prepare($query);
 
-        for($i=0;$i<count($params); $i++) {
-            $elem = $params[$i];
-            $type;
+        if ($params != null) {
+            for($i=0;$i<count($params); $i++) {
+                $elem = $params[$i];
+                $type;
 
-            if (is_string($elem) || is_float($elem))    //PARAM_FLOAT is not supported
-                $type = PDO::PARAM_STR;
-            else if (is_int($elem))
-                $type = PDO::PARAM_INT;
-            else if (is_bool($elem))
-                $type = PDO::PARAM_BOOL;
+                if (is_string($elem) || is_float($elem))    //PARAM_FLOAT is not supported
+                    $type = PDO::PARAM_STR;
+                else if (is_int($elem))
+                    $type = PDO::PARAM_INT;
+                else if (is_bool($elem))
+                    $type = PDO::PARAM_BOOL;
 
-            $stmt->bindParam($i+1, $elem, $type);
-        }
+                $stmt->bindParam($i+1, $elem, $type);
+            }
+        } else
+            $params = [];
 
         //Execute the query
         $stmt->execute($params);

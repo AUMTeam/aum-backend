@@ -9,7 +9,7 @@ $exec = function (array $data, array $data_init) : array {
     $role = getMyInfo($token)['role'];
     if (in_array(3, $role)) {
         if (isset($data['id'])) {
-            $db->query("UPDATE requests SET is_approved=2 WHERE request_id={$data['id']}");
+            $db->query("UPDATE requests SET is_approved=2 WHERE request_id=?", [$data['id']]);
         }
     } else {
         throw new UnauthorizedException();

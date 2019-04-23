@@ -4,12 +4,12 @@ function getTokenExpire() {
     global $db;
     global $token;
 
-    $result = $db->query("SELECT token_expire FROM users_tokens WHERE token = '{$token}'");
+    $result = $db->preparedQuery("SELECT token_expire FROM users_tokens WHERE token=?", [$token]);
     if(is_bool($result) or count($result) == 0)
         throw new InvalidTokenException("Token is not valid");
 
     if(time() > $result[0]['token_expire']) {
-        $db->query("DELETE FROM users_tokens WHERE token = '{$token}'");
+        $db->preparedQuery("DELETE FROM users_tokens WHERE token=?", [$token]);
         throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
     }
 
@@ -26,7 +26,7 @@ function increaseTokenExpire() {
     else
         $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
 
-    $db->query("UPDATE users_tokens SET token_expire = $new_expire WHERE token = '$token'");
+    $db->preparedQuery("UPDATE users_tokens SET token_expire=? WHERE token=?", [$new_expire, $token]);
 
     if($printDebug->isDebug()) $response['response_data']['debug']['expire'] = $new_expire;
 }

@@ -29,19 +29,19 @@ $exec = function (array $data, array $data_init) : array {
     $author_user_id = getMyInfo($token)['user_id'];
 
     //Add the request into the database, and consequently get the ID of the just added request
-    $db->query("INSERT INTO requests(description, install_type, install_link, author_user_id, component_id, branch_id) VALUES 
-            (\"{$data['description']}\", ${data['install_type']}, '${data['install_link']}', $author_user_id, ${data['component']}, ${data['branch']})"); 
+    $db->preparedQuery("INSERT INTO requests(description, install_type, install_link, author_user_id, component_id, branch_id) VALUES 
+            (?, ?, ?, ?, ?, ?)", [$data['description'], $data['install_type'], $data['install_link'], $author_user_id, $data['component'], $data['branch']]); 
     $request_id = $db->query("SELECT LAST_INSERT_ID() as 'request_id'")[0]['request_id'];
 
     //Destination clients and Commits are in separated tables: add the data also in those tables using the received request_id
     $clients = $data['dest_clients'];
     foreach($clients as $client_user_id)
-        $db->query("INSERT INTO requests_clients(request_id, client_user_id) VALUES (${request_id}, ${client_user_id})");
+        $db->preparedQuery("INSERT INTO requests_clients(request_id, client_user_id) VALUES (?, ?)", [$request_id, $client_user_id]);
 
     if (isset($data['commits'])) {  //commits' array is not strictly required
         $commits = $data['commits'];
         foreach($clients as $commit_id)
-            $db->query("INSERT INTO requests_commits(request_id, commit_id) VALUES (${request_id}, ${commit_id})");
+            $db->preparedQuery("INSERT INTO requests_commits(request_id, commit_id) VALUES (?, ?)", [$request_id, $commit_id]);
     }
 
     return [

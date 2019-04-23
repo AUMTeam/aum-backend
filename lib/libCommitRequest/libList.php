@@ -104,28 +104,34 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
 
     global $db;
     $query;
+    $params = [];
     $out = [];
 
     //Calculate the starting commit ID (number of commits per page * number of page)
-    $offset = $data['limit'] * $data['page'];
+    $data['limit'] = intval($data['limit']);
+    $offset = $data['limit'] * intval($data['page']);
 
     if ($listType == "client")
-        $query = getClientQuery($cur_user_id);
+        $query = getClientQuery($cur_user_id, $params);
     else
-        $query = getInternalQuery($data, $cur_user_id, $cur_user_role);
+        $query = getInternalQuery($data, $cur_user_id, $cur_user_role, $params);
     
-    if (isset($data['filter']['attribute']))
-        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
+    if (isset($data['filter']['attribute'])) {   //Attribute and Negate are safe
+        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE ?";
+        array_push($params, "%{$data['filter']['valueMatches']}%");
+    }
     
-    //Order part
+    //Order part - safe
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
-    $query .= " LIMIT $offset, {$data['limit']}";
+    $query .= " LIMIT ?, ?";
+    array_push($params, $offset);
+    array_push($params, $data['limit']);
 
-    $queryResult = $db->query($query);
+    $queryResult = $db->preparedQuery($query, $params);
 
-    $out = getCount($query, $data, $queryResult);
+    $out = getCount($query, $data, $queryResult, $params);
     
 
     if ($listType == "client") {
@@ -168,18 +174,20 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
     return $out;
 }
 
-function getClientQuery(int $cur_user_id) : string {
+function getClientQuery(int $cur_user_id, array &$params) : string {
+    $params = [$cur_user_id];
+    
     return "SELECT requests.request_id as 'id', approvation_date, description, install_type, install_date, comment, install_link, branch_id 
         FROM requests_clients, requests
-        WHERE requests_clients.request_id=requests.request_id AND is_approved=2 AND client_user_id=$cur_user_id";
+        WHERE requests_clients.request_id=requests.request_id AND is_approved=2 AND client_user_id=?";
 }
 
-function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role) : string {
+function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, array &$params) : string {
     global $db;
     global $listType;
     $query;
     
-    //Base query
+    //Base query - $listType is safe and prepared statements could not be used in FROM anyway
     $query = "SELECT author.username as au_username, author.name as au_name,
     approver.username as ap_username, approver.name as ap_name, $listType.*
     FROM $listType LEFT JOIN users as approver ON $listType.approver_user_id=approver.user_id, users as author
@@ -187,25 +195,29 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role) :
 
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
     if (in_array(2, $cur_user_role)) {
-        $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
+        $area = $db->preparedQuery("SELECT area_id FROM users WHERE user_id=?", [$cur_user_id])[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
     //If the user is a programmer (1), show only his commits
-    } else if (in_array(1, $cur_user_role))
-        $query .= " AND author_user_id = ${cur_user_id}";
-
+    } else if (in_array(1, $cur_user_role)) {
+        $query .= " AND author_user_id=?";
+        array_push($params, $cur_user_id);
+    }
     return $query;
 }
 
 //--Get the total number of commits
-function getCount(string $query, array $data, array $queryResult) : array {
+function getCount(string $query, array $data, array $queryResult, array $params) : array {
     global $db;
     $out = [];
+    //Remove last two elements of params array (LIMIT part)
+    array_pop($params);
+    array_pop($params);
     
     $countQuery = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
     $countQuery = substr($countQuery, 0, strpos($countQuery, 'ORDER'));  //Strip ORDER BY part
 
     $countQuery = "SELECT COUNT(*) AS 'count' " . $countQuery;           //Add COUNT in SELECT
-    $countTotal = (int) $db->query($countQuery)[0]['count'];
+    $countTotal = (int) $db->preparedQuery($countQuery, $params)[0]['count'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
     if ($countTotal > 0) {

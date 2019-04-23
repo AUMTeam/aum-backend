@@ -15,7 +15,8 @@ $exec = function (array $data, array $data_init) : array {
             if (isset($data['feedback']))
                 $feedback = $data['feedback'];
 
-            $db->query("UPDATE requests_clients SET comment='$feedback', install_date=FROM_UNIXTIME($now) WHERE request_id={$data['id']} AND client_user_id={$info['user_id']}");
+            $db->preparedQuery("UPDATE requests_clients SET comment=?, install_date=FROM_UNIXTIME(?)
+                WHERE request_id=? AND client_user_id=?", [$feedback, $now, $data['id'], $info['user_id']]);
         }
     }
     

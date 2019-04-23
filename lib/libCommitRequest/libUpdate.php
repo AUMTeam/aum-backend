@@ -21,7 +21,7 @@ function getUpdates($data, $type) {
 
     $time = $data['latest_update_timestamp'];
 
-    //Get the last added commit' timestamp (TODO: commit count)
+    //Get the last added commit' timestamp (TODO: commit count) -- query is safe here
     $data = $db->query("SELECT MAX(approvation_date) as latest_timestamp FROM $type");
 
     $out = [

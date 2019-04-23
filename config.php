@@ -13,7 +13,7 @@ $db_type = "mysql"; //Uncomment this for PDO usage
     'db_name' => "./db/main.db_",
 ];*/
 
-//MySQL configuration
+//DB configuration
 $config = [
     'server' => "127.0.0.1",
     'username' => "root",
