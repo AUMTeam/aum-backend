@@ -277,7 +277,7 @@ E' poi possibile impostare (facoltativamente) un **filtro** di ricerca. Si speci
 
 #### Risposte
 
-*count* contiene il conteggio degli elementi nella risposta. *count_total* contiene il numero totale di elementi presenti nel database.
+*count* contiene il conteggio degli elementi nella risposta. *count_total* contiene il numero totale di elementi presenti nel database. *approval_status* è uguale a *0* se il commit deve essere ancora valutato, *1* se è stato approvato e *-1* se è stato respinto.
 
 ```json
 {
@@ -286,16 +286,24 @@ E' poi possibile impostare (facoltativamente) un **filtro** di ricerca. Si speci
         "count_total": 35,
         "list": [
             {
-                "approval_status": "0",
+                "id": 67,
+                "title": "Silverleaf Mountain Gum",
+                "description": "Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.",
+                "timestamp": 1537610451,
+                "update_timestamp": 1531140258,
+                "components": "Sed ante. Vivamus tortor. Duis mattis egestas metus.",
+                "branch": 2,
+                "approval_status": "1",
                 "author": {
-                    "name": "Test of Client user",
-                    "user_id": "3",
-                    "username": "client.test"
+                    "user_id": 1,
+                    "username": "admin",
+                    "name": "Test Admin"
                 },
-                "description": "Self-enabling systematic analyzer",
-                "id": "27",
-                "timestamp": 1520488563
-            },
+                "approver": {
+                    "user_id": 2,
+                    "username": "dev.test",
+                    "name": "Test Developer"
+            }
             [...]
         ],
         "page": 6,
@@ -316,7 +324,7 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
     "module":"commit",
     "access":"update",
     "request_data":{
-        "latest_update_timestamp":"..."
+        "latest_update_timestamp":1555745875
     }
 }
 ```
@@ -327,10 +335,12 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 
 ```json
 {
-    "response_data": {
-        "updates_found":true
-    },
-    "status_code": 200
+  "response_data": {
+    "latest_update_timestamp": 1555745875,
+    "new_count": 65,
+    "updates_found": true
+  },
+  "status_code": 200
 }
 ```
 
@@ -355,8 +365,9 @@ Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obblig
     "module":"commit",
     "access":"add",
     "request_data":{
+        "title":"title",
         "description":"description string",
-        "component":4,
+        "components":"component description",
         "branch":1
     }
 }
@@ -397,12 +408,12 @@ Tutti i campi tranne *commits* sono obbligatori.
     "module":"request",
     "access":"add",
     "request_data":{
+        "title":"title string",
         "description":"description string",
         "install_type":1,
-        "install_link":"ftp://site.com",
         "dest_clients":[1,2,3],
         "commits":[34,56,23],
-        "component":4,
+        "components":"component description",
         "branch":1
     }
 }
@@ -461,7 +472,6 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
 
 ##### Risposta con role_id=4
 
-**Soggetto a variazioni**
 ```json
 {
   "response_data": {
@@ -470,6 +480,7 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
     "list": [
       {
         "id": "4",
+        "title":"title",
         "description": "Assimilated intangible functionalities",
         "timestamp": "2019-03-14 16:02:36",
         "install_type": "0",
@@ -486,7 +497,7 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
 ```
 
 ##### Risposta con role_id!=4
-
+Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se la richiesta deve essere ancora valutata, *1* se è stata approvata e *-1* se è stata respinta e **2** se è stata inviata ai clienti.
 ```json
 {
     "response_data": {
@@ -494,15 +505,26 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
         "count_total": 35,
         "list": [
             {
-                "approval_status": "0",
+                "id": 84,
+                "title": "Mariposa Pussypaws",
+                "description": "Morbi porttitor lorem id ligula.",
+                "timestamp": 1539402365,
+                "update_timestamp": 1555237944,
+                "components": "Suspendisse potenti. In eleifend quam a odio.",
+                "branch": 1,
+                "approval_status": "-1",
                 "author": {
-                    "name": "Test of Client user",
-                    "user_id": "3",
-                    "username": "client.test"
+                    "user_id": 2,
+                    "username": "dev.test",
+                    "name": "Test Developer"
                 },
-                "description": "Self-enabling systematic analyzer",
-                "id": "27",
-                "timestamp": 1520488563
+                "approver": {
+                    "user_id": 2,
+                    "username": "dev.test",
+                    "name": "Test Developer"
+                },
+                "install_link": "http:\/\/geocities.jp\/blandit\/mi\/in\/porttitor\/pede\/justo.json",
+                "install_type": "1"
             },
             [...]
         ],
