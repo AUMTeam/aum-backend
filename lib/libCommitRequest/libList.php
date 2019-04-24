@@ -62,6 +62,8 @@ function translateName(string $attribute) : string {
                 return "commit_id";
             else
                 return "request_id";
+        case "title":
+            return "title";
         case "description":
             return "description";
         case "timestamp":
@@ -74,12 +76,12 @@ function translateName(string $attribute) : string {
             return "approver_user_id";
         case "approval_status":
             return "is_approved";
-        case "component":
-            return "component_id";
+        case "components":
+            return "components";
         case "branch":
             return "branch_id";
         default:
-            throw new InvalidRequestException("Invalid parameter '$attribute'");
+            throw new InvalidRequestException("Invalid sorting/filtring parameter '$attribute'");
     }
 }
 
@@ -138,8 +140,10 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
         foreach($queryResult as $entry) {
             $temp = [
                 'id' => $entry['id'],
+                'title' => $entry['title'],
                 'description' => $entry['description'],
                 'timestamp' => $entry['approvation_date'],
+                'branch' => $entry['branch_id'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
                 'install_date' => $entry['install_date'],
@@ -152,9 +156,12 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
         foreach ($queryResult as $entry) {
             $temp = [
                 'id' => $entry[$id],
+                'title' => $entry['title'],
                 'description' => $entry['description'],
                 'timestamp' => strtotime($entry['creation_date']),
                 'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
+                'components' => $entry['components'],
+                'branch' => $entry['branch_id'],
                 'approval_status' => $entry['is_approved'],
                 'author' => [
                     'user_id' => $entry['author_user_id'],
@@ -167,6 +174,14 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
                     'name' => $entry['ap_name']
                 ]
             ];
+            if ($listType=="requests") {
+                $install = [
+                    'install_link' => $entry['install_link'],
+                    'install_type' => $entry['install_type']
+                ];
+                $temp = array_merge($temp, $install);
+            }
+
             $out['list'][] = $temp;
         }
     }
@@ -177,7 +192,7 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
 function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
-    return "SELECT requests.request_id as 'id', approvation_date, description, install_type, install_date, comment, install_link, branch_id 
+    return "SELECT requests.request_id as 'id', title, approvation_date, description, install_type, install_date, comment, install_link, branch_id 
         FROM requests_clients, requests
         WHERE requests_clients.request_id=requests.request_id AND is_approved=2 AND client_user_id=?";
 }
