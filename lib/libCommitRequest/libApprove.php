@@ -29,7 +29,7 @@ function approve($data, $user, $type) {
             throw new Exception("Impossible to use the endpoint");
     }
 
-    //Check if commit_id is valid and whether the commit has already been approved
+    //Check if commit_id is valid and whether the commit has already been approved - $type is safe
     $query = $db->preparedQuery("SELECT is_approved FROM $type WHERE $id=?", [$data['id']]);
     if (count($query) == 0)
         throw new InvalidRequestException("id doesn't refer to a valid commit!", 3007);

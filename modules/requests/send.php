@@ -6,6 +6,10 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
     global $db;
 
+    if (!isset($data['id'])) {
+        throw new InvalidRequestException("Missing 'id' parameter!");
+    }
+
     $role = getMyInfo($token)['role'];
     if (in_array(3, $role)) {
         if (isset($data['id'])) {

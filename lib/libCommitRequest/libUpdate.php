@@ -21,12 +21,13 @@ function getUpdates($data, $type) {
 
     $time = $data['latest_update_timestamp'];
 
-    //Get the last added commit' timestamp (TODO: commit count) -- query is safe here
-    $data = $db->query("SELECT MAX(approvation_date) as latest_timestamp FROM $type");
+    //Get the last added commit' timestamp -- query is safe here
+    $approv = $db->preparedQuery("SELECT MAX(approvation_date) as latest_timestamp FROM $type");
+    $new_count = $db->preparedQuery("SELECT COUNT(*) as new_commit FROM commits WHERE ? < creation_date", [$time]);
 
     $out = [
-        "latest_update_timestamp" => strtotime($data[0]['latest_timestamp']),
-        //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit WHERE '$time' < commit.timestamp")[0]['new_commit']
+        "latest_update_timestamp" => strtotime($approv[0]['latest_timestamp']),
+        "new_count" => $new_count[0]['new_commit']
     ];
     //Boolean condition
     $out['updates_found'] = $out['latest_update_timestamp'] > $time;

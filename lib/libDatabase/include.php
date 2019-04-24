@@ -38,7 +38,7 @@ class DatabaseWrapper {
     }
 
     //Executes a parametrized query (Can throw PDOException)
-    public function preparedQuery(string $query, array $params) : array {
+    public function preparedQuery(string $query, array $params = null) : array {
         $out = [];
         $stmt = $this->handler->prepare($query);
 
