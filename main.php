@@ -24,12 +24,12 @@ require_once __DIR__ . "/lib/libToken/include.php";
 date_default_timezone_set('Europe/Rome');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
-//header("Content-Encoding: gzip");
+header("Content-Encoding: gzip");
 header("Server-Version: $version");
 
 
 //GZIP compression
-//if(!ob_start("ob_gzhandler")) ob_start();
+if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     //OPTIONS Method -> communicate the allowed methods
@@ -209,5 +209,5 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
 }
 
 //Terminate the server for all the methods
-//ob_end_flush();
+ob_end_flush();
 exit;

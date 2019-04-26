@@ -266,30 +266,6 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
 }
 ```
 
-## commit/shortList
-
-Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
-
-#### Richiesta
-```json
-{
-	"module":"commit",
-	"action":"shortList"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    3,
-    4,
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
 ## commit/update
 
 Utilizzato per richiedere se vi sono nuovi commit data una certa data.
@@ -355,14 +331,14 @@ Restituisce l'elenco delle aree funzionali
 }
 ```
 
-## data/branch
+## data/branches
 Restituisce l'elenco delle branch
 
 #### Richiesta
 ```json
 {
 	"module":"data",
-	"action":"branch"
+	"action":"branches"
 }
 ```
 
@@ -404,6 +380,30 @@ Restituisce l'elenco dei clienti
       "user_id": 3,
       "name": "Test Client User"
     },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
+## data/commits
+
+Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"commits"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    3,
+    4,
     [...]
   ],
   "status_code": 200
