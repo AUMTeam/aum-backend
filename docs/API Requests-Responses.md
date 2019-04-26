@@ -463,7 +463,7 @@ Restituisce l'elenco dei ruoli in uso
 }
 ```
 
-## request/add
+## sendRequest/add
 
 Utilizzato per aggiungere una nuova richiesta di invio al database.
 *install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio.
@@ -473,7 +473,7 @@ Tutti i campi tranne *commits* sono obbligatori.
 #### Richiesta
 ```json
 {
-    "module":"request",
+    "module":"sendRequest",
     "access":"add",
     "request_data":{
         "title":"title string",
@@ -497,14 +497,14 @@ Tutti i campi tranne *commits* sono obbligatori.
 }
 ```
 
-## request/approve
+## sendRequest/approve
 
 Vedasi commit/approve
 
 #### Richiesta
 ```json
 {
-    "module":"request",
+    "module":"sendRequest",
     "access":"approve",
     "request_data":{
         "id":1,
@@ -513,14 +513,14 @@ Vedasi commit/approve
 }
 ```
 
-## request/install
+## sendRequest/install
 
 Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
 
 #### Richiesta
 ```json
 
-	"module":"request",
+	"module":"sendRequest",
 	"action":"install",
 	"request_data": {
 		"id":4,
@@ -539,14 +539,14 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 }
 ```
 
-## request/list
+## sendRequest/list
 
 Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 #### Richiesta
 ```json
 {
-    "module":"request",
+    "module":"sendRequest",
     "access":"list",
     "role":4,
     "request_data":{
@@ -632,7 +632,7 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
 }
 ```
 
-## requests/send
+## sendRequest/send
 
 Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio revisioni possono effettuare tale azione.
 
@@ -640,7 +640,7 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 
 ```json
 {
-	"module":"requests",
+	"module":"sendRequest",
 	"action":"send",
 	"request_data": {
 		"id":4
@@ -669,14 +669,14 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 }
 ```
 
-## request/update
+## sendRequest/update
 
 Vedasi *commit/update*
 
 #### Richiesta
 ```json
 {
-    "module":"request",
+    "module":"sendRequest",
     "access":"update",
     "request_data":{
         "latest_update_timestamp":1555745875
