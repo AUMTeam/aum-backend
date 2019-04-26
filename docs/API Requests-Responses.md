@@ -312,14 +312,14 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 }
 ```
 
-## data/getAreas
+## data/areas
 Restituisce l'elenco delle aree funzionali
 
 #### Richiesta
 ```json
 {
 	"module":"data",
-	"action":"getAreas"
+	"action":"areas"
 }
 ```
 
@@ -337,14 +337,14 @@ Restituisce l'elenco delle aree funzionali
 }
 ```
 
-## data/getBranch
+## data/branch
 Restituisce l'elenco delle branch
 
 #### Richiesta
 ```json
 {
 	"module":"data",
-	"action":"getBranch"
+	"action":"branch"
 }
 ```
 
@@ -362,14 +362,14 @@ Restituisce l'elenco delle branch
 }
 ```
 
-## data/getClients
+## data/clients
 Restituisce l'elenco dei clienti
 
 #### Richiesta
 ```json
 {
 	"module":"data",
-	"action":"getClients"
+	"action":"clients"
 }
 ```
 
@@ -392,14 +392,42 @@ Restituisce l'elenco dei clienti
 }
 ```
 
-## data/getRoles
+## data/installType
+Restituisce i tipi di installazione
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"installType"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "id": 0,
+      "desc": "A Caldo"
+    },
+    {
+      "id": 1,
+      "desc": "A Freddo"
+    }
+  ],
+  "status_code": 200
+}
+```
+
+## data/roles
 Restituisce l'elenco dei ruoli in uso
 
 #### Richiesta
 ```json
 {
 	"module":"data",
-	"action":"getRoles"
+	"action":"roles"
 }
 ```
 
