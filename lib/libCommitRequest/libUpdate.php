@@ -9,11 +9,11 @@ function getUpdates($data, $type) {
 
     $id;
     switch ($type) {
-        case "commits":
-            $id = "commit_id";
+        case TYPE_COMMIT:
+            $id = TYPE_COMMIT_ID;
             break;
-        case "requests":
-            $id = "request_id";
+        case TYPE_REQUEST:
+            $id = TYPE_REQUEST_ID;
             break;
         default:
             throw new Exception("Impossible to use the endpoint");

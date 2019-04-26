@@ -1,7 +1,8 @@
 <?php
 
-define("TYPE_APPROVED", 1);
-define("TYPE_NEW_COMMIT", 2);
+define("MAIL_APPROVED", 1);
+define("MAIL_NEW_COMMIT", 2);
+define("MAIL_NEW_PATCH", 3);
 
 foreach (scandir(__DIR__) as $file) {
     switch ($file){
@@ -16,23 +17,40 @@ foreach (scandir(__DIR__) as $file) {
     }
 }
 
-function send($from_user_token, $to_user_id, $commit_id, $type) {
+function send($from_user_token, $to_user_id, $id, $type, $typeCommit) {
     global $db;
-    $from = getUserData($db, $from_user_token)[0]['user_real_name'];
-    $to = getUserData($db, null, array(user_id=>$to_user_id))[0]['user_real_name'];
+    $idCommit;
+
+    switch($typeCommit) {
+        case TYPE_COMMIT:
+            $idCommit = TYPE_COMMIT_ID;
+            break;
+        case TYPE_REQUEST:
+            $idCommit = TYPE_REQUEST_ID;
+            break;
+    }
+
+    $from = getMyInfo($from_user_token);
+    $to = getUserInfo($to_user_id);
     $mail;
 
     switch($type) {
-        case TYPE_APPROVED:
-            $mail = new ApprovedMail($from, $to, $commit_id);
-        case TYPE_NEW_COMMIT:
-            $mail = new NewCommitMail($from, $to, $commit_id);
+        case MAIL_APPROVED:
+            $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idCommit, $id);
+            break;
+        case MAIL_NEW_COMMIT:
+            $mail = new NewCommitMail($from['name'], $to['name'],$typeCommit, $idCommit, $id);
+            break;
+        case MAIL_NEW_PATCH:
+            $mail = new NewPatchMail($from['name'], $to['name']);
+            break;
         default:
-            throw new Exception("ERRORE: Tipo non riconosciuto!");
+            throw new InvalidRequestException("Tipo di mail non riconosciuto!");
+            break;
     }
 
-    $subject = getSubject();
-    $message = getMsg();
+    $subject = $mail->getSubject();
+    $message = $mail->getMsg();
 
     $headers = "MIME-Version: 1.0" . "\r\n";
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";

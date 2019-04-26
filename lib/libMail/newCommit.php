@@ -1,26 +1,40 @@
 <?php
 
 class NewCommitMail extends AbstractMail {
-    private $commitTitle;
+    private $title;
+    private $desc;
+    private $typeCommit;
 
-    public function __construct(string $from, string $to, int $commit_id) {
-        parent::__construct();
+    public function __construct(string $from, string $to, string $type, string $id, int $commit_id) {
+        parent::__construct($from, $to, $commit_id);
         global $db;
-        $this->commitTitle = $db->query("SELECT description FROM commits WHERE commit_id=$commit_id")[0]['description'];
+        $out = $db->preparedQuery("SELECT title, description FROM $type WHERE $id=?", [$commit_id])[0];
+        $this->title = $out['title'];
+        $this->desc = $out['description'];
+        $this->typeCommit = $type;
     }
 
     public function getSubject() : string {
-        return "AUM - Nuovo Commit da " . $to;
+        if ($this->typeCommit==TYPE_COMMIT)
+            return "AUM - Nuovo commit pubblicato da " . $this->to;
+        else
+            return "AUM - Nuova richiesta di invio pubblicata da " . $this->to;
     }
 
     public function getTitle() : string {
-        return "Un nuovo commit è stato pubblicato!";
+        if ($this->typeCommit==TYPE_COMMIT)
+            return "$this->from ha pubblicato un nuovo commit";
+        else
+            return "$this->from ha pubblicato una nuova richiesta di invio";
     }
     
     public function getContent() : string {
         return "
             <h4>Contenuto:</h4>
-            <p>Titolo: <i>$commitTitle</i><br>
-               Autore: <i>$to</i></p>";
+            <table>
+            <tr><td><b>Titolo: </b></td><td>$this->title</td></tr>
+            <tr><td><b>Descrizione: </b></td><td>$this->desc</td></tr>
+            <tr><td><b>Autore: </b></td><td>$this->from</td></tr>
+            </table>";
     }
 }

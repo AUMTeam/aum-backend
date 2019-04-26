@@ -26,3 +26,10 @@ $maintenance_state = false;
 
 //URL to the Front-End, used in mails
 $gui_url = "https://coopcisf.github.io/aum-frontend/";
+
+//Types for commit/request
+define("TYPE_COMMIT", "commits");
+define("TYPE_COMMIT_ID", "commit_id");
+define("TYPE_REQUEST", "requests");
+define("TYPE_REQUEST_ID", "request_id");
+define("TYPE_CLIENT", "client");

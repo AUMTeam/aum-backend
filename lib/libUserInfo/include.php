@@ -32,8 +32,23 @@ function getUserInfo(int $user_id) : array {
        $out['role_id'][$i] = (int) $roles[$i]['role_id'];
 
     //Obtaining string for 'area' if needed
-    if(!is_null($out['area_id']))
-        $out['area_id'] = $db->preparedQuery("SELECT area_name FROM areas WHERE area_id=?", [$out['area_id']])[0]['area_name'];
+    if(!is_null($out['area_id'])) {
+        $out['area_name'] = $db->preparedQuery("SELECT area_name FROM areas WHERE area_id=?", [$out['area_id']])[0]['area_name'];
+
+        //Gets the tech area boss
+        $tech = $db->preparedQuery("SELECT users.user_id, name, email FROM users, users_roles WHERE 
+            users.user_id=users_roles.user_id AND area_id=? AND role_id=?", [$out['area_id'], 2]);
+        $out['resp'] = [];
+
+        foreach($tech as $entry) {
+            $arr = [
+                'email' => $entry['email'],
+                'user_id' => $entry['user_id'],
+                'name' => $entry['name']
+            ]; 
+            array_push($out['resp'], $arr);
+        }
+    }
 
     //Make a new correct response
     $out = [
@@ -41,7 +56,8 @@ function getUserInfo(int $user_id) : array {
         'role' => $out['role_id'],
         'area' => $out['area_id'],
         'user_id' => $out['user_id'],
-        'name' => $out['name']
+        'name' => $out['name'],
+        'resp' => $out['resp']
     ];
 
     return $out;

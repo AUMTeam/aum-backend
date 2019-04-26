@@ -11,7 +11,7 @@ $exec = function (array $data, array $data_init) : array {
     $role_id = $user_info['role'];
 
     return [
-        "response_data" => get_list("commits", $data, $user_id, $role_id),
+        "response_data" => get_list(TYPE_COMMIT, $data, $user_id, $role_id),
         "status_code" => 200,
     ];
 };

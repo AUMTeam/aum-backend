@@ -10,13 +10,13 @@ $exec = function (array $data, array $data_init) : array {
     if (isset($data['role'])) {
 
         if ($data['role'] == 4)
-            $type = "client";
+            $type = TYPE_CLIENT;
         else
-            $type = "requests";
+            $type = TYPE_REQUEST;
 
     } else  //Fallback for now to 'requests' TODO: Remove this
         //throw new InvalidRequestException("Error: missing role_id parameter!");
-        $type = "requests";
+        $type = TYPE_REQUEST;
 
     $user_info = getMyInfo($token);
     $user_id = $user_info['user_id'];

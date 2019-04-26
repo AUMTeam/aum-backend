@@ -58,10 +58,10 @@ function translateName(string $attribute) : string {
     
     switch($attribute) {
         case "id":
-            if ($listType == "commits")
-                return "commit_id";
+            if ($listType == TYPE_COMMIT)
+                return TYPE_COMMIT_ID;
             else
-                return "request_id";
+                return TYPE_REQUEST_ID;
         case "title":
             return "title";
         case "description":
@@ -92,13 +92,13 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
     
     //Execute the query based on $type parameter
     switch ($listType) {
-        case "commits":
-            $id = "commit_id";
+        case TYPE_COMMIT:
+            $id = TYPE_COMMIT_ID;
             break;
-        case "requests":
-            $id = "request_id";
+        case TYPE_REQUEST:
+            $id = TYPE_REQUEST_ID;
             break;
-        case "client":
+        case TYPE_CLIENT:
             break;
         default:
             throw new Exception("Impossible to use the list");
@@ -113,7 +113,7 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
     $data['limit'] = intval($data['limit']);
     $offset = $data['limit'] * intval($data['page']);
 
-    if ($listType == "client")
+    if ($listType == TYPE_CLIENT)
         $query = getClientQuery($cur_user_id, $params);
     else
         $query = getInternalQuery($data, $cur_user_id, $cur_user_role, $params);
@@ -136,7 +136,7 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
     $out = getCount($query, $data, $queryResult, $params);
     
 
-    if ($listType == "client") {
+    if ($listType == TYPE_CLIENT) {
         foreach($queryResult as $entry) {
             $temp = [
                 'id' => $entry['id'],
@@ -174,7 +174,7 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
                     'name' => $entry['ap_name']
                 ]
             ];
-            if ($listType=="requests") {
+            if ($listType==TYPE_REQUEST) {
                 $install = [
                     'install_link' => $entry['install_link'],
                     'install_type' => $entry['install_type']

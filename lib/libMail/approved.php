@@ -1,25 +1,40 @@
 <?php
 
 class ApprovedMail extends AbstractMail {
-    private $commitTitle;
+    private $title;
+    private $desc;
+    private $typeCommit;
 
-    public function __construct(string $from, string $to, string $commit_id) {
-        parent::__construct();
-        $this->commitTitle = $db->query("SELECT description FROM commits WHERE commit_id=$commit_id")[0]['description'];
+    public function __construct(string $from, string $to, string $type, string $id, int $commit_id) {
+        parent::__construct($from, $to, $commit_id);
+        global $db;
+        $out = $db->preparedQuery("SELECT title, description FROM $type WHERE $id=?", [$commit_id])[0];
+        $this->title = $out['title'];
+        $this->desc = $out['description'];
+        $this->typeCommit = $type;
     }
 
     public function getSubject() : string {
-        return "AUM - Commit Approvato da " . $to;
+        if ($this->typeCommit==TYPE_COMMIT)
+            return "AUM - Commit Approvato da " . $this->to;
+        else
+            return "AUM - Richiesta di invio approvata da " . $this->to;
     }
 
     public function getTitle() : string {
-        return "Un tuo commit è stato approvato!";
+        if ($this->typeCommit==TYPE_COMMIT)
+            return "Un tuo commit è stato approvato";
+        else
+            return "Una tua richiesta di invio è stata approvata";
     }
     
     public function getContent() : string {
         return "
             <h4>Contenuto:</h4>
-            <p>Titolo: <i>$commitTitle</i><br>
-               Approvato da: <i>$to</i></p>";
+            <table>
+            <tr><td><b>Titolo: </b></td><td>$this->title</td></tr>
+            <tr><td><b>Descrizione: </b></td><td>$this->desc</td></tr>
+            <tr><td><b>Approvato da: </b></td><td>$this->from</td></tr>
+            </table>";
     }
 }

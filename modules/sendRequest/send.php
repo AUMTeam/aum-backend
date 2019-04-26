@@ -13,7 +13,11 @@ $exec = function (array $data, array $data_init) : array {
     $role = getMyInfo($token)['role'];
     if (in_array(3, $role)) {
         if (isset($data['id'])) {
-            $db->query("UPDATE requests SET is_approved=2 WHERE request_id=?", [$data['id']]);
+            $db->preparedQuery("UPDATE requests SET is_approved=2 WHERE request_id=?", [$data['id']]);
+
+            $cli = $db->preparedQuery("SELECT client_user_id FROM requests_clients WHERE request_id=?", [$data['id']]);
+            foreach($cli as $entry)
+                send($token, $entry['client_user_id'], $data['id'], MAIL_NEW_PATCH);
         }
     } else {
         throw new UnauthorizedException();

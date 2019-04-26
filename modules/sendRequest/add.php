@@ -12,7 +12,8 @@ $exec = function (array $data, array $data_init) : array {
         throw new InvalidRequestException("Invalid request", 3000);
     
     //Get the current user's id, which is the author's id
-    $author_user_id = getMyInfo($token)['user_id'];
+    $user = getMyInfo($token);
+    $author_user_id = $user['user_id'];
 
     //Add the request into the database, and consequently get the ID of the just added request
     $db->preparedQuery("INSERT INTO requests(title, description, install_type, author_user_id, components, branch_id) VALUES 
@@ -28,6 +29,10 @@ $exec = function (array $data, array $data_init) : array {
         $commits = $data['commits'];
         foreach($commits as $commit_id)
             $db->preparedQuery("INSERT INTO requests_commits(request_id, commit_id) VALUES (?, ?)", [$request_id, $commit_id]);
+    }
+
+    foreach($user['resp'] as $resp) {
+        send($token, $resp['user_id'], $request_id, MAIL_NEW_COMMIT, TYPE_REQUEST);
     }
 
     return [

@@ -7,7 +7,7 @@ $exec = function (array $data, array $data_init) : array {
     require_once __DIR__ . "/../../lib/libCommitRequest/libApprove.php";
 
     $user = getMyInfo($token);
-    approve($data, $user, "requests");
+    approve($data, $user, TYPE_REQUEST);
 
     return [
         "response_data" => [],
