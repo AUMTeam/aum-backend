@@ -38,7 +38,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
         header("Access-Control-Allow-Methods: POST, OPTIONS");
         $printDebug->printDebug("Options message sent\n");
     } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        //Other Methods (typically GET) -> show an easter egg if in debug mode
+        //Show an easter egg if in debug mode
         http_response_code(405);
         $printDebug->printDebug('
         <html>

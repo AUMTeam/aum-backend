@@ -6,8 +6,6 @@ In tutte le richieste, salvo quella di login, è necessario specificare il token
 
 Gli errori globali possono apparire in ogni azione (salvo alcune per svariate eccezioni).
 
-#### Risposte
-
 * Token assente.
 ```json
 {
@@ -88,8 +86,6 @@ Accede utilizzando username e password. Il token non è richiesto.
 }
 ```
 
-
-
 ## auth/validateToken
 
 Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere di fare l'accesso. Il token deve essere presente nell'header "X-Auth-Header".
@@ -144,10 +140,9 @@ Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obblig
 }
 ```
 
-#### Risposte
+#### Risposta
 
 * Inserimento andato a buon fine
-
 ```json
 {
     "response_data": {},
@@ -232,7 +227,7 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
 }
 ```
 
-#### Risposte
+#### Risposta
 
 *count* contiene il conteggio degli elementi nella risposta per la pagina corrente, mentre *count_total* contiene il numero totale di elementi per la query effettuata. Il conteggio per *page* e *page_total* parte da 0. *approval_status* è uguale a *0* se il commit deve essere ancora valutato, *1* se è stato approvato e *-1* se è stato respinto.
 
@@ -260,6 +255,7 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
                     "user_id": 2,
                     "username": "dev.test",
                     "name": "Test Developer"
+                }
             }
             [...]
         ],
@@ -267,6 +263,30 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
         "page_total": 6
     },
     "status_code": 200
+}
+```
+
+## commit/shortList
+
+Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
+
+#### Richiesta
+```json
+{
+	"module":"commit",
+	"action":"shortList"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    3,
+    4,
+    [...]
+  ],
+  "status_code": 200
 }
 ```
 
@@ -289,7 +309,6 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 #### Risposte
 
 * Aggiornamenti trovati
-
 ```json
 {
   "response_data": {
@@ -302,7 +321,6 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 ```
 
 * Aggiornamenti non trovati
-
 ```json
 {
     "response_data": {
@@ -469,10 +487,9 @@ Tutti i campi tranne *commits* sono obbligatori.
 }
 ```
 
-#### Risposte
+#### Risposta
 
 * Inserimento andato a buon fine
-
 ```json
 {
     "response_data": {},
@@ -495,14 +512,15 @@ Vedasi commit/approve
     }
 }
 ```
-## requests/install
+
+## request/install
 
 Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
 
 #### Richiesta
 ```json
 
-	"module":"requests",
+	"module":"request",
 	"action":"install",
 	"request_data": {
 		"id":4,
@@ -526,7 +544,6 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 #### Richiesta
-
 ```json
 {
     "module":"request",
@@ -631,7 +648,7 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 }
 ```
 
-#### Risposta
+#### Risposte
 
 * Invio andato a buon fine 
 ```json

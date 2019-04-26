@@ -8,7 +8,7 @@ $init = function (array $data) : array { return []; };
 $exec = function (array $data, array $data_init) : array {
     global $db;
 
-    $data = $db->preparedQuery("SELECT * FROM branches");   //users
+    $data = $db->preparedQuery("SELECT * FROM branches");
     $out = [];
 
     foreach ($data as $entry) {

@@ -1,17 +1,12 @@
 <?php
 
 //Version of the server
-$version = "0.30b";
+$version = "0.50b";
 
 //DB type
 //$db_type = "pgsql"; //Uncomment this for PostgreSQL usage
 //$db_type = "sqlite"; //Uncomment this for SQLite3 usage
 $db_type = "mysql"; //Uncomment this for PDO usage
-
-//SQLite3 configuration
-/*$config = [
-    'db_name' => "./db/main.db_",
-];*/
 
 //DB configuration
 $config = [

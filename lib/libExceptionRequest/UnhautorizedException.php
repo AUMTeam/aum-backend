@@ -1,11 +1,8 @@
 <?php
 
 class UnauthorizedException extends ExceptionRequest {
-
+    
     public function __construct(string $message = "Unhautorized!", int $error_code = 104, int $status_code = 403) {
-        if (is_null($message))
-            $message = "Unauthorized!";
-        
         parent::__construct($message, $error_code, $status_code);
     }
 
