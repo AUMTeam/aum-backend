@@ -58,9 +58,9 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     if (!$maintenance_state) {
         //Header identification server status
         if($printDebug->isDebug())
-            header("Server-Mode: Chihiro API");
+            header("Server-Mode: AUM API - Debug");
         else
-            header("Server-Mode: AUM API");
+            header("Server-Mode: AUM API - Release");
 
         $response = NULL;
         $db = NULL;
@@ -85,7 +85,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
 
             //#1: Handle module and action on URL
             $url_data = explode("/", $_SERVER['REQUEST_URI']);
-            if(count($url_data) >= 4 + (count(explode("/", __DIR__)) - 3)) {    //Base dir is '/membri/aum/'. The 'count' thing is done is cases where main.php is not in the root dir
+            $file_path = explode("/", $_SERVER['SCRIPT_NAME']);
+            if(count($url_data) == count($file_path) + 2) {    //Check if request has more fields than this file
                 $main_posi = 0;
 
                 while($url_data[$main_posi] !== "main.php")

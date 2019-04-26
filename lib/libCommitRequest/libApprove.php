@@ -15,7 +15,7 @@ function approve($data, $user, $type) {
 
     //Only Tech Area users (role: 2) and Power Users (role: 5) are authorized to approve commits/requests
     if (!in_array(2, $role_id) && !in_array(5, $role_id))
-        throw new InvalidRequestException("The current user is not authorized to perform this action!", 103, 401);    //TODO: New error code?
+        throw new UnauthorizedException("The current user is not authorized to perform this action!");
 
     $id;
     switch ($type) {

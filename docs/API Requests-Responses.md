@@ -38,18 +38,19 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 }
 ```
 
-* Utente bloccato. L'utente è stato bloccato dall'amministratore. Di conseguenza, non ha più accesso alla piattaforma (temporaneo/permanente). L'utente deve contattare l'amministratore. (UNUSED?)
+* Dati impostati in modo scorretto
 ```json
 {
     "response_data":{
-        "error_code":104
+        "error_code":1001
     },
-    "status_code":423
+    "message":"Richiesta invalida",
+    "status_code":400
 }
 ```
 
 ## auth/login
-### Accedere utilizzando username e password. Il token in questa richiesta non è richiesto.
+Accede utilizzando username e password. Il token non è richiesto.
 
 #### Richiesta
 ```json
@@ -58,7 +59,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
     "access":"login",
     "request_data":{
         "username":"<username>",
-        "hash_pass":"<hash della password>"
+        "password":"<password>"
     }
 }
 ```
@@ -69,7 +70,6 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```json
 {
     "response_data":{
-        "success":true,
         "token":"<random hashed SHA1 bytes>",
         "user_id":1
     },
@@ -88,27 +88,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 }
 ```
 
-* Login fallito. Non sono state fornite le credenziali in modo corretto.
-```json
-{
-    "response_data":{
-        "error_code":1001
-    },
-    "message":"Richiesta invalida",
-    "status_code":400
-}
-```
 
-* Login fallito. L'utente è stato bloccato dall'amministratore. (UNUSED?)
-```json
-{
-    "response_data":{
-        "error_code":1003
-    },
-    "message":"Utente bloccato da amministratore",
-    "status_code":423
-}
-```
 
 ## auth/validateToken
 
@@ -128,7 +108,9 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 * Token valido. L'utente può proseguire con la sessione.
 ```json
 {
-    "response_data":{},
+    "response_data":{
+        "token_expire":123463345
+    },
     "status_code":200
 }
 ```
@@ -139,51 +121,37 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
     "response_data":{
         "error_code":1002
     },
-    "message":"Credenziali errate",
+    "message":"Token non valido",
     "status_code":401
 }
 ```
 
-## user/info
+## commit/add
 
-Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornate le informazioni dell'utente proprietario del token inviato nella richiesta. 
+Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori.
 
 #### Richiesta
 ```json
 {
-    "module":"user",
-    "access":"info",
+    "module":"commit",
+    "access":"add",
     "request_data":{
-        "user_id":1
+        "title":"title",
+        "description":"description string",
+        "components":"component description",
+        "branch":1
     }
 }
 ```
 
 #### Risposte
 
-* Utente trovato. (Utente proprietario del token)
-```json
-{
-    "response_data":{
-        "user_data":{
-            "user_id":1,
-            "name":"Mario",
-            "email":"test@example.com",
-            "role":[1,2,3],
-            "area":1
-        }
-    },
-    "status_code":200
-}
-```
+* Inserimento andato a buon fine
 
-* Utente non trovato
 ```json
 {
-    "response_data":{
-        "error_code":2000
-    },
-    "status_code":404
+    "response_data": {},
+    "status_code": 200
 }
 ```
 
@@ -220,18 +188,7 @@ Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: No
         "error_code":103
     },
     "message":"The current user is not authorized to perform this action!",
-    "status_code":401
-}
-```
-
-* L'ID del commit non è valido
-```json
-{
-    "response_data":{
-        "error_code":3007
-    },
-    "message":"Commit_id doesn't refer to a valid commit!",
-    "status_code":400
+    "status_code":403
 }
 ```
 
@@ -252,7 +209,7 @@ Restituisce la lista dei commit presenti nel database sotto forma di pagine. E' 
 
 Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id (id dei commit), description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, reviewer, approval_status, component, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo l'id dei commit.
 
-E' poi possibile impostare (facoltativamente) un **filtro** di ricerca. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
+E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
 
 #### Richiesta
 ```json
@@ -277,7 +234,7 @@ E' poi possibile impostare (facoltativamente) un **filtro** di ricerca. Si speci
 
 #### Risposte
 
-*count* contiene il conteggio degli elementi nella risposta. *count_total* contiene il numero totale di elementi presenti nel database. *approval_status* è uguale a *0* se il commit deve essere ancora valutato, *1* se è stato approvato e *-1* se è stato respinto.
+*count* contiene il conteggio degli elementi nella risposta per la pagina corrente, mentre *count_total* contiene il numero totale di elementi per la query effettuata. Il conteggio per *page* e *page_total* parte da 0. *approval_status* è uguale a *0* se il commit deve essere ancora valutato, *1* se è stato approvato e *-1* se è stato respinto.
 
 ```json
 {
@@ -313,7 +270,7 @@ E' poi possibile impostare (facoltativamente) un **filtro** di ricerca. Si speci
 }
 ```
 
-#commit/update
+## commit/update
 
 Utilizzato per richiedere se vi sono nuovi commit data una certa data.
 E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggiornamento ricevuto.
@@ -355,43 +312,108 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 }
 ```
 
-#commit/add
-
-Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori.
+## data/getAreas
+Restituisce l'elenco delle aree funzionali
 
 #### Richiesta
 ```json
 {
-    "module":"commit",
-    "access":"add",
-    "request_data":{
-        "title":"title",
-        "description":"description string",
-        "components":"component description",
-        "branch":1
-    }
+	"module":"data",
+	"action":"getAreas"
 }
 ```
 
-#### Risposte
-
-* Inserimento andato a buon fine
-
+#### Risposta
 ```json
 {
-    "response_data": {},
-    "status_code": 200
-}
-```
-
-* Almeno un campo è mancante
-```json
-{
-    "response_data":{
-        "error_code":1001
+  "response_data": [
+    {
+      "area_id": 1,
+      "area_string": "Area 1"
     },
-    "message":"Richiesta invalida",
-    "status_code":400
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
+## data/getBranch
+Restituisce l'elenco delle branch
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"getBranch"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "id": 1,
+      "name": "Tres-Zap"
+    },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
+## data/getClients
+Restituisce l'elenco dei clienti
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"getClients"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "email": "client@aum.com",
+      "role": [
+        4
+      ],
+      "area": null,
+      "user_id": 3,
+      "name": "Test Client User"
+    },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
+## data/getRoles
+Restituisce l'elenco dei ruoli in uso
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"getRoles"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "role_id": 1,
+      "role_string": "Developer"
+    },
+    [...]
+  ],
+  "status_code": 200
 }
 ```
 
@@ -430,20 +452,50 @@ Tutti i campi tranne *commits* sono obbligatori.
 }
 ```
 
-* Almeno un campo è mancante
+## request/approve
+
+Vedasi commit/approve
+
+#### Richiesta
 ```json
 {
-    "response_data":{
-        "error_code":1001
-    },
-    "message":"Richiesta invalida",
-    "status_code":400
+    "module":"request",
+    "access":"approve",
+    "request_data":{
+        "id":1,
+        "approve_flag":1
+    }
+}
+```
+## requests/install
+
+Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
+
+#### Richiesta
+```json
+
+	"module":"requests",
+	"action":"install",
+	"request_data": {
+		"id":4,
+		"feedback":"Test Feedback"
+	}
+}
+```
+
+#### Risposta
+
+* Inserimento andato a buon fine
+```json
+{
+  "response_data": [],
+  "status_code": 200
 }
 ```
 
 ## request/list
 
-Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role_id' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 #### Richiesta
 
@@ -451,7 +503,7 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
 {
     "module":"request",
     "access":"list",
-    "role_id":4,
+    "role":4,
     "request_data":{
         "limit":5,
         "page":6,
@@ -547,13 +599,13 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 	"action":"send",
 	"request_data": {
 		"id":4
-		}
+	}
 }
 ```
 
 #### Risposta
 
-Invio andato a buon fine 
+* Invio andato a buon fine 
 ```json
 {
   "response_data": [],
@@ -561,28 +613,72 @@ Invio andato a buon fine
 }
 ```
 
-## requests/install
+* L'utente non è autorizzato ad eseguire questa azione
+```json
+{
+    "response_data":{
+        "error_code":103
+    },
+    "message":"Unhautorized",
+    "status_code":403
+}
+```
 
-Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
+## request/update
+
+Vedasi *commit/update*
 
 #### Richiesta
 ```json
-
-	"module":"requests",
-	"action":"install",
-	"request_data": {
-		"id":4,
-		"feedback":"Test Feedback"
-		}
+{
+    "module":"request",
+    "access":"update",
+    "request_data":{
+        "latest_update_timestamp":1555745875
+    }
 }
 ```
 
-#### Risposta
+## user/info
 
-Inserimento andato a buon fine
+Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornate le informazioni dell'utente proprietario del token inviato nella richiesta. 
+
+#### Richiesta
 ```json
 {
-  "response_data": [],
-  "status_code": 200
+    "module":"user",
+    "access":"info",
+    "request_data":{
+        "user_id":1
+    }
+}
+```
+
+#### Risposte
+
+* Utente trovato
+```json
+{
+    "response_data":{
+        "user_data":{
+            "user_id":1,
+            "name":"Mario",
+            "email":"test@example.com",
+            "role":[1,2,3],
+            "area":1
+        }
+    },
+    "status_code":200
+}
+```
+
+* Utente non trovato
+```json
+{
+    "response_data":{
+        "error_code":104,
+        "error_message":"Utente non trovato"
+    },
+    "status_code":404
 }
 ```
