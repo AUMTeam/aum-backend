@@ -1,6 +1,8 @@
 <?php
 
-function approve(DatabaseWrapper $db, $data, $user, $type) {
+function approve($data, $user, $type) {
+    global $db;
+    
     //Checks fields integrity
     if(!isset($data['id']))
         throw new InvalidRequestException("Commit ID cannot be omitted", 3007);
@@ -11,25 +13,24 @@ function approve(DatabaseWrapper $db, $data, $user, $type) {
     $user_id = $user['user_id'];
     $role_id = $user['role'];
 
-    //Only Tech Area users (role: 2) are authorized to approve commits/requests
-    if (!in_array(2, $role_id))
-        throw new InvalidRequestException("The current user is not authorized to perform this action $role_id $role_id[0]!", 103, 401);    //TODO: New error code?
+    //Only Tech Area users (role: 2) and Power Users (role: 5) are authorized to approve commits/requests
+    if (!in_array(2, $role_id) && !in_array(5, $role_id))
+        throw new UnauthorizedException("The current user is not authorized to perform this action!");
 
     $id;
     switch ($type) {
-        case "commit":
+        case "commits":
             $id = "commit_id";
             break;
-        case "request":
+        case "requests":
             $id = "request_id";
             break;
         default:
             throw new Exception("Impossible to use the endpoint");
     }
-    $type .= "s";
 
-    //Check if commit_id is valid and whether the commit has already been approved
-    $query = $db->query("SELECT is_approved FROM $type WHERE $id={$data['id']}");
+    //Check if commit_id is valid and whether the commit has already been approved - $type is safe
+    $query = $db->preparedQuery("SELECT is_approved FROM $type WHERE $id=?", [$data['id']]);
     if (count($query) == 0)
         throw new InvalidRequestException("id doesn't refer to a valid commit!", 3007);
     else if ($query[0]['is_approved'] != 0)
@@ -39,5 +40,5 @@ function approve(DatabaseWrapper $db, $data, $user, $type) {
     if (isset($data['approvation_comment'])) $approvation_comment = $data['approvation_comment'];
 
 
-    $db->query("UPDATE $type SET is_approved={$data['approve_flag']}, approvation_comment='{$approvation_comment}', approver_user_id={$user_id}  WHERE $id={$data['id']}");
+    $db->preparedQuery("UPDATE $type SET is_approved=?, approvation_comment=?, approver_user_id=? WHERE $id=?", [$data['approve_flag'], $approvation_comment, $user_id, $data['id']]);
 }

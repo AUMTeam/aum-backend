@@ -2,7 +2,7 @@
 
 class InvalidRequestException extends ExceptionRequest {
 
-    public function __construct(string $message, int $error_code = 104, int $status_code = 400) {
+    public function __construct(string $message = "Invalid Request", int $error_code = 104, int $status_code = 400) {
         parent::__construct($message, $error_code, $status_code);
     }
 

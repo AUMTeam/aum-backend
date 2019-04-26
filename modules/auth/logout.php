@@ -7,7 +7,7 @@ $exec = function (array $data, array $data_init) : array {
     global $token;
 
     //Erase the token from the DB
-    $db->query("DELETE FROM users_tokens WHERE token = '$token'");
+    $db->preparedQuery("DELETE FROM users_tokens WHERE token=?", [$token]);
 
     return [
         "response_data" => [],

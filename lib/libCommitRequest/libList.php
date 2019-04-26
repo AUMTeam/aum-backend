@@ -1,7 +1,11 @@
 <?php
 
+$listType;
+
 //Validate the user input
-function validateInput(&$data, $type) {
+function validateInput(array &$data) : void {
+    global $listType;
+
     //Check is fundamental fields are present
     if(!isset($data['limit']))
         throw new InvalidRequestException("limit cannot be blank", 3000);
@@ -17,7 +21,7 @@ function validateInput(&$data, $type) {
         ];
     //Else convert the parameter name from the API one to the DB one
     } else {
-        $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $type);
+        $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $listType);
         if(!isset($data['sort']['order'])) $data['sort']['order'] = "DESC";
     }
 
@@ -44,15 +48,22 @@ function validateInput(&$data, $type) {
             throw new InvalidRequestException("filter parameter must have at least length one byte");
         else
             //Convert the attribute name from the API one to the DB one
-            $data['filter']['attribute'] = translateName($data['filter']['attribute'], $type);
+            $data['filter']['attribute'] = translateName($data['filter']['attribute'], $listType);
     }
 }
 
 //Translates the names from the API one to the DB one
-function translateName($attribute, $type) : string {
+function translateName(string $attribute) : string {
+    global $listType;
+    
     switch($attribute) {
         case "id":
-            return $type . "_id";
+            if ($listType == "commits")
+                return "commit_id";
+            else
+                return "request_id";
+        case "title":
+            return "title";
         case "description":
             return "description";
         case "timestamp":
@@ -65,70 +76,163 @@ function translateName($attribute, $type) : string {
             return "approver_user_id";
         case "approval_status":
             return "is_approved";
-        case "component":
-            return "component_id";
+        case "components":
+            return "components";
         case "branch":
             return "branch_id";
         default:
-            throw new InvalidRequestException("Invalid parameter '$attribute'");
+            throw new InvalidRequestException("Invalid sorting/filtring parameter '$attribute'");
     }
 }
 
-function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user_id, $cur_user_role) {
-    $type = strtolower($type);
-
+function get_list(string $type, array $data, int $cur_user_id, array $cur_user_role) {
+    global $listType;
+    $listType = $type;
+    validateInput($data);
+    
     //Execute the query based on $type parameter
-    switch ($type) {
-        case "commit":
+    switch ($listType) {
+        case "commits":
             $id = "commit_id";
             break;
-        case "request":
+        case "requests":
             $id = "request_id";
+            break;
+        case "client":
             break;
         default:
             throw new Exception("Impossible to use the list");
     }
 
-    //The real table names are actually plural
-    $table = $type . "s";
+    global $db;
+    $query;
+    $params = [];
+    $out = [];
+
     //Calculate the starting commit ID (number of commits per page * number of page)
-    $offset = $data['limit'] * $data['page'];
+    $data['limit'] = intval($data['limit']);
+    $offset = $data['limit'] * intval($data['page']);
 
-    //Base query
-    $query = "SELECT author.username as au_username, author.name as au_name,
-        approver.username as ap_username, approver.name as ap_name, $table.*
-        FROM $table
-            JOIN users as author ON $table.author_user_id = author.user_id
-            LEFT JOIN users as approver ON $table.approver_user_id = approver.user_id";
-
-    //Filter parameters was set (The LIKE part looks like this: attribute _/NOT LIKE %valueMatches%)
-    if (isset($data['filter']['attribute']))
-        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE '%{$data['filter']['valueMatches']}%'";
-
-    //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
-    if (in_array(2, $cur_user_role)) {
-        $area = $db->query("SELECT area_id FROM users WHERE user_id = {$cur_user_id}")[0]['area_id'];
-        $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
-    //If the user is (only) a programmer (1), show only his commits
-    } else if (in_array(1, $cur_user_role)) {
-        $query .= " AND author_user_id = ${cur_user_id}";
+    if ($listType == "client")
+        $query = getClientQuery($cur_user_id, $params);
+    else
+        $query = getInternalQuery($data, $cur_user_id, $cur_user_role, $params);
+    
+    if (isset($data['filter']['attribute'])) {   //Attribute and Negate are safe
+        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE ?";
+        array_push($params, "%{$data['filter']['valueMatches']}%");
     }
-
-    //Order part
+    
+    //Order part - safe
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
-    $query .= " LIMIT $offset, {$data['limit']}";
+    $query .= " LIMIT ?, ?";
+    array_push($params, $offset);
+    array_push($params, $data['limit']);
 
-    $queryResult = $db->query($query);
+    $queryResult = $db->preparedQuery($query, $params);
 
+    $out = getCount($query, $data, $queryResult, $params);
+    
 
-    //--Get the total number of commits
+    if ($listType == "client") {
+        foreach($queryResult as $entry) {
+            $temp = [
+                'id' => $entry['id'],
+                'title' => $entry['title'],
+                'description' => $entry['description'],
+                'timestamp' => $entry['approvation_date'],
+                'branch' => $entry['branch_id'],
+                'install_type' => $entry['install_type'],
+                'install_link' => $entry['install_link'],
+                'install_date' => $entry['install_date'],
+                'install_comment' => $entry['comment']
+            ];
+            $out['list'][] = $temp;
+        }
+    } else {
+        //Populate the response array with each commit element of the chosen page
+        foreach ($queryResult as $entry) {
+            $temp = [
+                'id' => $entry[$id],
+                'title' => $entry['title'],
+                'description' => $entry['description'],
+                'timestamp' => strtotime($entry['creation_date']),
+                'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
+                'components' => $entry['components'],
+                'branch' => $entry['branch_id'],
+                'approval_status' => $entry['is_approved'],
+                'author' => [
+                    'user_id' => $entry['author_user_id'],
+                    'username' => $entry['au_username'],
+                    'name' => $entry['au_name']
+                ],
+                'approver' => [
+                    'user_id' => $entry['approver_user_id'],
+                    'username' => $entry['ap_username'],
+                    'name' => $entry['ap_name']
+                ]
+            ];
+            if ($listType=="requests") {
+                $install = [
+                    'install_link' => $entry['install_link'],
+                    'install_type' => $entry['install_type']
+                ];
+                $temp = array_merge($temp, $install);
+            }
+
+            $out['list'][] = $temp;
+        }
+    }
+
+    return $out;
+}
+
+function getClientQuery(int $cur_user_id, array &$params) : string {
+    $params = [$cur_user_id];
+    
+    return "SELECT requests.request_id as 'id', title, approvation_date, description, install_type, install_date, comment, install_link, branch_id 
+        FROM requests_clients, requests
+        WHERE requests_clients.request_id=requests.request_id AND is_approved=2 AND client_user_id=?";
+}
+
+function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, array &$params) : string {
+    global $db;
+    global $listType;
+    $query;
+    
+    //Base query - $listType is safe and prepared statements could not be used in FROM anyway
+    $query = "SELECT author.username as au_username, author.name as au_name,
+    approver.username as ap_username, approver.name as ap_name, $listType.*
+    FROM $listType LEFT JOIN users as approver ON $listType.approver_user_id=approver.user_id, users as author
+    WHERE $listType.author_user_id=author.user_id";
+
+    //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
+    if (in_array(2, $cur_user_role)) {
+        $area = $db->preparedQuery("SELECT area_id FROM users WHERE user_id=?", [$cur_user_id])[0]['area_id'];
+        $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
+    //If the user is a programmer (1), show only his commits
+    } else if (in_array(1, $cur_user_role)) {
+        $query .= " AND author_user_id=?";
+        array_push($params, $cur_user_id);
+    }
+    return $query;
+}
+
+//--Get the total number of commits
+function getCount(string $query, array $data, array $queryResult, array $params) : array {
+    global $db;
+    $out = [];
+    //Remove last two elements of params array (LIMIT part)
+    array_pop($params);
+    array_pop($params);
+    
     $countQuery = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
-    $countQuery = substr($countQuery, 0, strpos($countQuery, 'LIMIT'));  //Strip LIMIT part
+    $countQuery = substr($countQuery, 0, strpos($countQuery, 'ORDER'));  //Strip ORDER BY part
 
     $countQuery = "SELECT COUNT(*) AS 'count' " . $countQuery;           //Add COUNT in SELECT
-    $countTotal = (int) $db->query($countQuery)[0]['count'];
+    $countTotal = (int) $db->preparedQuery($countQuery, $params)[0]['count'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
     if ($countTotal > 0) {
@@ -153,33 +257,6 @@ function get_list_data(string $type, array $data, DatabaseWrapper $db, $cur_user
         'page' => $page,
         'page_total' => $max_page,
     ];
-
-    //Populate the response array with each commit element of the chosen page
-    foreach ($queryResult as $entry) {
-
-        if ($entry == NULL)
-            break;
-
-        $temp = [
-            'id' => $entry[$id],
-            'description' => $entry['description'],
-            'timestamp' => strtotime($entry['creation_date']),
-            'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
-            'approval_status' => $entry['is_approved'],
-            'author' => [
-                'user_id' => $entry['author_user_id'],
-                'username' => $entry['au_username'],
-                'name' => $entry['au_name']
-            ],
-            'approver' => [
-                'user_id' => $entry['approver_user_id'],
-                'username' => $entry['ap_username'],
-                'name' => $entry['ap_name']
-            ]
-        ];
-
-        $out['list'][] = $temp;
-    }
 
     return $out;
 }

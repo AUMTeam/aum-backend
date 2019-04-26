@@ -3,11 +3,15 @@
 $init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    //Return the token's expiration date
+    $out = [
+        ['id' => 0,
+        'desc' => 'A Caldo'],
+        ['id' => 1,
+        'desc' => 'A Freddo']
+    ];
+
     return [
-        "response_data" => [
-            "token_expire" => getTokenExpire()
-        ],
+        "response_data" => $out,
         "status_code" => 200
     ];
 };

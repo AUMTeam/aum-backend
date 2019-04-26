@@ -1,8 +1,11 @@
 <?php
 $warnings = [];
 
-if(!file_exists(__DIR__ . "/log/"))
-    mkdir(__DIR__ . "/log/");
+require_once __DIR__ . "/config.php";
+
+//Initializing debug mode
+require_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
+$printDebug = new PrintDebug($debug_mode);
 
 //Set the error reporting system
 require_once __DIR__ . "/lib/libCatcher/include.php";
@@ -14,12 +17,11 @@ set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
 //Import important libraries
 require_once __DIR__ . "/lib/libDatabase/include.php";
 require_once __DIR__ . "/lib/libExceptionRequest/include.php";
-require_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
-require_once __DIR__ . "/lib/libMail/include.php";
-require_once __DIR__ . "/config.php";
 
 //small libs for actions
 require_once __DIR__ . "/lib/libUserInfo/include.php";
+require_once __DIR__ . "/lib/libMail/include.php";
+require_once __DIR__ . "/lib/libToken/include.php";
 
 //Set basic headers
 date_default_timezone_set('Europe/Rome');
@@ -28,8 +30,6 @@ header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encodi
 header("Content-Encoding: gzip");
 header("Server-Version: $version");
 
-//Initializing debug mode
-$printDebug = new PrintDebug($debug_mode);
 
 //GZIP compression
 if(!ob_start("ob_gzhandler")) ob_start();
@@ -39,9 +39,9 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(200);
         header("Access-Control-Allow-Methods: POST, OPTIONS");
-        $printDebug->printDebug("OPTIONS MESSAGE SENT\n");
+        $printDebug->printDebug("Options message sent\n");
     } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        //Other Methods (typically GET) -> show an easter egg if in debug mode
+        //Show an easter egg if in debug mode
         http_response_code(405);
         $printDebug->printDebug('
         <html>
@@ -61,26 +61,15 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
     if (!$maintenance_state) {
         //Header identification server status
         if($printDebug->isDebug())
-            header("Server-Mode: Chihiro API");
+            header("Server-Mode: AUM API - Debug");
         else
-            header("Server-Mode: AUM API");
+            header("Server-Mode: AUM API - Release");
 
         $response = NULL;
         $db = NULL;
 
         try {
-            //Set up database connection
-            if($db_usage == "SQLITE3")
-                //SQLite3 usage
-                $db = new SQLite3DatabaseWrapper($sqlite3_name);
-            else if ($db_usage == "MYSQL")
-                //MySQL usage
-                $db = new MySQLDatabaseWrapper($config);
-            else if ($db_usage == "PDO")
-                $db = new PDODatabaseWrapper($config);
-            else
-                //Invalid string
-                throw new Exception("Invalid DB setup");
+            $db = new DatabaseWrapper($db_type, $config);
 
             //**JSON Parsing**
             //Decodes JSON if present
@@ -99,7 +88,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
 
             //#1: Handle module and action on URL
             $url_data = explode("/", $_SERVER['REQUEST_URI']);
-            if(count($url_data) >= 4 + (count(explode("/", __DIR__)) - 3)) {    //Base dir is '/membri/aum/'. The 'count' thing is done is cases where main.php is not in the root dir
+            $file_path = explode("/", $_SERVER['SCRIPT_NAME']);
+            if(count($url_data) == count($file_path) + 2) {    //Check if request has more fields than this file
                 $main_posi = 0;
 
                 while($url_data[$main_posi] !== "main.php")
@@ -145,17 +135,8 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 if($token == null)
                     //No token found
                     throw new NoTokenException("Token can't be omitted here");
-                else {
-                    //Checks if token is active or valid
-                    $result = $db->query("SELECT token_expire FROM users_tokens WHERE token = '{$token}'");
-                    if(is_bool($result) or count($result) == 0)
-                        throw new InvalidTokenException("Token is not valid");
-
-                    if(time() > $result[0]['token_expire']) {
-                        $db->query("DELETE FROM users_tokens WHERE token = '{$token}'");
-                        throw new InvalidTokenException("Token is not valid anymore. Please remake login.");
-                    }
-                }
+                else
+                    getTokenExpire();   //We aren't interested in the return value
             }
 
             //Checks if you can find the module
@@ -185,27 +166,19 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             $response = $exec($request_data, $data_init);
 
             //Handling token expiration starts here:
-            if(isset($token) || isset($response['response_data']['token'])){
+            if(isset($token) || isset($response['response_data']['token'])) {
                 //Take the new generated token if you generated one
                 if(isset($response['response_data']['token']))
                     $token = $response['response_data']['token'];
 
                 //Write the new token expire
-                if($printDebug->isDebug()) // DEBUG PURPOSE ONLY
-                    $new_expire = time() + (60 * 30); //Valid for 30 minutes for debugging multiple timeout
-                else
-                    $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
-
-                $db->query("UPDATE users_tokens SET token_expire = $new_expire WHERE token = '$token'");
-
-                if($printDebug->isDebug()) $response['response_data']['debug']['expire'] = $new_expire;
+                increaseTokenExpire();
             }
 
-        }catch (ExceptionRequest $invalidRequestException){
+        }catch (ExceptionRequest $ex) {
             //Simple error
-            $response = $invalidRequestException->getErrorResponse();
-        }catch (Exception $exception){
-            fatal_error:
+            $response = $ex->getErrorResponse();
+        }catch (Exception $exception) {
             //Fatal error
             $response = [
                 'response_data' => [],

@@ -3,11 +3,10 @@
 $init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    //Return the token's expiration date
+    require_once __DIR__ . "/../../lib/libCommitRequest/libUpdate.php";
+
     return [
-        "response_data" => [
-            "token_expire" => getTokenExpire()
-        ],
+        "response_data" => getUpdates($data, "requests"),
         "status_code" => 200
     ];
 };
