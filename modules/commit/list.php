@@ -2,6 +2,9 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Gets the list of commits
+ */
 $exec = function (array $data, array $data_init) : array {
     require_once __DIR__ . "/../../lib/libCommitRequest/libList.php";
 

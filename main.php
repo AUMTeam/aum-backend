@@ -1,6 +1,4 @@
 <?php
-$warnings = [];
-
 require_once __DIR__ . "/config.php";
 
 //Initializing debug mode
@@ -8,6 +6,7 @@ require_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
 $printDebug = new PrintDebug($debug_mode);
 
 //Set the error reporting system
+$warnings = [];
 require_once __DIR__ . "/lib/libCatcher/include.php";
 //register_shutdown_function("envi_shutdown_catcher");
 set_error_handler("envi_error_catcher", E_STRICT);    //Catch on PHP Fatal error
@@ -15,13 +14,13 @@ set_error_handler("envi_warning_catcher", E_WARNING); //Catch on PHP Warning
 set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
 
 //Import important libraries
-require_once __DIR__ . "/lib/libDatabase/include.php";
 require_once __DIR__ . "/lib/libExceptionRequest/include.php";
+require_once __DIR__ . "/lib/libDatabase/include.php";
 
 //small libs for actions
+require_once __DIR__ . "/lib/libToken/include.php";
 require_once __DIR__ . "/lib/libUserInfo/include.php";
 require_once __DIR__ . "/lib/libMail/include.php";
-require_once __DIR__ . "/lib/libToken/include.php";
 
 //Set basic headers
 date_default_timezone_set('Europe/Rome');
@@ -35,11 +34,13 @@ header("Server-Version: $version");
 if(!ob_start("ob_gzhandler")) ob_start();
 
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
+
     //OPTIONS Method -> communicate the allowed methods
     if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
         http_response_code(200);
         header("Access-Control-Allow-Methods: POST, OPTIONS");
         $printDebug->printDebug("Options message sent\n");
+
     } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         //Show an easter egg if in debug mode
         http_response_code(405);
@@ -58,17 +59,19 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
 } else {
     header("Content-Type: application/json");
 
+    //Check if the server is in maintenance state
     if (!$maintenance_state) {
+
         //Header identification server status
         if($printDebug->isDebug())
             header("Server-Mode: AUM API - Debug");
         else
             header("Server-Mode: AUM API - Release");
 
-        $response = NULL;
-        $db = NULL;
 
+        $db = null;
         try {
+            //Connect to the database
             $db = new DatabaseWrapper($db_type, $config);
 
             //**JSON Parsing**
@@ -83,6 +86,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             //Module and Action can be specified either in the URL (main.php/module/action) or JSON elements (module=; action=)
             $module = null;
             $action = null;
+            $response = null;
             $token = null;
             $user = null;
             $request_data = [];
@@ -96,9 +100,9 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 while($url_data[$main_posi] !== "main.php")
                     $main_posi++;
 
-            //Save data on variables
-            $module = $url_data[$main_posi+1];
-            $action = $url_data[$main_posi+2];
+                //Save data on variables
+                $module = $url_data[$main_posi+1];
+                $action = $url_data[$main_posi+2];
 
             //#2: Handle module and action in JSON (or fail if they're not present)
             } else {
@@ -113,12 +117,14 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 $action = $request['action'];
             }
 
+
             //Save the payload if present
             if(!isset($request['request_data']) or is_null($request['request_data'])){
                 //Preparing an empty object as default request
                 $request['request_data'] = [];
             }
             $request_data = $request['request_data'];
+
 
             //Getting all headers from request
             $headers = getallheaders();
@@ -129,7 +135,6 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             else if(isset($headers['X-Auth-Header']))
                 $token = $headers['x-auth-header'];
 
-
             //Ignoring token check only when special entrypoints are called
             if(!(($module == "auth" and $action == "login") or ($module == "data" and $action == "roles"))) {
                 //Checks if token is on the header
@@ -138,9 +143,10 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                     throw new NoTokenException("Token can't be omitted here");
                 else {
                     getTokenExpire();   //We aren't interested in the return value
-                    $user = getMyInfo($token);  //Get the user infos (used in many points)
+                    $user = getMyInfo();  //Get the user infos (used in many points)
                 }
             }
+
 
             //Checks if the module is present
             if(!file_exists(__DIR__ . "/modules/$module/$action.php"))
@@ -178,10 +184,10 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 increaseTokenExpire();
             }
 
-        }catch (ExceptionRequest $ex) {
+        } catch (ExceptionRequest $ex) {    //ExceptionRequest are managed exceptions
             //Simple error
             $response = $ex->getErrorResponse();
-        }catch (Exception $exception) {
+        } catch (Exception $exception) {    //Unmanaged exceptions - print the message if in debug mode
             //Fatal error
             $response = [
                 'response_data' => [],
@@ -202,14 +208,14 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
         if(count($warnings) > 0)
             $response['response_data']['debug']['warnings'] = $warnings;
 
-    } else {
+    } else {    //if (!$maintenance_state)
         $response = [
             "status_code" => 503,
             "message" => "Server in manutenzione",
         ];
     }
 
-    //Here ends the request with HTTP Code and JSON-ifying of a response
+    //End the request with HTTP Code and JSON-ify the response
     http_response_code($response['status_code']);
     echo json_encode($response);
 }

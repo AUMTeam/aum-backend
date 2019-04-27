@@ -2,6 +2,9 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Gets the list commits ID for the current user, used for autocomplete in the frontend
+ */
 $exec = function (array $data, array $data_init) : array {
     global $user;
     global $db;

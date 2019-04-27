@@ -7,10 +7,9 @@ $init = function (array $data) : array { return []; };
  */
 $exec = function (array $data, array $data_init) : array {
     global $db;
+    $out = [];
 
     $data = $db->query("SELECT * FROM areas");
-
-    $out = [];
 
     foreach ($data as $entry)
         $out[] = [

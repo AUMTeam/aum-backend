@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Mail used to communicate that there's a new commit/request to the tech area members
+ */
 class NewCommitMail extends AbstractMail {
     private $title;
     private $desc;

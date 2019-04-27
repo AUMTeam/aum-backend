@@ -2,15 +2,16 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Log the user into the application
+ */
 $exec = function (array $data, array $data_init) : array {
     global $db;
+    global $max_sessions;
 
     //Check fields presence
-    if(!isset($data['username']))
-        throw new InvalidRequestException("'username' field cannot be blank");
-
-    if(!isset($data['password']))
-        throw new InvalidRequestException("'password' field cannot be blank");
+    if(!isset($data['username']) || !isset($data['password']))
+        throw new InvalidRequestException();
 
     //Compute the hash of the password and verify if the user is present in the DB
     $result = $db->preparedQuery("SELECT user_id, hash_pass FROM users WHERE username=?", [$data['username']]);
@@ -21,6 +22,7 @@ $exec = function (array $data, array $data_init) : array {
     //Get the ID of the user
     $user_id = $result[0]['user_id'];
 
+
     //Generate a random access token
     $token = sha1(random_bytes(64));
 
@@ -28,12 +30,11 @@ $exec = function (array $data, array $data_init) : array {
     $tokens = $db->preparedQuery("SELECT token, token_expire FROM users_tokens WHERE user_id=? ORDER BY token_expire ASC", [$user_id]);
 
     //If there are more than 5 tokens, overwrite one of them (max 5 sessions are allowed); else add it to the list
-    if(count($tokens) >= 5)
+    if(count($tokens) >= $max_sessions)
         $db->preparedQuery("UPDATE users_tokens SET token=? WHERE token_expire=? AND user_id=?", [$token, $tokens[0]['token_expire'], $user_id]);
     else {
         $expire = time() + (60*30);
         $db->preparedQuery("INSERT INTO users_tokens(user_id, token, token_expire) VALUES(?, ?, ?)", [$user_id, $token, $expire]);
-
     }
 
     return [

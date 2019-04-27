@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Mail to inform client of the presence of a new update of the app
+ */
 class NewPatchMail extends AbstractMail {
 
     public function __construct(string $from, string $to) {

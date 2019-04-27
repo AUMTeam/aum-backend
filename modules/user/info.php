@@ -2,6 +2,9 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Gets the current user info, or an user info if user_id is specified
+ */
 $exec = function (array $data, array $data_init) : array {
     $out = [];
 

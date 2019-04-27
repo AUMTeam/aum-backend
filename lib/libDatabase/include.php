@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Class used to communicate to the DataBase
+ */
 class DatabaseWrapper {
+    //PDO object
     private $handler;
 
+    //Istantiate the PDO object using values from 'config.php' file
     public function __construct(string $db_type, array $config) {
         $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false];
 
@@ -19,6 +24,7 @@ class DatabaseWrapper {
         }
     }
 
+    //Execute a query. WARNING: this is SQL-Injection insafe
     public function query(string $query) : array {
         try {
             if (strpos($query, "SELECT") !== false) {
@@ -37,35 +43,43 @@ class DatabaseWrapper {
         }
     }
 
-    //Executes a parametrized query (Can throw PDOException)
+    //Executes a parametrized query, SQL Injection Safe
     public function preparedQuery(string $query, array $params = null) : array {
-        $out = [];
-        $stmt = $this->handler->prepare($query);
+        try {
+            $out = [];
+            $stmt = $this->handler->prepare($query);
 
-        if ($params != null) {
-            for($i=0;$i<count($params); $i++) {
-                $elem = $params[$i];
-                $type = PDO::PARAM_STR;
-
-                if (is_string($elem) || is_float($elem))    //PARAM_FLOAT is not supported
+            if ($params != null) {
+                //Bind the params with their respective data types
+                for($i=0;$i<count($params); $i++) {
+                    $elem = $params[$i];
                     $type = PDO::PARAM_STR;
-                else if (is_int($elem))
-                    $type = PDO::PARAM_INT;
-                else if (is_bool($elem))
-                    $type = PDO::PARAM_BOOL;
 
-                $stmt->bindParam($i+1, $elem, $type);
-            }
-        } else
-            $params = [];
+                    if (is_string($elem) || is_float($elem))    //PARAM_FLOAT is not supported
+                        $type = PDO::PARAM_STR;
+                    else if (is_int($elem))
+                        $type = PDO::PARAM_INT;
+                    else if (is_bool($elem))
+                        $type = PDO::PARAM_BOOL;
 
-        //Execute the query
-        $stmt->execute($params);
+                    $stmt->bindParam($i+1, $elem, $type);
+                }
+            } else
+                $params = [];
 
-        if (strpos($query, "SELECT") !== false)
-            $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            //Execute the query
+            $stmt->execute($params);
 
-        return $out;
+            //We need to get results only from SELECT queries
+            if (strpos($query, "SELECT") !== false)
+                $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return $out;
+        
+        } catch(PDOException $ex) {
+            //Print the exception in the JSON response
+            throw new DBException("Error in executing query: " + $ex->getMessage());
+        }
     }
 
     public function __destruct() {

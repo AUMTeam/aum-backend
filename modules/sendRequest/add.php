@@ -2,6 +2,9 @@
 
 $init = function (array $data) : array { return [ ]; };
 
+/**
+ * Adds a new send request to the database
+ */
 $exec = function (array $data, array $data_init) : array {
     global $user;
     global $db;
@@ -30,8 +33,9 @@ $exec = function (array $data, array $data_init) : array {
             $db->preparedQuery("INSERT INTO requests_commits(request_id, commit_id) VALUES (?, ?)", [$request_id, $commit_id]);
     }
 
+    //Send an email to the tech area responsibles
     foreach($user['resp'] as $resp) {
-        send($resp['user_id'], $request_id, MAIL_NEW_COMMIT, TYPE_REQUEST);
+        sendMail($resp['user_id'], $request_id, MAIL_NEW_COMMIT, TYPE_REQUEST);
     }
 
     return [

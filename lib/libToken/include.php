@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Returns the expiration date (UNIX timestamp) of the token
+ */
 function getTokenExpire() {
     global $db;
     global $token;
@@ -16,15 +19,20 @@ function getTokenExpire() {
     return $result[0]['token_expire'];
 }
 
+/**
+ * Increases the current token' expiration date
+ */
 function increaseTokenExpire() {
     global $db;
     global $token;
     global $printDebug;
+    global $token_validity_debug;
+    global $token_validity_release;
 
-    if($printDebug->isDebug()) // DEBUG PURPOSE ONLY
-        $new_expire = time() + (60 * 30); //Valid for 30 minutes for debugging multiple timeout
+    if($printDebug->isDebug())
+        $new_expire = time() + (60 * $token_validity_debug); //Valid for 30 minutes
     else
-        $new_expire = time() + ((60*60) * 4); //Token Valid for more 4hours from now.
+        $new_expire = time() + (60 * $token_validity_release); //Token valid for more 4hours from now.
 
     $db->preparedQuery("UPDATE users_tokens SET token_expire=? WHERE token=?", [$new_expire, $token]);
 

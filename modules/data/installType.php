@@ -2,6 +2,9 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Gets the install types
+ */
 $exec = function (array $data, array $data_init) : array {
     $out = [
         ['id' => 0,

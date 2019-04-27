@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Mail for approved commits/send requests
+ */
 class ApprovedMail extends AbstractMail {
     private $title;
     private $desc;

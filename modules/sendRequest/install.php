@@ -2,6 +2,9 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Notifty IBT that a client has installed a new update
+ */
 $exec = function (array $data, array $data_init) : array {
     global $db;
     global $user;
@@ -11,8 +14,8 @@ $exec = function (array $data, array $data_init) : array {
 
     $now = time();
 
-    if (in_array(4, $user['role'])) {
-        $feedback = "";
+    if (in_array(4, $user['role'])) {   //Only clients can use this endpoint
+        $feedback = "";     //Feedback is not mandatory
         if (isset($data['feedback']))
             $feedback = $data['feedback'];
 

@@ -6,7 +6,7 @@ $version = "0.50b";
 //DB type
 //$db_type = "pgsql"; //Uncomment this for PostgreSQL usage
 //$db_type = "sqlite"; //Uncomment this for SQLite3 usage
-$db_type = "mysql"; //Uncomment this for PDO usage
+$db_type = "mysql"; //Uncomment this for MySQL usage
 
 //DB configuration
 $config = [
@@ -20,6 +20,13 @@ $config = [
 $debug_mode = true;
 if($debug_mode == false && !file_exists(__DIR__ . "/log/"))
     mkdir(__DIR__ . "/log/");
+
+//Token validity times (in minutes)
+$token_validity_debug = 30;
+$token_validity_release = 240;  //4 hours
+
+//Max number of sessions per user
+$max_sessions = 5;
 
 //Flag for maintenance mode
 $maintenance_state = false;

@@ -7,8 +7,9 @@ $init = function (array $data) : array { return []; };
  */
 $exec = function (array $data, array $data_init) : array {
     global $db;
-    $data = $db->query("SELECT * FROM roles");
     $out = [];
+
+    $data = $db->query("SELECT * FROM roles");
 
     foreach ($data as $entry)
         $out[] = [

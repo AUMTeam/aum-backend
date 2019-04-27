@@ -1,7 +1,11 @@
 <?php
 
-function getMyInfo(string $token) : array {
+/**
+ * Get the current user infos given its token
+ */
+function getMyInfo() : array {
     global $db;
+    global $token;
     $out = [];
 
     $user_id = $db->preparedQuery("SELECT user_id FROM users_tokens WHERE token=?", [$token]);
@@ -14,23 +18,34 @@ function getMyInfo(string $token) : array {
     return $out;
 }
 
-function getUserInfo(int $user_id) : array {
+/**
+ * Get the infos of an user with a defined user_id
+ */
+function getUserInfo($user_id) : array {
     global $db;
 
     //Retrive data from the DB
-    $user_data = $db->preparedQuery("SELECT user_id, name, area_id, email FROM users WHERE user_id=?", [$user_id]);
+    $query = $db->preparedQuery("SELECT user_id, username, name, area_id, email FROM users WHERE user_id=?", [$user_id]);
 
-    if(count($user_data) == 0)
+    if(count($query) == 0)
         throw new UserNotFoundException("User not found");
-
-    //Temporary storing
-    $out = $user_data[0];
-    $out['resp'] = [];
+    $query = $query[0];
+    
+    //Prepopulate the response array
+    $out = [
+        'user_id' => $query['user_id'],
+        'username' => $query['username'],
+        'name' => $query['name'],
+        'email' => $query['email'],
+        'role' => [],
+        'resp' => [],
+        'area_id' => $query['area_id']
+    ];
 
     //Get the list of roles
     $roles = $db->preparedQuery("SELECT role_id FROM users_roles WHERE user_id=?", [$user_id]);
     for($i=0; $i < count($roles); $i++)
-       $out['role_id'][$i] = (int) $roles[$i]['role_id'];
+       $out['role'][$i] = (int) $roles[$i]['role_id'];
 
     //Obtaining string for 'area' if needed
     if(!is_null($out['area_id'])) {
@@ -42,23 +57,13 @@ function getUserInfo(int $user_id) : array {
         
         foreach($tech as $entry) {
             $arr = [
-                'email' => $entry['email'],
                 'user_id' => $entry['user_id'],
-                'name' => $entry['name']
+                'name' => $entry['name'],
+                'email' => $entry['email']
             ]; 
             array_push($out['resp'], $arr);
         }
     }
-
-    //Make a new correct response
-    $out = [
-        'email' => $out['email'],
-        'role' => $out['role_id'],
-        'area' => $out['area_id'],
-        'user_id' => $out['user_id'],
-        'name' => $out['name'],
-        'resp' => $out['resp']
-    ];
 
     return $out;
 }

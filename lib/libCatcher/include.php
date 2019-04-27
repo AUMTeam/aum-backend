@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Functions used to catch errors/warnings/notices and print then in 
+ *  JSON response (debug=true) or in log files (debug=false)
+ */
+
 //Fatal error handling
 function envi_error_catcher($errno, $errstr, $errfile, $errline) {
     global $printDebug;
@@ -17,13 +22,15 @@ function envi_error_catcher($errno, $errstr, $errfile, $errline) {
             "error_file" => $errfile,
             "error_message" => "Custom error: [$errno] $errstr. Error on line $errline in $errfile"
         ];
+        http_response_code(500);
+        die(json_encode($out));
     } else {
         file_put_contents(__DIR__ . "/log/Error_" . date("d-m-y") . ".log", time() . "Custom error: [$errno] $errstr. Error on line $errline in $errfile");
+        $fp=fopen("php://output","w");
+        fwrite($fp,json_encode($out));
+        http_response_code(500);
+        die(fclose($fp));
     }
-
-    $fp=fopen("php://output","w");
-    fwrite($fp,json_encode($out));
-    die(fclose($fp));
 }
 
 function envi_shutdown_catcher() {
@@ -36,13 +43,13 @@ function envi_shutdown_catcher() {
     }
 }
 
+//Warning handling
 function envi_warning_catcher($errno, $errstr, $errfile, $errline) {
     global $printDebug;
     global $warnings;
 
     if($printDebug->isDebug()) {
         $warnings[] = [
-            "warning" => "Warning triggered: Error on line $errline in $errfile",
             "dev_message" => "Warning triggered: [$errno] $errstr. Error on line $errline in $errfile"
         ];
     } else {
@@ -50,13 +57,13 @@ function envi_warning_catcher($errno, $errstr, $errfile, $errline) {
     }
 }
 
+//Notices handling
 function envi_notice_catcher($errno, $errstr, $errfile, $errline) {
     global $printDebug;
     global $warnings;
 
     if($printDebug->isDebug()) {
         $warnings[] = [
-            "warning" => "Notice triggered: Error on line $errline in $errfile",
             "dev_message" => "Notice triggered: [$errno] $errstr. Error on line $errline in $errfile"
         ];
     } else {

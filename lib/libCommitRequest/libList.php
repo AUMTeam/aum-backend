@@ -1,5 +1,6 @@
 <?php
 
+//Type of the list (commit/request/client)
 $listType;
 
 //Validate the user input
@@ -9,12 +10,14 @@ function validateInput(array &$data) : void {
     //Check is fundamental fields are present
     if(!isset($data['limit']))
         throw new InvalidRequestException("limit cannot be blank", 3000);
-
     if(!isset($data['page']))
         throw new InvalidRequestException("page cannot be blank", 3000);
 
-    //If no sorting option was chosen, sort the commits by timestamp (descending)
-    if(!isset($data['sort']) || !isset($data['sort']['parameter'])) {
+    
+    /* **SORTING**
+     * If no sorting option was chosen, sort the commits by timestamp (descending)
+     */
+     if(!isset($data['sort']) || !isset($data['sort']['parameter'])) {
         $data['sort'] = [
             'order' => "DESC",
             'parameter' => "approvation_date"
@@ -47,7 +50,7 @@ function validateInput(array &$data) : void {
         if (strlen($data['filter']['valueMatches']) == 0)
             throw new InvalidRequestException("filter parameter must have at least length one byte");
         else
-            //Convert the attribute name from the API one to the DB one
+            //OK - convert the attribute name from the API one to the DB one
             $data['filter']['attribute'] = translateName($data['filter']['attribute'], $listType);
     }
 }
@@ -85,12 +88,15 @@ function translateName(string $attribute) : string {
     }
 }
 
-function get_list(string $type, array $data) {
+/**
+ * Retrive the list of commits / send requests / client send requests
+ */
+function get_list(string $type, array $data) : array {
     global $listType;
     $listType = $type;
     validateInput($data);
     
-    //Execute the query based on $type parameter
+    //Check the $type parameter
     switch ($listType) {
         case TYPE_COMMIT:
             $id = TYPE_COMMIT_ID;
@@ -110,21 +116,23 @@ function get_list(string $type, array $data) {
     $params = [];
     $out = [];
 
-    //Calculate the starting commit ID (number of commits per page * number of page)
+    //Calculate the starting ID (number of commits per page * number of page)
     $data['limit'] = intval($data['limit']);
     $offset = $data['limit'] * intval($data['page']);
 
+    //Get the query from the above functions
     if ($listType == TYPE_CLIENT)
         $query = getClientQuery($user['user_id'], $params);
     else
         $query = getInternalQuery($data, $user['user_id'], $user['role'], $params);
     
+    //If filter was set, add it to the query
     if (isset($data['filter']['attribute'])) {   //Attribute and Negate are safe
         $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE ?";
         array_push($params, "%{$data['filter']['valueMatches']}%");
     }
     
-    //Order part - safe
+    //Order the result based on 'sort' array in request (parameter and order are safe)
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
@@ -132,11 +140,11 @@ function get_list(string $type, array $data) {
     array_push($params, $offset);
     array_push($params, $data['limit']);
 
+    //Execute the query and get the count of elements
     $queryResult = $db->preparedQuery($query, $params);
-
     $out = getCount($query, $data, $queryResult, $params);
     
-
+    //Populate the response array based on $listType
     if ($listType == TYPE_CLIENT) {
         foreach($queryResult as $entry) {
             $temp = [
@@ -153,7 +161,7 @@ function get_list(string $type, array $data) {
             $out['list'][] = $temp;
         }
     } else {
-        //Populate the response array with each commit element of the chosen page
+        //Populate the response array with each element of the chosen page
         foreach ($queryResult as $entry) {
             $temp = [
                 'id' => $entry[$id],
@@ -222,18 +230,21 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
     return $query;
 }
 
-//--Get the total number of commits
+//Get the total number of elements
 function getCount(string $query, array $data, array $queryResult, array $params) : array {
     global $db;
     $out = [];
+
     //Remove last two elements of params array (LIMIT part)
     array_pop($params);
     array_pop($params);
     
+    //Query string manipulation - we want to have only SELECT COUNT(*) FROM ...
     $countQuery = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
     $countQuery = substr($countQuery, 0, strpos($countQuery, 'ORDER'));  //Strip ORDER BY part
 
     $countQuery = "SELECT COUNT(*) AS 'count' " . $countQuery;           //Add COUNT in SELECT
+    //Get the total number of elements
     $countTotal = (int) $db->preparedQuery($countQuery, $params)[0]['count'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)

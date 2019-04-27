@@ -4,6 +4,7 @@ define("MAIL_APPROVED", 1);
 define("MAIL_NEW_COMMIT", 2);
 define("MAIL_NEW_PATCH", 3);
 
+//Include all the mail files
 foreach (scandir(__DIR__) as $file) {
     switch ($file){
         case ".":
@@ -17,11 +18,15 @@ foreach (scandir(__DIR__) as $file) {
     }
 }
 
-function send($to_user_id, $id, $type, $typeCommit) {
+/**
+ * Send a mail from the current user to '$to_user_id' user,
+ *  with a specific '$type'
+ */
+function sendMail(int $to_user_id, $id, string $mailType, string $typeCommit) : void {
     global $db;
     global $user;
-    $idCommit;
 
+    $idCommit;
     switch($typeCommit) {
         case TYPE_COMMIT:
             $idCommit = TYPE_COMMIT_ID;
@@ -31,11 +36,13 @@ function send($to_user_id, $id, $type, $typeCommit) {
             break;
     }
 
+    //Get the user infos
     $from = $user;
     $to = getUserInfo($to_user_id);
+    
+    //Istantiate the mail class based on the $mailType parameter
     $mail;
-
-    switch($type) {
+    switch($mailType) {
         case MAIL_APPROVED:
             $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idCommit, $id);
             break;
@@ -46,10 +53,11 @@ function send($to_user_id, $id, $type, $typeCommit) {
             $mail = new NewPatchMail($from['name'], $to['name']);
             break;
         default:
-            throw new InvalidRequestException("Tipo di mail non riconosciuto!");
+            throw new InvalidRequestException("Invalid mail type!");
             break;
     }
 
+    //Build the mail with the given fields
     $subject = $mail->getSubject();
     $message = $mail->getMsg();
 
@@ -57,5 +65,6 @@ function send($to_user_id, $id, $type, $typeCommit) {
     $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
     $headers .= "From: <${from['email']}>" . "\r\n";
 
+    //Send the mail - TODO: change the destination address
     mail("aum.coopcisf@gmail.com", $subject, $message, $headers);
 }
