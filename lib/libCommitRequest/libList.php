@@ -85,7 +85,7 @@ function translateName(string $attribute) : string {
     }
 }
 
-function get_list(string $type, array $data, int $cur_user_id, array $cur_user_role) {
+function get_list(string $type, array $data) {
     global $listType;
     $listType = $type;
     validateInput($data);
@@ -105,6 +105,7 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
     }
 
     global $db;
+    global $user;
     $query;
     $params = [];
     $out = [];
@@ -114,9 +115,9 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
     $offset = $data['limit'] * intval($data['page']);
 
     if ($listType == TYPE_CLIENT)
-        $query = getClientQuery($cur_user_id, $params);
+        $query = getClientQuery($user['user_id'], $params);
     else
-        $query = getInternalQuery($data, $cur_user_id, $cur_user_role, $params);
+        $query = getInternalQuery($data, $user['user_id'], $user['role'], $params);
     
     if (isset($data['filter']['attribute'])) {   //Attribute and Negate are safe
         $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE ?";
@@ -174,6 +175,7 @@ function get_list(string $type, array $data, int $cur_user_id, array $cur_user_r
                     'name' => $entry['ap_name']
                 ]
             ];
+
             if ($listType==TYPE_REQUEST) {
                 $install = [
                     'install_link' => $entry['install_link'],

@@ -3,7 +3,6 @@
 $init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    global $token;
     $type;
     require_once __DIR__ . "/../../lib/libCommitRequest/libList.php";
 
@@ -18,12 +17,8 @@ $exec = function (array $data, array $data_init) : array {
         //throw new InvalidRequestException("Error: missing role_id parameter!");
         $type = TYPE_REQUEST;
 
-    $user_info = getMyInfo($token);
-    $user_id = $user_info['user_id'];
-    $role_id = $user_info['role'];
-
     return [
-        "response_data" => get_list($type, $data, $user_id, $role_id),
+        "response_data" => get_list($type, $data),
         "status_code" => 200,
     ];
 };

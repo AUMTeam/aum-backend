@@ -17,8 +17,9 @@ foreach (scandir(__DIR__) as $file) {
     }
 }
 
-function send($from_user_token, $to_user_id, $id, $type, $typeCommit) {
+function send($to_user_id, $id, $type, $typeCommit) {
     global $db;
+    global $user;
     $idCommit;
 
     switch($typeCommit) {
@@ -30,7 +31,7 @@ function send($from_user_token, $to_user_id, $id, $type, $typeCommit) {
             break;
     }
 
-    $from = getMyInfo($from_user_token);
+    $from = $user;
     $to = getUserInfo($to_user_id);
     $mail;
 

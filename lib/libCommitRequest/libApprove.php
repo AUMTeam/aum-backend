@@ -1,8 +1,8 @@
 <?php
 
-function approve($data, $user, $type) {
+function approve($data, $type) {
     global $db;
-    global $token;
+    global $user;
     
     //Checks fields integrity
     if(!isset($data['id']))
@@ -44,7 +44,7 @@ function approve($data, $user, $type) {
     $db->preparedQuery("UPDATE $type SET is_approved=?, approvation_comment=?, approver_user_id=? WHERE $id=?", [$data['approve_flag'], $approvation_comment, $user_id, $data['id']]);
 
     //Send the email to the author
-    send($token, $query['author_user_id'], $data['id'], MAIL_APPROVED, $type);
+    send($query['author_user_id'], $data['id'], MAIL_APPROVED, $type);
 
 
     //In case of send request, send the mail to the Revision Office

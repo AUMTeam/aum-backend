@@ -3,7 +3,7 @@
 $init = function (array $data) : array { return [ ]; };
 
 $exec = function (array $data, array $data_init) : array {
-    global $token;
+    global $user;
     global $db;
 
     //Check if all the fields are in place
@@ -12,7 +12,6 @@ $exec = function (array $data, array $data_init) : array {
         throw new InvalidRequestException("Invalid request", 3000);
     
     //Get the current user's id, which is the author's id
-    $user = getMyInfo($token);
     $author_user_id = $user['user_id'];
 
     //Add the request into the database, and consequently get the ID of the just added request
@@ -32,7 +31,7 @@ $exec = function (array $data, array $data_init) : array {
     }
 
     foreach($user['resp'] as $resp) {
-        send($token, $resp['user_id'], $request_id, MAIL_NEW_COMMIT, TYPE_REQUEST);
+        send($resp['user_id'], $request_id, MAIL_NEW_COMMIT, TYPE_REQUEST);
     }
 
     return [

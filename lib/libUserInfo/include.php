@@ -25,6 +25,7 @@ function getUserInfo(int $user_id) : array {
 
     //Temporary storing
     $out = $user_data[0];
+    $out['resp'] = [];
 
     //Get the list of roles
     $roles = $db->preparedQuery("SELECT role_id FROM users_roles WHERE user_id=?", [$user_id]);
@@ -38,8 +39,7 @@ function getUserInfo(int $user_id) : array {
         //Gets the tech area boss
         $tech = $db->preparedQuery("SELECT users.user_id, name, email FROM users, users_roles WHERE 
             users.user_id=users_roles.user_id AND area_id=? AND role_id=?", [$out['area_id'], 2]);
-        $out['resp'] = [];
-
+        
         foreach($tech as $entry) {
             $arr = [
                 'email' => $entry['email'],

@@ -3,11 +3,9 @@
 $init = function (array $data) : array { return []; };
 
 $exec = function (array $data, array $data_init) : array {
-    global $token;
     require_once __DIR__ . "/../../lib/libCommitRequest/libApprove.php";
 
-    $user = getMyInfo($token);
-    approve($data, $user, TYPE_REQUEST);
+    approve($data, TYPE_REQUEST);
 
     return [
         "response_data" => [],

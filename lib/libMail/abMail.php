@@ -7,7 +7,7 @@ abstract class AbstractMail {
     protected $to;
     protected $commit_id;
 
-    public function __construct(string $from, string $to, $type, $commit_id = null) {
+    public function __construct(string $from, string $to, $commit_id = null) {
         $this->from = $from;
         $this->to = $to;
         if ($commit_id != null)

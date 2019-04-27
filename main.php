@@ -84,6 +84,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             $module = null;
             $action = null;
             $token = null;
+            $user = null;
             $request_data = [];
 
             //#1: Handle module and action on URL
@@ -130,16 +131,18 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
 
 
             //Ignoring token check only when special entrypoints are called
-            if(!(($module == "auth" and $action == "login") or ($module == "data"))) {
+            if(!(($module == "auth" and $action == "login") or ($module == "data" and $action == "roles"))) {
                 //Checks if token is on the header
                 if($token == null)
                     //No token found
                     throw new NoTokenException("Token can't be omitted here");
-                else
+                else {
                     getTokenExpire();   //We aren't interested in the return value
+                    $user = getMyInfo($token);  //Get the user infos (used in many points)
+                }
             }
 
-            //Checks if you can find the module
+            //Checks if the module is present
             if(!file_exists(__DIR__ . "/modules/$module/$action.php"))
                 throw new NotImplementedException("Module $module/$action not implemented");
 
@@ -156,7 +159,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             //Bringing the action which we wanted
             require_once __DIR__ . "/modules/$module/$action.php";
 
-            //Made for init data
+            //Execute the init function if present
             if(isset($init))
                 $data_init = $init($request_data);
             else

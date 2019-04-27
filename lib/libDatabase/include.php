@@ -45,7 +45,7 @@ class DatabaseWrapper {
         if ($params != null) {
             for($i=0;$i<count($params); $i++) {
                 $elem = $params[$i];
-                $type;
+                $type = PDO::PARAM_STR;
 
                 if (is_string($elem) || is_float($elem))    //PARAM_FLOAT is not supported
                     $type = PDO::PARAM_STR;
