@@ -58,12 +58,25 @@ function getUserInfo($user_id) : array {
         foreach($tech as $entry) {
             $arr = [
                 'user_id' => $entry['user_id'],
-                'name' => $entry['name'],
-                'email' => $entry['email']
+                'name' => $entry['name']
             ]; 
             array_push($out['resp'], $arr);
         }
     }
+
+    return $out;
+}
+
+/**
+ * Returns the list of user_id having the same role
+ */
+function getUserIdByRole(int $role_id) : array {
+    global $db;
+    $out = [];
+
+    $query = $db->preparedQuery("SELECT users.user_id as 'id' FROM users, users_roles WHERE role_id=?", [$role_id]);
+    foreach($query as $entry)
+        array_push($out, $entry['id']);
 
     return $out;
 }
