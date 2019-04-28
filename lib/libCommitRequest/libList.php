@@ -170,7 +170,9 @@ function get_list(string $type, array $data) : array {
                 'timestamp' => strtotime($entry['creation_date']),
                 'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
                 'components' => $entry['components'],
-                'branch' => $entry['branch_id'],
+                'branch' => $entry['branch_name'],
+                'commits' => [],
+                'clients' => [],
                 'approval_status' => $entry['is_approved'],
                 'author' => [
                     'user_id' => $entry['author_user_id'],
@@ -185,11 +187,38 @@ function get_list(string $type, array $data) : array {
             ];
 
             if ($listType==TYPE_REQUEST) {
+                //Get the install type and link
                 $install = [
                     'install_link' => $entry['install_link'],
                     'install_type' => $entry['install_type']
                 ];
                 $temp = array_merge($temp, $install);
+
+
+                //Get the list of commits
+                $commits = $db->preparedQuery("SELECT commits.commit_id as 'id', title FROM commits, requests_commits
+                    WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']]);
+                
+                foreach($commits as $entry) {
+                    $arr = [
+                        'id' => $entry['id'],
+                        'title' => $entry['title']
+                    ];
+                    array_push($temp['commits'], $arr);
+                }
+
+                //Get the destination clients
+                $clients = $db->preparedQuery("SELECT user_id, username, name FROM users, requests_clients
+                    WHERE users.user_id=requests_clients.client_user_id AND request_id=?", [$temp['id']]);
+
+                foreach($clients as $entry) {
+                    $arr = [
+                        'id' => $entry['user_id'],
+                        'username' => $entry['username'],
+                        'name' => $entry['name']
+                    ];
+                    array_push($temp['clients'], $arr);
+                }
             }
 
             $out['list'][] = $temp;
@@ -214,9 +243,9 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
     
     //Base query - $listType is safe and prepared statements could not be used in FROM anyway
     $query = "SELECT author.username as au_username, author.name as au_name,
-    approver.username as ap_username, approver.name as ap_name, $listType.*
-    FROM $listType LEFT JOIN users as approver ON $listType.approver_user_id=approver.user_id, users as author
-    WHERE $listType.author_user_id=author.user_id";
+    approver.username as ap_username, approver.name as ap_name, $listType.*, branch_name
+    FROM $listType LEFT JOIN users as approver ON $listType.approver_user_id=approver.user_id, users as author, branches
+    WHERE $listType.author_user_id=author.user_id AND branches.branch_id=$listType.branch_id";
 
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
     if (in_array(2, $cur_user_role)) {

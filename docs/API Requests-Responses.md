@@ -602,25 +602,42 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
         "count_total": 35,
         "list": [
             {
-                "id": 84,
-                "title": "Mariposa Pussypaws",
-                "description": "Morbi porttitor lorem id ligula.",
-                "timestamp": 1539402365,
-                "update_timestamp": 1555237944,
-                "components": "Suspendisse potenti. In eleifend quam a odio.",
-                "branch": 1,
-                "approval_status": "-1",
+                "id": 33,
+                "title": "Jamaican Goldback Fern",
+                "description": "Sed sagittis. Nam congue, risus semper porta volutpat,",
+                "timestamp": 1553113050,
+                "update_timestamp": 1556438738,
+                "components": "Vestibulum quam sapien, varius ut, blandit non,",
+                "branch": "Tres-Zap",
+                "commits": [
+                    {
+                        "id": 13,
+                        "title": "Carolina Desert-thorn"
+                    },
+                    {
+                        "id": 69,
+                        "title": "Longstalk Holly"
+                    }
+                ],
+                "clients": [
+                    {
+                        "id": 3,
+                        "username": "client.test",
+                        "name": "Test Client User"
+                    }
+                ],
+                "approval_status": "1",
                 "author": {
-                    "user_id": 2,
-                    "username": "dev.test",
-                    "name": "Test Developer"
+                    "user_id": 1,
+                    "username": "admin",
+                    "name": "Test Admin"
                 },
                 "approver": {
-                    "user_id": 2,
-                    "username": "dev.test",
-                    "name": "Test Developer"
+                    "user_id": 1,
+                    "username": "admin",
+                    "name": "Test Admin"
                 },
-                "install_link": "http:\/\/geocities.jp\/blandit\/mi\/in\/porttitor\/pede\/justo.json",
+                "install_link": "http:\/\/irs.gov\/enim\/leo\/rhoncus\/sed\/vestibulum\/sit.html",
                 "install_type": "1"
             },
             [...]
