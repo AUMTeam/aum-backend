@@ -4,3 +4,4 @@
 *.gitignore
 *.jpg
 .vscode
+*log/*
