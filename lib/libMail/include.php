@@ -1,7 +1,7 @@
 <?php
 
 define("MAIL_APPROVED", 1);
-define("MAIL_NEW_COMMIT", 2);
+define("MAIL_NEW_ENTRY", 2);
 define("MAIL_NEW_PATCH", 3);
 
 //Include all the mail files
@@ -22,17 +22,17 @@ foreach (scandir(__DIR__) as $file) {
  * Send a mail from the current user to '$to_user_id' user,
  *  with a specific '$type'
  */
-function sendMail(int $to_user_id, $id, string $mailType, string $typeCommit) : void {
+function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCommit = TYPE_REQUEST) : void {
     global $db;
     global $user;
 
-    $idCommit;
+    $idType;
     switch($typeCommit) {
         case TYPE_COMMIT:
-            $idCommit = TYPE_COMMIT_ID;
+            $idType = TYPE_COMMIT_ID;
             break;
         case TYPE_REQUEST:
-            $idCommit = TYPE_REQUEST_ID;
+            $idType = TYPE_REQUEST_ID;
             break;
     }
 
@@ -44,10 +44,10 @@ function sendMail(int $to_user_id, $id, string $mailType, string $typeCommit) : 
     $mail;
     switch($mailType) {
         case MAIL_APPROVED:
-            $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idCommit, $id);
+            $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idType, $id);
             break;
-        case MAIL_NEW_COMMIT:
-            $mail = new NewCommitMail($from['name'], $to['name'],$typeCommit, $idCommit, $id);
+        case MAIL_NEW_ENTRY:
+            $mail = new NewCommitMail($from['name'], $to['name'], $typeCommit, $idType, $id);
             break;
         case MAIL_NEW_PATCH:
             $mail = new NewPatchMail($from['name'], $to['name']);

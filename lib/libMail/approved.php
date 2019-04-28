@@ -8,13 +8,15 @@ class ApprovedMail extends AbstractMail {
     private $desc;
     private $typeCommit;
 
-    public function __construct(string $from, string $to, string $type, string $id, int $commit_id) {
-        parent::__construct($from, $to, $commit_id);
+    public function __construct(string $from, string $to, string $typeCommit, string $idType, int $id) {
+        parent::__construct($from, $to);
         global $db;
-        $out = $db->preparedQuery("SELECT title, description FROM $type WHERE $id=?", [$commit_id])[0];
+
+        //Gets title and description from the current commit/sendRequest
+        $out = $db->preparedQuery("SELECT title, description FROM $typeCommit WHERE $idType=?", [$id])[0];
         $this->title = $out['title'];
         $this->desc = $out['description'];
-        $this->typeCommit = $type;
+        $this->typeCommit = $typeCommit;
     }
 
     public function getSubject() : string {

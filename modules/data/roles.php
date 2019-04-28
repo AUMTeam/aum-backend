@@ -9,12 +9,12 @@ $exec = function (array $data, array $data_init) : array {
     global $db;
     $out = [];
 
-    $data = $db->query("SELECT * FROM roles");
+    $data = $db->preparedQuery("SELECT * FROM roles");
 
     foreach ($data as $entry)
         $out[] = [
             'role_id' => $entry['role_id'],
-            'role_string' => $entry['role_name']
+            'role_string' => $entry['role_string']
         ];
 
     return [

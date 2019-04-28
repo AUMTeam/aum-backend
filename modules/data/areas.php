@@ -9,7 +9,7 @@ $exec = function (array $data, array $data_init) : array {
     global $db;
     $out = [];
 
-    $data = $db->query("SELECT * FROM areas");
+    $data = $db->preparedQuery("SELECT * FROM areas");
 
     foreach ($data as $entry)
         $out[] = [

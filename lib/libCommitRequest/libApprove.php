@@ -11,10 +11,10 @@ function approve(array $data, string $type) : void {
     $id_name;
     switch ($type) {
         case TYPE_COMMIT:
-            $id = TYPE_COMMIT_ID;
+            $id_name = TYPE_COMMIT_ID;
             break;
         case TYPE_REQUEST:
-            $id = TYPE_REQUEST_ID;
+            $id_name = TYPE_REQUEST_ID;
             break;
         default:
             throw new Exception("Impossible to use the endpoint");
@@ -40,7 +40,7 @@ function approve(array $data, string $type) : void {
 
     
     //Check if commit_id is valid and whether the commit has already been approved - $type is safe
-    $query = $db->preparedQuery("SELECT is_approved, author_user_id FROM $type WHERE $id=?", [$data['id']])[0];
+    $query = $db->preparedQuery("SELECT is_approved, author_user_id FROM $type WHERE $id_name=?", [$data['id']])[0];
     if (count($query) == 0)
         throw new InvalidRequestException("id doesn't refer to a valid commit!", 3007);
     else if ($query['is_approved'] != 0)
@@ -51,11 +51,14 @@ function approve(array $data, string $type) : void {
     $db->preparedQuery("UPDATE $type SET is_approved=?, approvation_comment=?, approver_user_id=? WHERE $id_name=?", [$data['approve_flag'], $approvation_comment, $user_id, $data['id']]);
 
 
-    //Send the email to the author
-    sendMail($query['author_user_id'], $data['id'], MAIL_APPROVED, $type);
+    //Send the response to the author
+    sendMail($query['author_user_id'], MAIL_APPROVED, $data['id'], $type);
 
     //In case of send request, send the mail to the Revision Office
     if ($type==TYPE_REQUEST && $data['approve_flag']==1) {
-        //TODO
+        $revOffice = getUserIdByRole(3);
+        
+        foreach($revOffice as $entry)
+            sendMail($entry, MAIL_NEW_ENTRY, $data['id'], TYPE_REQUEST);
     }
 }

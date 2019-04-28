@@ -23,7 +23,7 @@ $exec = function (array $data, array $data_init) : array {
     
     //Send the email to the tech area responsibles
     foreach($user['resp'] as $resp) {
-        sendMail($resp['user_id'], $id, MAIL_NEW_COMMIT, TYPE_COMMIT);
+        sendMail($resp['user_id'], MAIL_NEW_ENTRY, $id, TYPE_COMMIT);
     }
     
     return [

@@ -8,13 +8,10 @@ abstract class AbstractMail {
     protected $from;
     //Name of sender
     protected $to;
-    protected $commit_id;
 
-    public function __construct(string $from, string $to, $commit_id = null) {
+    public function __construct(string $from, string $to) {
         $this->from = $from;
         $this->to = $to;
-        if ($commit_id != null)
-            $this->commit_id = $commit_id;
     }
     
     //Subject of the mail
