@@ -18,8 +18,11 @@ $config = [
 
 //Flag for debug/release mode
 $debug_mode = true;
-if($debug_mode == false && !file_exists(__DIR__ . "/log/"))
-    mkdir(__DIR__ . "/log/");
+
+//Log path
+$log_path = __DIR__ . "/log";
+if($debug_mode == false && !file_exists($log_path))
+    mkdir($log_path);
 
 //Token validity times (in minutes)
 $token_validity_debug = 30;
