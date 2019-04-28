@@ -1,43 +1,82 @@
 <?php
 
+/**
+ * Get the current user infos given its token
+ */
+function getMyInfo() : array {
+    global $db;
+    global $token;
+    $out = [];
 
-function getUserData(DatabaseWrapper $db, string $token, array $data = []) : array {
-    //Keep selected user_id if it's present, else extract it starting from the token
-    if(isset($data['user_id']))
-        $user_data[0]['user_id'] = $data['user_id'];
+    $user_id = $db->preparedQuery("SELECT user_id FROM users_tokens WHERE token=?", [$token]);
+
+    if (count($user_id) > 0)
+        $out = getUserInfo($user_id[0]['user_id']);
     else
-        $user_data = $db->query("SELECT user_id FROM users_tokens WHERE token = '$token'");  //FIXME: Duplicated
+        throw new InvalidTokenException();
 
-    //TODO: Needed? (And others)
-    if(is_bool($user_data) || is_null($user_data))
-        throw new UserNotFoundException("User not found");
+    return $out;
+}
+
+/**
+ * Get the infos of an user with a defined user_id
+ */
+function getUserInfo($user_id) : array {
+    global $db;
 
     //Retrive data from the DB
-    $user_data = $db->query("SELECT user_id, name, area_id, email FROM users WHERE user_id = {$user_data[0]['user_id']}");
+    $query = $db->preparedQuery("SELECT user_id, username, name, area_id, email FROM users WHERE user_id=?", [$user_id]);
 
-    if(is_bool($user_data) || is_null($user_data))
+    if(count($query) == 0)
         throw new UserNotFoundException("User not found");
+    $query = $query[0];
+    
+    //Prepopulate the response array
+    $out = [
+        'user_id' => $query['user_id'],
+        'username' => $query['username'],
+        'name' => $query['name'],
+        'email' => $query['email'],
+        'role' => [],
+        'resp' => [],
+        'area_id' => $query['area_id']
+    ];
 
-    //Temporary storing
-    $out = $user_data[0];
-
-	$roles = $db->query("SELECT role_id FROM users_roles WHERE user_id={$user_data[0]['user_id']}");
-    for($i=0; $i < count($roles); $i++) {
-       $out['role_id'][$i] = (int) $roles[$i]['role_id'];
-    }
+    //Get the list of roles
+    $roles = $db->preparedQuery("SELECT role_id FROM users_roles WHERE user_id=?", [$user_id]);
+    for($i=0; $i < count($roles); $i++)
+       $out['role'][$i] = (int) $roles[$i]['role_id'];
 
     //Obtaining string for 'area' if needed
-    if(!is_null($out['area_id']))
-        $out['area_id'] = $db->query("SELECT area_name FROM areas WHERE area_id = {$out['area_id']}")[0]['area_name'];
+    if(!is_null($out['area_id'])) {
+        $out['area_name'] = $db->preparedQuery("SELECT area_name FROM areas WHERE area_id=?", [$out['area_id']])[0]['area_name'];
 
-    //Make a new correct response
-    $out = [
-        'email' => $out['email'],
-        'area' => $out['area_id'],
-        'roles' => $out['role_id'],
-        'user_id' => $out['user_id'],
-        'name' => $out['name']
-    ];
+        //Gets the tech area boss
+        $tech = $db->preparedQuery("SELECT users.user_id, name, email FROM users, users_roles WHERE 
+            users.user_id=users_roles.user_id AND area_id=? AND role_id=?", [$out['area_id'], 2]);
+        
+        foreach($tech as $entry) {
+            $arr = [
+                'user_id' => $entry['user_id'],
+                'name' => $entry['name']
+            ]; 
+            array_push($out['resp'], $arr);
+        }
+    }
+
+    return $out;
+}
+
+/**
+ * Returns the list of user_id having the same role
+ */
+function getUserIdByRole(int $role_id) : array {
+    global $db;
+    $out = [];
+
+    $query = $db->preparedQuery("SELECT users.user_id as 'id' FROM users, users_roles WHERE role_id=?", [$role_id]);
+    foreach($query as $entry)
+        array_push($out, $entry['id']);
 
     return $out;
 }

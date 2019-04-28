@@ -1,35 +1,31 @@
 <?php
 
-$init = function (array $data) : array { return [
-    // Source: https://stackoverflow.com/questions/15737408/php-find-all-occurrences-of-a-substring-in-a-string
-    'strpos_all' => function (string $haystack, string $needle) : array {
-        $offset = 0;
-        $allpos = array();
-        while (($pos = strpos($haystack, $needle, $offset)) !== FALSE) {
-            $offset   = $pos + 1;
-            $allpos[] = $pos;
-        }
-        return $allpos;
-    }
-]; };
+$init = function (array $data) : array { return [ ]; };
 
+/**
+ * Adds a new commit to the database
+ */
 $exec = function (array $data, array $data_init) : array {
-
     global $db;
-    global $token;
+    global $user;
 
-    if(!isset($data['description']))
-        throw new InvalidRequestException("description comment be blank", 3000);
-    else
-        str_replace('"', '\"', $data['description'], count($data_init['strpos_all']($data['description'],'"')));
+    //Check if all the fields are in place
+    if(!isset($data['title']) || !isset($data['description']) || !isset($data['components']) || !isset($data['branch']))
+        throw new InvalidRequestException();
 
-    //if(!isset($data['destination_client']))
-        //throw new InvalidRequestException("destination_client cannot be blank", 3000);
+    //Get the current user's id, which is the author's id
+    $author_user_id = $user['user_id'];
 
-    $user_id = getUserData($db, $token)['user_id'];
-
-    $db->query("INSERT INTO commit(description, author_user_id) VALUES (\"{$data['description']}\",$user_id)");
-
+    //Add the commit into the database
+    $db->preparedQuery("INSERT INTO commits(title, description, components, branch_id, author_user_id)
+        VALUES (?, ?, ?, ?, ?)", [$data['title'], $data['description'], $data['components'], $data['branch'], $author_user_id]);
+    $id = $db->preparedQuery("SELECT LAST_INSERT_ID() as 'id' FROM commits")[0]['id'];
+    
+    //Send the email to the tech area responsibles
+    foreach($user['resp'] as $resp) {
+        sendMail($resp['user_id'], MAIL_NEW_ENTRY, $id, TYPE_COMMIT);
+    }
+    
     return [
         "response_data" => [],
         "status_code" => 200

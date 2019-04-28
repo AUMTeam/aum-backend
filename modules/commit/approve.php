@@ -2,13 +2,13 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Approve a commit with a given ID and approvation flag
+ */
 $exec = function (array $data, array $data_init) : array {
-    global $db;
-    global $token;
     require_once __DIR__ . "/../../lib/libCommitRequest/libApprove.php";
 
-    $user = getUserData($db, $token);
-    approve($db, $data, $user, "commit");
+    approve($data, TYPE_COMMIT);
 
     return [
         "response_data" => [],

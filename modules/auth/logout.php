@@ -2,12 +2,15 @@
 
 $init = function (array $data) : array { return []; };
 
+/**
+ * Log the user out of the application by removing its token
+ */
 $exec = function (array $data, array $data_init) : array {
     global $db;
     global $token;
 
     //Erase the token from the DB
-    $db->query("DELETE FROM users_tokens WHERE token = '$token'");
+    $db->preparedQuery("DELETE FROM users_tokens WHERE token=?", [$token]);
 
     return [
         "response_data" => [],

@@ -3,19 +3,18 @@
 $init = function (array $data) : array { return []; };
 
 /**
- * Get the list of areas present in the DB (id + desc)
+ * Get the list of roles present in the DB (id + desc)
  */
 $exec = function (array $data, array $data_init) : array {
     global $db;
-
-    $data = $db->query("SELECT * FROM areas");
-
     $out = [];
+
+    $data = $db->preparedQuery("SELECT * FROM roles");
 
     foreach ($data as $entry)
         $out[] = [
-            'area_id' => $entry['area_id'],
-            'area_tring' => $entry['area_name']
+            'role_id' => $entry['role_id'],
+            'role_string' => $entry['role_string']
         ];
 
     return [

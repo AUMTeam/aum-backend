@@ -3,3 +3,5 @@
 *.htaccess
 *.gitignore
 *.jpg
+.vscode
+*log/*

@@ -1,33 +1,37 @@
 <?php
 
-function getUpdates(DatabaseWrapper $db, $data, $type) {
+/**
+ * Check if there are new commits/requests for the current user,
+ * given a timestamp
+ */
+function getUpdates($data, $type) {
+    global $db;
+    
     //Check parameter presence
     if(!isset($data['latest_update_timestamp']))
         throw new InvalidRequestException("latest_update_timestamp cannot be blank", 3001);
 
-    $id;
+    $id_name;
     switch ($type) {
-        case "commit":
-            $id = "commit_id";
+        case TYPE_COMMIT:
+            $id_name = TYPE_COMMIT_ID;
             break;
-        case "request":
-            $id = "request_id";
+        case TYPE_REQUEST:
+            $id_name = TYPE_REQUEST_ID;
             break;
         default:
             throw new Exception("Impossible to use the endpoint");
     }
-    $type .= "s";
 
     $time = $data['latest_update_timestamp'];
 
-    //Get the last added commit' timestamp (TODO: commit count)
-    $data = $db->query("SELECT MAX(approvation_date) as latest_timestamp, COUNT($id) as amount FROM $type");
+    //Get the last added commit' timestamp -- $type is safe here
+    $approv = $db->preparedQuery("SELECT MAX(approvation_date) as latest_timestamp FROM $type");
+    //$new_count = $db->preparedQuery("SELECT COUNT(*) as new_commit FROM commits WHERE ? < creation_date", [$time]);
 
     $out = [
-        "query" => $query,
-        "count" => $data[0]['amount'],
-        "latest_update_timestamp" => strtotime($data[0]['latest_timestamp']),
-        //"new_commit_count" => $db->query("SELECT COUNT(timestamp) as new_commit FROM commit WHERE '$time' < commit.timestamp")[0]['new_commit']
+        "latest_update_timestamp" => strtotime($approv[0]['latest_timestamp']),
+        //"new_count" => $new_count[0]['new_commit']
     ];
     //Boolean condition
     $out['updates_found'] = $out['latest_update_timestamp'] > $time;
