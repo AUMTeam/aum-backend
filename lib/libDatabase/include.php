@@ -78,7 +78,7 @@ class DatabaseWrapper {
         
         } catch(PDOException $ex) {
             //Print the exception in the JSON response
-            throw new DBException("Error in executing query: " + $ex->getMessage());
+            throw new DBException("Error in executing query: '$query' -- Message: " . $ex->getMessage());
         }
     }
 

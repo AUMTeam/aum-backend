@@ -28,12 +28,12 @@ $exec = function (array $data, array $data_init) : array {
 
     //Get the current user's token list
     $tokens = $db->preparedQuery("SELECT token, token_expire FROM users_tokens WHERE user_id=? ORDER BY token_expire ASC", [$user_id]);
+    $expire = time() + (60*30);     //This is a placeholder: expiration time is increased later, see main.php/increaseTokenExpire()
 
     //If there are more than 5 tokens, overwrite one of them (max 5 sessions are allowed); else add it to the list
     if(count($tokens) >= $max_sessions)
-        $db->preparedQuery("UPDATE users_tokens SET token=? WHERE token_expire=? AND user_id=?", [$token, $tokens[0]['token_expire'], $user_id]);
+        $db->preparedQuery("UPDATE users_tokens SET token=? WHERE token=?", [$token, $tokens[0]['token']]);
     else {
-        $expire = time() + (60*30);
         $db->preparedQuery("INSERT INTO users_tokens(user_id, token, token_expire) VALUES(?, ?, ?)", [$user_id, $token, $expire]);
     }
 

@@ -22,10 +22,11 @@ function getTokenExpire() {
 /**
  * Increases the current token' expiration date
  */
-function increaseTokenExpire() {
+function increaseTokenExpire() : void {
     global $db;
     global $token;
     global $printDebug;
+    global $response;
     global $token_validity_debug;
     global $token_validity_release;
 
@@ -36,5 +37,6 @@ function increaseTokenExpire() {
 
     $db->preparedQuery("UPDATE users_tokens SET token_expire=? WHERE token=?", [$new_expire, $token]);
 
-    if($printDebug->isDebug()) $response['response_data']['debug']['expire'] = $new_expire;
+    if($printDebug->isDebug())
+        $response['response_data']['debug']['expire'] = $new_expire;
 }
