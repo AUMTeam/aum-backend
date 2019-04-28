@@ -171,8 +171,6 @@ function get_list(string $type, array $data) : array {
                 'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
                 'components' => $entry['components'],
                 'branch' => $entry['branch_name'],
-                'commits' => [],
-                'clients' => [],
                 'approval_status' => $entry['is_approved'],
                 'author' => [
                     'user_id' => $entry['author_user_id'],
@@ -196,7 +194,8 @@ function get_list(string $type, array $data) : array {
 
 
                 //Get the list of commits
-                $commits = $db->preparedQuery("SELECT commits.commit_id as 'id', title FROM commits, requests_commits
+                $commits = [];
+                $query = $db->preparedQuery("SELECT commits.commit_id as 'id', title FROM commits, requests_commits
                     WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']]);
                 
                 foreach($commits as $entry) {
@@ -204,11 +203,14 @@ function get_list(string $type, array $data) : array {
                         'id' => $entry['id'],
                         'title' => $entry['title']
                     ];
-                    array_push($temp['commits'], $arr);
+                    array_push($commits, $arr);
                 }
+                array_merge($temp, $commits);
+
 
                 //Get the destination clients
-                $clients = $db->preparedQuery("SELECT user_id, username, name FROM users, requests_clients
+                $clients = [];
+                $query = $db->preparedQuery("SELECT user_id, username, name FROM users, requests_clients
                     WHERE users.user_id=requests_clients.client_user_id AND request_id=?", [$temp['id']]);
 
                 foreach($clients as $entry) {
@@ -217,8 +219,9 @@ function get_list(string $type, array $data) : array {
                         'username' => $entry['username'],
                         'name' => $entry['name']
                     ];
-                    array_push($temp['clients'], $arr);
+                    array_push($clients, $arr);
                 }
+                array_merge($temp, $clients);
             }
 
             $out['list'][] = $temp;
