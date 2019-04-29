@@ -154,8 +154,8 @@ function get_list(string $type, array $data) : array {
                 'branch' => $entry['branch_name'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
-                'install_date' => $entry['install_date'],
-                'send_date' => $entry['send_date'],
+                'install_date' => is_null($entry['send_date']) ? 0 : strtotime($entry['install_date']),
+                'send_timestamp' => is_null($entry['send_date']) ? 0 : strtotime($entry['send_date']),
                 'install_comment' => $entry['comment']
             ];
             $out['list'][] = $temp;
@@ -192,7 +192,7 @@ function get_list(string $type, array $data) : array {
                 $temp += [
                     'install_link' => $entry['install_link'],
                     'install_type' => $entry['install_type'],
-                    'send_date' => is_null($entry['send_date']) ? 0 : $entry['send_date']
+                    'send_timestamp' => is_null($entry['send_date']) ? 0 : strtotime($entry['send_date'])
                 ];
 
                 //Get the list of commits
