@@ -541,7 +541,7 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 
 ## sendRequest/list
 
-Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a '3' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 #### Richiesta
 ```json
@@ -604,11 +604,22 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
             {
                 "id": 33,
                 "title": "Jamaican Goldback Fern",
-                "description": "Sed sagittis. Nam congue, risus semper porta volutpat,",
+                "description": "Sed sagittis. Nam congue, risus semper porta volutpat, ",
                 "timestamp": 1553113050,
                 "update_timestamp": 1556438738,
-                "components": "Vestibulum quam sapien, varius ut, blandit non,",
+                "components": "Vestibulum quam sapien, varius ut, blandit non, ",
                 "branch": "Tres-Zap",
+                "approval_status": "1",
+                "author": {
+                    "name": "Test Admin",
+                    "email": "admin@aum.com"
+                },
+                "approver": {
+                    "name": "Test Admin",
+                    "email": "admin@aum.com"
+                },
+                "install_link": "http:\/\/irs.gov\/enim\/leo\/rhoncus\/sed\/vestibulum\/sit.html",
+                "install_type": "1",
                 "commits": [
                     {
                         "id": 13,
@@ -621,24 +632,10 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
                 ],
                 "clients": [
                     {
-                        "id": 3,
-                        "username": "client.test",
-                        "name": "Test Client User"
+                        "name": "Test Client User",
+                        "email": "client@aum.com"
                     }
-                ],
-                "approval_status": "1",
-                "author": {
-                    "user_id": 1,
-                    "username": "admin",
-                    "name": "Test Admin"
-                },
-                "approver": {
-                    "user_id": 1,
-                    "username": "admin",
-                    "name": "Test Admin"
-                },
-                "install_link": "http:\/\/irs.gov\/enim\/leo\/rhoncus\/sed\/vestibulum\/sit.html",
-                "install_type": "1"
+                ]
             },
             [...]
         ],

@@ -152,7 +152,7 @@ function get_list(string $type, array $data) : array {
                 'title' => $entry['title'],
                 'description' => $entry['description'],
                 'timestamp' => $entry['approvation_date'],
-                'branch' => $entry['branch_id'],
+                'branch' => $entry['branch_name'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
                 'install_date' => $entry['install_date'],
@@ -173,57 +173,40 @@ function get_list(string $type, array $data) : array {
                 'branch' => $entry['branch_name'],
                 'approval_status' => $entry['is_approved'],
                 'author' => [
-                    'user_id' => $entry['author_user_id'],
-                    'username' => $entry['au_username'],
-                    'name' => $entry['au_name']
-                ],
-                'approver' => [
-                    'user_id' => $entry['approver_user_id'],
-                    'username' => $entry['ap_username'],
-                    'name' => $entry['ap_name']
+                    'name' => $entry['au_name'],
+                    'email' => $entry['au_email']
                 ]
+            ];
+
+            //Add the approver infos if the element was approved
+            if ($temp['approval_status'] != 0)
+                $temp += [
+                    'approver' => [
+                        'name' => $entry['ap_name'],
+                        'email' => $entry['ap_email']
+                    ],
             ];
 
             if ($listType==TYPE_REQUEST) {
                 //Get the install type and link
-                $install = [
+                $temp += [
                     'install_link' => $entry['install_link'],
                     'install_type' => $entry['install_type']
                 ];
-                $temp = array_merge($temp, $install);
-
 
                 //Get the list of commits
-                $commits = [];
-                $query = $db->preparedQuery("SELECT commits.commit_id as 'id', title FROM commits, requests_commits
-                    WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']]);
-                
-                foreach($commits as $entry) {
-                    $arr = [
-                        'id' => $entry['id'],
-                        'title' => $entry['title']
-                    ];
-                    array_push($commits, $arr);
-                }
-                array_merge($temp, $commits);
-
+                $temp += [
+                    'commits' => $db->preparedQuery("SELECT commits.commit_id as 'id', title FROM commits, requests_commits
+                    WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']])
+                ];
 
                 //Get the destination clients
-                $clients = [];
-                $query = $db->preparedQuery("SELECT user_id, username, name FROM users, requests_clients
-                    WHERE users.user_id=requests_clients.client_user_id AND request_id=?", [$temp['id']]);
+                $temp += [
+                    'clients' => $db->preparedQuery("SELECT name, email FROM users, requests_clients
+                    WHERE users.user_id=requests_clients.client_user_id AND request_id=?", [$temp['id']])
+                ];
 
-                foreach($clients as $entry) {
-                    $arr = [
-                        'id' => $entry['user_id'],
-                        'username' => $entry['username'],
-                        'name' => $entry['name']
-                    ];
-                    array_push($clients, $arr);
-                }
-                array_merge($temp, $clients);
             }
-
             $out['list'][] = $temp;
         }
     }
@@ -234,9 +217,9 @@ function get_list(string $type, array $data) : array {
 function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
-    return "SELECT requests.request_id as 'id', title, approvation_date, description, install_type, install_date, comment, install_link, branch_id 
-        FROM requests_clients, requests
-        WHERE requests_clients.request_id=requests.request_id AND is_approved=2 AND client_user_id=?";
+    return "SELECT requests.request_id as 'id', title, approvation_date, description, install_type, install_date, comment, install_link, branch_name 
+        FROM requests_clients, requests, branches
+        WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND is_approved=2 AND client_user_id=?";
 }
 
 function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, array &$params) : string {
@@ -245,13 +228,15 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
     $query;
     
     //Base query - $listType is safe and prepared statements could not be used in FROM anyway
-    $query = "SELECT author.username as au_username, author.name as au_name,
-    approver.username as ap_username, approver.name as ap_name, $listType.*, branch_name
+    $query = "SELECT author.email as au_email, author.name as au_name,
+    approver.email as ap_email, approver.name as ap_name, $listType.*, branch_name
     FROM $listType LEFT JOIN users as approver ON $listType.approver_user_id=approver.user_id, users as author, branches
     WHERE $listType.author_user_id=author.user_id AND branches.branch_id=$listType.branch_id";
 
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
-    if (in_array(2, $cur_user_role)) {
+    if (isset($data['role']) && $data['role'] == 3) {
+        $query .= " AND is_approved IN ('1','2')";
+    } else if (in_array(2, $cur_user_role)) {
         $area = $db->preparedQuery("SELECT area_id FROM users WHERE user_id=?", [$cur_user_id])[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
     //If the user is a programmer (1), show only his commits
@@ -259,6 +244,7 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
         $query .= " AND author_user_id=?";
         array_push($params, $cur_user_id);
     }
+
     return $query;
 }
 
