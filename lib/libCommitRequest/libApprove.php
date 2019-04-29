@@ -54,7 +54,7 @@ function approve(array $data, string $type) : void {
 
     //In case of send request, send the mail to the Revision Office
     if ($type==TYPE_REQUEST && $data['approve_flag']==1) {
-        $revOffice = getUserIdByRole(3);
+        $revOffice = getUserIdByRole(ROLE_REVOFFICE);
         
         foreach($revOffice as $entry)
             sendMail($entry, MAIL_NEW_ENTRY, $data['id'], TYPE_REQUEST);

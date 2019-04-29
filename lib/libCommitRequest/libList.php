@@ -124,7 +124,7 @@ function get_list(string $type, array $data) : array {
     if ($listType == TYPE_CLIENT)
         $query = getClientQuery($user['user_id'], $params);
     else
-        $query = getInternalQuery($data, $user['user_id'], $user['role'], $params);
+        $query = getInternalQuery($data, $user['user_id'], $user['role_name'], $params);
     
     //If filter was set, add it to the query
     if (isset($data['filter']['attribute'])) {   //Attribute and Negate are safe
@@ -151,11 +151,11 @@ function get_list(string $type, array $data) : array {
                 'id' => $entry['id'],
                 'title' => $entry['title'],
                 'description' => $entry['description'],
-                'timestamp' => $entry['approvation_date'],
                 'branch' => $entry['branch_name'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
                 'install_date' => $entry['install_date'],
+                'send_date' => $entry['send_date'],
                 'install_comment' => $entry['comment']
             ];
             $out['list'][] = $temp;
@@ -218,7 +218,7 @@ function get_list(string $type, array $data) : array {
 function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
-    return "SELECT requests.request_id as 'id', title, approvation_date, description, install_type, install_date, comment, install_link, branch_name 
+    return "SELECT requests.request_id as 'id', title, description, install_type, install_date, comment, install_link, branch_name, send_date 
         FROM requests_clients, requests, branches
         WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND is_approved=2 AND client_user_id=?";
 }
@@ -235,13 +235,13 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
     WHERE $listType.author_user_id=author.user_id AND branches.branch_id=$listType.branch_id";
 
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
-    if (isset($data['role']) && $data['role'] == 3) {
+    if (isset($data['role']) && $data['role'] == ROLE_REVOFFICE) {
         $query .= " AND is_approved IN ('1','2')";
-    } else if (in_array(2, $cur_user_role)) {
+    } else if (in_array(ROLE_TECHAREA, $cur_user_role)) {
         $area = $db->preparedQuery("SELECT area_id FROM users WHERE user_id=?", [$cur_user_id])[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
     //If the user is a programmer (1), show only his commits
-    } else if (in_array(1, $cur_user_role)) {
+    } else if (in_array(ROLE_DEVELOPER, $cur_user_role)) {
         $query .= " AND author_user_id=?";
         array_push($params, $cur_user_id);
     }

@@ -74,11 +74,12 @@ function getUserInfo($user_id) : array {
 /**
  * Returns the list of user_id having the same role
  */
-function getUserIdByRole(int $role_id) : array {
+function getUserIdByRole(string $role_name) : array {
     global $db;
     $out = [];
 
-    $query = $db->preparedQuery("SELECT users.user_id as 'id' FROM users, users_roles WHERE role_id=?", [$role_id]);
+    $query = $db->preparedQuery("SELECT users.user_id as 'id' FROM users, users_roles, roles
+        WHERE roles.role_id=users_roles.role_id AND role_name=?", [$role_name]);
     foreach($query as $entry)
         array_push($out, $entry['id']);
 

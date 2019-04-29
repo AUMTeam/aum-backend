@@ -47,6 +47,18 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 }
 ```
 
+* L'utente non è autorizzato ad eseguire questa azione
+```json
+{
+    "response_data":{
+        "error_code":103
+    },
+    "message":"Unhautorized",
+    "status_code":403
+}
+```
+
+
 ## auth/login
 Accede utilizzando username e password. Il token non è richiesto.
 
@@ -173,17 +185,6 @@ Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: No
 {
     "response_data":{},
     "status_code":200
-}
-```
-
-* L'utente non è autorizzato ad eseguire questa azione
-```json
-{
-    "response_data":{
-        "error_code":103
-    },
-    "message":"The current user is not authorized to perform this action!",
-    "status_code":403
 }
 ```
 
@@ -541,7 +542,7 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 
 ## sendRequest/list
 
-Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a '4' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a '3' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a 'client' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a 'revisionOfficeManager' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 #### Richiesta
 ```json
@@ -579,10 +580,10 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
         "id": "4",
         "title":"title",
         "description": "Assimilated intangible functionalities",
-        "timestamp": "2019-03-14 16:02:36",
         "install_type": "0",
         "install_link": "https://example.com",
         "install_date": "2019-03-18 13:52:25",
+        "send_date": "2019-03-16 11:47:12",
         "install_comment": null
       }
     ],
@@ -670,17 +671,6 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 }
 ```
 
-* L'utente non è autorizzato ad eseguire questa azione
-```json
-{
-    "response_data":{
-        "error_code":103
-    },
-    "message":"Unhautorized",
-    "status_code":403
-}
-```
-
 ## sendRequest/update
 
 Vedasi *commit/update*
@@ -716,16 +706,27 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 * Utente trovato
 ```json
 {
-    "response_data":{
-        "user_data":{
-            "user_id":1,
-            "name":"Mario",
-            "email":"test@example.com",
-            "role":[1,2,3],
-            "area":1
-        }
-    },
-    "status_code":200
+  "response_data": {
+    "user_id": 1,
+    "username": "admin",
+    "name": "Test Admin",
+    "email": "admin@aum.com",
+    "role": [1,2,3,4],
+    "role_name": [ "ROLE_DEVELOPER", "ROLE_TECHAREA", "ROLE_REVOFFICE", "ROLE_CLIENT"],
+    "resp": [
+      {
+        "user_id": 1,
+        "name": "Test Admin"
+      },
+      {
+        "user_id": 4,
+        "name": "Test Tech Area User"
+      }
+    ],
+    "area_id": 1,
+    "area_name": "Area 1"
+  },
+  "status_code": 200
 }
 ```
 
@@ -760,17 +761,6 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 {
     "response_data":{},
     "status_code":200
-}
-```
-
-* L'utente non è autorizzato ad eseguire questa azione
-```json
-{
-    "response_data":{
-        "error_code":103
-    },
-    "message":"The current user is not authorized to perform this action!",
-    "status_code":401
 }
 ```
 
