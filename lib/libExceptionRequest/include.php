@@ -15,6 +15,9 @@ abstract class ExceptionRequest extends Exception {
         $this->error_code = $error_code;
     }
 
+    /**
+     * Returns the exception parameters in a JSON-like format
+     */
     public function getErrorResponse() : array {
         return [
             "response_data" => [
@@ -28,9 +31,8 @@ abstract class ExceptionRequest extends Exception {
 
 //Include all the child exceptions
 $dir = scandir(__DIR__);
-
 foreach ($dir as $file) {
-    switch ($file){
+    switch ($file) {
         case ".":
         case "..":
             break;

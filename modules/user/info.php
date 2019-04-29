@@ -8,14 +8,14 @@ $init = function (array $data) : array { return []; };
 $exec = function (array $data, array $data_init) : array {
     $out = [];
 
+    //user_id was specified
     if (isset($data['user_id']))
         $out = getUserInfo($data['user_id']);
-    else {
+    else {  //Use the current user
         global $user;
         $out = $user;
     }
 
-    //We are done here, see libUserInfo/include.php for details
     return [
         "response_data" => $out,
         "status_code" => 200

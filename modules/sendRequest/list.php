@@ -10,7 +10,7 @@ $exec = function (array $data, array $data_init) : array {
     require_once __DIR__ . "/../../lib/libCommitRequest/libList.php";
 
     if (isset($data['role'])) {
-        if ($data['role'] == 4)
+        if ($data['role'] == ROLE_CLIENT)
             $type = TYPE_CLIENT;
         else
             $type = TYPE_REQUEST;

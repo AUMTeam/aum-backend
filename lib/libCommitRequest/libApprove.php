@@ -7,6 +7,12 @@ function approve(array $data, string $type) : void {
     global $db;
     global $user;
 
+    //Check whether the current user is a technical area manager or not
+    $user_id = $user['user_id'];
+    //Only Tech Area users (role: 2) are authorized to approve commits/requests
+    if (!in_array(ROLE_TECHAREA, $user['role_name']))
+        throw new UnauthorizedException("The current user is not authorized to perform this action!");
+
     //Check if $type is a valid parameter
     $id_name;
     switch ($type) {
@@ -29,14 +35,6 @@ function approve(array $data, string $type) : void {
     $approvation_comment = "";
     if (isset($data['approvation_comment']))
         $approvation_comment = $data['approvation_comment'];
-
-    
-    //Check whether the current user is a technical area manager or not
-    $user_id = $user['user_id'];
-    $role_id = $user['role'];
-    //Only Tech Area users (role: 2) and Power Users (role: 5) are authorized to approve commits/requests
-    if (!in_array(2, $role_id) && !in_array(5, $role_id))
-        throw new UnauthorizedException("The current user is not authorized to perform this action!");
 
     
     //Check if commit_id is valid and whether the commit has already been approved - $type is safe

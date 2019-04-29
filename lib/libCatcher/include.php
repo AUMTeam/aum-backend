@@ -6,7 +6,7 @@
  */
 
 //Fatal error handling
-function envi_error_catcher($errno, $errstr, $errfile, $errline) {
+function envi_error_catcher($errno, $errstr, $errfile, $errline) : void {
     global $printDebug;
     global $log_path;
 
@@ -35,7 +35,7 @@ function envi_error_catcher($errno, $errstr, $errfile, $errline) {
     }
 }
 
-function envi_shutdown_catcher() {
+function envi_shutdown_catcher() : void {
     global $printDebug;
 
     if($printDebug->isDebug()) {
@@ -46,7 +46,7 @@ function envi_shutdown_catcher() {
 }
 
 //Warning handling
-function envi_warning_catcher($errno, $errstr, $errfile, $errline) {
+function envi_warning_catcher($errno, $errstr, $errfile, $errline) : void {
     global $printDebug;
     global $warnings;
     global $log_path;
@@ -61,7 +61,7 @@ function envi_warning_catcher($errno, $errstr, $errfile, $errline) {
 }
 
 //Notices handling
-function envi_notice_catcher($errno, $errstr, $errfile, $errline) {
+function envi_notice_catcher($errno, $errstr, $errfile, $errline) : void {
     global $printDebug;
     global $warnings;
     global $log_path;

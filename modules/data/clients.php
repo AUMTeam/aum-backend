@@ -12,10 +12,8 @@ $exec = function (array $data, array $data_init) : array {
     $data = $db->preparedQuery("SELECT users.user_id FROM users, users_roles WHERE 
         users.user_id=users_roles.user_id AND role_id=?", [4]);   //users
     
-    foreach ($data as $entry) {
-        $user = getUserInfo($entry['user_id']);
-        $out[] = $user;
-    }
+    foreach ($data as $entry)
+        $out[] = getUserInfo($entry['user_id']);
 
     return [
         "response_data" => $out,

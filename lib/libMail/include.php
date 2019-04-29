@@ -5,7 +5,8 @@ define("MAIL_NEW_ENTRY", 2);
 define("MAIL_NEW_PATCH", 3);
 
 //Include all the mail files
-foreach (scandir(__DIR__) as $file) {
+$dir = scandir(__DIR__);
+foreach ($dir as $file) {
     switch ($file){
         case ".":
         case "..":
@@ -13,7 +14,7 @@ foreach (scandir(__DIR__) as $file) {
             break;
         default:
             if (strpos($file, ".php"))
-                require_once __DIR__ . "/" . $file;
+                require_once __DIR__ . "/$file";
             break;
     }
 }

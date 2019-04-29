@@ -13,15 +13,18 @@ $exec = function (array $data, array $data_init) : array {
     if(!isset($data['username']) || !isset($data['password']))
         throw new InvalidRequestException();
 
-    //Compute the hash of the password and verify if the user is present in the DB
+    //Verify if the user is present in the DB
     $result = $db->preparedQuery("SELECT user_id, hash_pass FROM users WHERE username=?", [$data['username']]);
-
-    if(count($result) == 0 || !password_verify($data['password'], $result[0]['hash_pass']))
+    if(count($result) == 0)
+        throw new UserNotFoundException();
+    
+    //Verify if the password correspond
+    if(!password_verify($data['password'], $result[0]['hash_pass']))
         throw new InvalidCredentialsException("Credentials are wrong");
+
 
     //Get the ID of the user
     $user_id = $result[0]['user_id'];
-
 
     //Generate a random access token
     $token = sha1(random_bytes(64));
@@ -33,9 +36,8 @@ $exec = function (array $data, array $data_init) : array {
     //If there are more than 5 tokens, overwrite one of them (max 5 sessions are allowed); else add it to the list
     if(count($tokens) >= $max_sessions)
         $db->preparedQuery("UPDATE users_tokens SET token=? WHERE token=?", [$token, $tokens[0]['token']]);
-    else {
+    else
         $db->preparedQuery("INSERT INTO users_tokens(user_id, token, token_expire) VALUES(?, ?, ?)", [$user_id, $token, $expire]);
-    }
 
     return [
         "response_data" => [

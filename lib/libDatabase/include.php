@@ -13,11 +13,12 @@ class DatabaseWrapper {
 
         try {
             if (array_key_exists("db_name", $config)) {
-                if ($db_type == "sqlite") {
+                if ($db_type == "sqlite")
                     $this->handler = new PDO("{$db_type}:{$config['db_name']}", $options);
-                } else if (array_key_exists("server", $config) && array_key_exists("username", $config) && array_key_exists("password", $config)) {
+                
+                else if (array_key_exists("server", $config) && array_key_exists("username", $config) && array_key_exists("password", $config))
                     $this->handler = new PDO("{$db_type}:host={$config['server']};dbname={$config['db_name']}", $config['username'], $config['password'], $options);
-                }
+
             }
         } catch (PDOException $e) {
             throw new InvalidRequestException("Error connecting to the database using PDO: " . $e->getMessage());
@@ -26,21 +27,21 @@ class DatabaseWrapper {
 
     //Execute a query. WARNING: this is SQL-Injection insafe
     public function query(string $query) : array {
+        $out = [];
+
         try {
+            //We need to get results only from SELECT queries
             if (strpos($query, "SELECT") !== false) {
-                $result = $this->handler->query($query);
-                $out = [];
-
-                while($row = $result->fetch(PDO::FETCH_ASSOC))
-                    $out[] = $row;
-
-                return $out;
+                $stmt = $this->handler->query($query);
+                $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
             }
             else
                 $this->handler->exec($query);
         } catch (PDOException $e) {
             throw new Exception("Error in executing query '$query' : ". $e->getMessage());
         }
+
+        return $out;
     }
 
     //Executes a parametrized query, SQL Injection Safe

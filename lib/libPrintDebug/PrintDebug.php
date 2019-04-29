@@ -11,7 +11,7 @@ class PrintDebug {
     }
 
     /**
-     * It let you know if this environment is a debug one or production
+     * Check if this environment is a debug one or production
      * @return bool true if debug mode
      */
     public function isDebug() : bool {
@@ -19,18 +19,18 @@ class PrintDebug {
     }
 
     /**
-     * It let you print on body/CLI some debug strings
-     * @param string $input string you want to show only on debug mode
+     * Prints on body/CLI some debug string, given that we are in debug mode
+     * @param string $input String you want to print
      */
-    public function printDebug(string $input){
+    public function printDebug(string $input) {
         if($this->debug_flag)
             print($input);
     }
 
     /**
-     * It let you write a string with something if this environment is set to be a debug one
-     * @param string $input string you want to show only on debug mode
-     * @return string what you put in if on debug mode, otherwise an empty string.
+     * Prints on body/CLI some debug string, given that we are in debug mode
+     * @param string $input String you want to print
+     * @return string '$input' if debug_flag=true, "" otherwise
      */
     public function getDebugString(string $input) : string {
         return $this->debug_flag ? $input : "";

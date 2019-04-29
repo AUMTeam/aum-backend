@@ -657,7 +657,8 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 	"module":"sendRequest",
 	"action":"send",
 	"request_data": {
-		"id":4
+		"id":4,
+        "install_link":"http://example.com"
 	}
 }
 ```

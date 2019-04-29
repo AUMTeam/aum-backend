@@ -7,10 +7,12 @@ function getTokenExpire() {
     global $db;
     global $token;
 
+    //Check the DB for the current session token
     $result = $db->preparedQuery("SELECT token_expire FROM users_tokens WHERE token=?", [$token]);
-    if(is_bool($result) or count($result) == 0)
+    if(count($result) == 0)
         throw new InvalidTokenException("Token is not valid");
 
+    //If the token is invalid, delete it from the DB
     if(time() > $result[0]['token_expire']) {
         $db->preparedQuery("DELETE FROM users_tokens WHERE token=?", [$token]);
         throw new InvalidTokenException("Token is not valid anymore. Please remake login.");

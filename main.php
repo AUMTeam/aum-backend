@@ -8,41 +8,44 @@ $printDebug = new PrintDebug($debug_mode);
 //Set the error reporting system
 $warnings = [];
 require_once __DIR__ . "/lib/libCatcher/include.php";
-//register_shutdown_function("envi_shutdown_catcher");
 set_error_handler("envi_error_catcher", E_STRICT);    //Catch on PHP Fatal error
 set_error_handler("envi_warning_catcher", E_WARNING); //Catch on PHP Warning
 set_error_handler("envi_notice_catcher", E_NOTICE);   //Catch on PHP Notice
 
+
 //Import important libraries
 require_once __DIR__ . "/lib/libExceptionRequest/include.php";
 require_once __DIR__ . "/lib/libDatabase/include.php";
-
 //small libs for actions
 require_once __DIR__ . "/lib/libToken/include.php";
 require_once __DIR__ . "/lib/libUserInfo/include.php";
 require_once __DIR__ . "/lib/libMail/include.php";
 
+
 //Set basic headers
 date_default_timezone_set('Europe/Rome');
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
-header("Content-Encoding: gzip");
 header("Server-Version: $version");
+if($printDebug->isDebug())
+    header("Server-Mode: AUM API - Debug");
+else
+    header("Server-Mode: AUM API - Release");
 
 
 //GZIP compression
+header("Content-Encoding: gzip");
 if(!ob_start("ob_gzhandler")) ob_start();
+
 
 if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
 
-    //OPTIONS Method -> communicate the allowed methods
-    if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    if($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {  //OPTIONS Method -> communicate the allowed methods
         http_response_code(200);
         header("Access-Control-Allow-Methods: POST, OPTIONS");
         $printDebug->printDebug("Options message sent\n");
 
     } else if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        //Show an easter egg if in debug mode
         http_response_code(405);
         $printDebug->printDebug('
         <html>
@@ -54,20 +57,15 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             </body>
         </html>
         ');
-    }
+    } else      //Other methods - Not allowed
+        http_response_code(405);
+
 //POST Method
 } else {
     header("Content-Type: application/json");
 
     //Check if the server is in maintenance state
     if (!$maintenance_state) {
-
-        //Header identification server status
-        if($printDebug->isDebug())
-            header("Server-Mode: AUM API - Debug");
-        else
-            header("Server-Mode: AUM API - Release");
-
 
         $db = null;
         try {
@@ -83,7 +81,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
                 throw new InvalidRequestException("Request is not a JSON");
 
 
-            //Module and Action can be specified either in the URL (main.php/module/action) or JSON elements (module=; action=)
+            //Defining some useful variables
             $module = null;
             $action = null;
             $response = null;
@@ -91,6 +89,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             $user = null;
             $request_data = [];
 
+            //Module and Action can be specified either in the URL (main.php/module/action) or JSON elements (module=; action=)
             //#1: Handle module and action on URL
             $url_data = explode("/", $_SERVER['REQUEST_URI']);
             $file_path = explode("/", $_SERVER['SCRIPT_NAME']);

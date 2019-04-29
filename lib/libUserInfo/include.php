@@ -10,7 +10,7 @@ function getMyInfo() : array {
 
     $user_id = $db->preparedQuery("SELECT user_id FROM users_tokens WHERE token=?", [$token]);
 
-    if (count($user_id) > 0)
+    if (count($user_id) == 1)
         $out = getUserInfo($user_id[0]['user_id']);
     else
         throw new InvalidTokenException();
@@ -38,14 +38,18 @@ function getUserInfo($user_id) : array {
         'name' => $query['name'],
         'email' => $query['email'],
         'role' => [],
+        'role_name' => [],
         'resp' => [],
         'area_id' => $query['area_id']
     ];
 
     //Get the list of roles
-    $roles = $db->preparedQuery("SELECT role_id FROM users_roles WHERE user_id=?", [$user_id]);
-    for($i=0; $i < count($roles); $i++)
+    $roles = $db->preparedQuery("SELECT roles.role_id, role_name FROM users_roles, roles
+        WHERE roles.role_id=users_roles.role_id AND user_id=?", [$user_id]);
+    for($i=0; $i < count($roles); $i++) {
        $out['role'][$i] = (int) $roles[$i]['role_id'];
+       $out['role_name'][$i] = $roles[$i]['role_name'];
+    }
 
     //Obtaining string for 'area' if needed
     if(!is_null($out['area_id'])) {

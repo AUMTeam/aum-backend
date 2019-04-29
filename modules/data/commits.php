@@ -13,7 +13,7 @@ $exec = function (array $data, array $data_init) : array {
     $res = $db->preparedQuery("SELECT commit_id FROM commits WHERE author_user_id=?", [$user['user_id']]);
 
     foreach($res as $entry)
-        array_push($out, $entry['commit_id']);
+        $out[] = $entry['commit_id'];
 
     return [
         "response_data" => $out,
