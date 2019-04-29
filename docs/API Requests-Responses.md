@@ -602,41 +602,38 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
         "count_total": 35,
         "list": [
             {
-                "id": 33,
-                "title": "Jamaican Goldback Fern",
-                "description": "Sed sagittis. Nam congue, risus semper porta volutpat, ",
-                "timestamp": 1553113050,
-                "update_timestamp": 1556438738,
-                "components": "Vestibulum quam sapien, varius ut, blandit non, ",
-                "branch": "Tres-Zap",
-                "approval_status": "1",
-                "author": {
-                    "name": "Test Admin",
-                    "email": "admin@aum.com"
-                },
-                "approver": {
-                    "name": "Test Admin",
-                    "email": "admin@aum.com"
-                },
-                "install_link": "http:\/\/irs.gov\/enim\/leo\/rhoncus\/sed\/vestibulum\/sit.html",
-                "install_type": "1",
-                "commits": [
-                    {
-                        "id": 13,
-                        "title": "Carolina Desert-thorn"
-                    },
-                    {
-                        "id": 69,
-                        "title": "Longstalk Holly"
-                    }
-                ],
-                "clients": [
-                    {
-                        "name": "Test Client User",
-                        "email": "client@aum.com"
-                    }
-                ]
+            "id": 50,
+            "title": "Perennial Cupgrass",
+            "description": "Etiam vel augue. Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.",
+            "timestamp": 1535911423,
+            "update_timestamp": 1556539604,
+            "components": "Sed ante. Vivamus tortor. Duis mattis egestas metus.",
+            "branch": "Pannier",
+            "approval_status": "0",
+            "author": {
+                "name": "Test Admin",
+                "email": "admin@aum.com"
             },
+            "install_link": "www.ciaone.it",
+            "install_type": "0",
+            "send_date": "2019-04-29 14:06:44",
+            "commits": [
+                {
+                    "id": 23,
+                    "title": "Twolobe Dutchman's Pipe"
+                },
+                {
+                    "id": 75,
+                    "title": "Wart Lichen"
+                }
+            ],
+            "clients": [
+                {
+                    "name": "Test Client User",
+                    "email": "client@aum.com"
+                }
+            ]
+        },
             [...]
         ],
         "page": 6,

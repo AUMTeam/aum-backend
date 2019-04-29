@@ -23,9 +23,10 @@ $exec = function (array $data, array $data_init) : array {
     if (count($entry) == 0)
         throw new InvalidArgumentException("id not found");
     else if ($entry[0]['is_approved'] != 1)
-        throw new InvalidRequestException("Request status is invalid");
+        throw new InvalidRequestException("The request approval status is invalid");
 
-    $db->preparedQuery("UPDATE requests SET is_approved=2, install_link=? WHERE request_id=?", [$data['install_link'], $data['id']]);
+    $now = time();
+    $db->preparedQuery("UPDATE requests SET is_approved='2', install_link=?, send_date=FROM_UNIXTIME(?) WHERE request_id=?", [$data['install_link'], $now, $data['id']]);
 
 
     //Send an email to the clients

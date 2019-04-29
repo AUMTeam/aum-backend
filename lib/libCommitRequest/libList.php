@@ -191,7 +191,8 @@ function get_list(string $type, array $data) : array {
                 //Get the install type and link
                 $temp += [
                     'install_link' => $entry['install_link'],
-                    'install_type' => $entry['install_type']
+                    'install_type' => $entry['install_type'],
+                    'send_date' => is_null($entry['send_date']) ? 0 : $entry['send_date']
                 ];
 
                 //Get the list of commits
