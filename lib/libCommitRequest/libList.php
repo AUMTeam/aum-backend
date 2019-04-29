@@ -154,8 +154,8 @@ function get_list(string $type, array $data) : array {
                 'branch' => $entry['branch_name'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
-                'install_date' => is_null($entry['send_date']) ? 0 : strtotime($entry['install_date']),
-                'send_timestamp' => is_null($entry['send_date']) ? 0 : strtotime($entry['send_date']),
+                'install_date' => is_null($entry['send_date']) ? null : strtotime($entry['install_date']),
+                'send_timestamp' => is_null($entry['send_date']) ? null : strtotime($entry['send_date']),
                 'install_comment' => $entry['comment']
             ];
             $out['list'][] = $temp;
@@ -168,7 +168,7 @@ function get_list(string $type, array $data) : array {
                 'title' => $entry['title'],
                 'description' => $entry['description'],
                 'timestamp' => strtotime($entry['creation_date']),
-                'update_timestamp' => is_null($entry['approvation_date']) ? 0 : strtotime($entry['approvation_date']),
+                'update_timestamp' => is_null($entry['approvation_date']) ? null : strtotime($entry['approvation_date']),
                 'components' => $entry['components'],
                 'branch' => $entry['branch_name'],
                 'approval_status' => $entry['is_approved'],
