@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Adds a new send request to the database
  */
@@ -14,8 +12,8 @@ $exec = function (array $data, array $data_init) : array {
         throw new UnauthorizedException();
 
     //Check if all the fields are in place
-    if(!isset($data['title']) || !isset($data['description']) || !isset($data['install_type']) || $data['install_type'] < 0 || $data['install_type'] > 1
-        || !isset($data['dest_clients']) || !isset($data['components']) || !isset($data['branch']))
+    if(empty($data['title']) || empty($data['description']) || !isset($data['install_type']) || $data['install_type'] < 0 || $data['install_type'] > 1
+        || empty($data['dest_clients']) || empty($data['components']) || empty($data['branch']))
         throw new InvalidRequestException("Invalid request", 3000);
     
 
@@ -41,10 +39,10 @@ $exec = function (array $data, array $data_init) : array {
 
     //Send an email to the tech area responsibles
     foreach($user['resp'] as $resp)
-        sendMail($resp['user_id'], MAIL_NEW_ENTRY, $request_id, TYPE_REQUEST);
+        sendMail($resp, MAIL_NEW_ENTRY, $request_id, TYPE_REQUEST);
 
     return [
-        "response_data" => [ ],
+        "response_data" => [],
         "status_code" => 200
     ];
 };

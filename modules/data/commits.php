@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Gets the list commits ID for the current user, used for autocomplete in the frontend
  */

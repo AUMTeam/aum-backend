@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Adds a new commit to the database
  */
@@ -14,7 +12,7 @@ $exec = function (array $data, array $data_init) : array {
         throw new UnauthorizedException();
         
     //Check if all the fields are in place
-    if(!isset($data['title']) || !isset($data['description']) || !isset($data['components']) || !isset($data['branch']))
+    if(empty($data['title']) || empty($data['description']) || empty($data['components']) || empty($data['branch']))
         throw new InvalidRequestException();
 
 
@@ -29,7 +27,7 @@ $exec = function (array $data, array $data_init) : array {
     
     //Send the email to the tech area responsibles
     foreach($user['resp'] as $resp)
-        sendMail($resp['user_id'], MAIL_NEW_ENTRY, $id, TYPE_COMMIT);
+        sendMail($resp, MAIL_NEW_ENTRY, $id, TYPE_COMMIT);
     
     return [
         "response_data" => [],

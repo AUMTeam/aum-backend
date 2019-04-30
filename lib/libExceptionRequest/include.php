@@ -35,6 +35,7 @@ foreach ($dir as $file) {
     switch ($file) {
         case ".":
         case "..":
+        case "include.php":
             break;
         default:
             require_once __DIR__ . "/$file";

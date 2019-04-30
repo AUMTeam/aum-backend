@@ -12,14 +12,12 @@ class DatabaseWrapper {
         $options = [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false];
 
         try {
-            if (array_key_exists("db_name", $config)) {
                 if ($db_type == "sqlite")
                     $this->handler = new PDO("{$db_type}:{$config['db_name']}", $options);
                 
-                else if (array_key_exists("server", $config) && array_key_exists("username", $config) && array_key_exists("password", $config))
+                else
                     $this->handler = new PDO("{$db_type}:host={$config['server']};dbname={$config['db_name']}", $config['username'], $config['password'], $options);
 
-            }
         } catch (PDOException $e) {
             throw new InvalidRequestException("Error connecting to the database using PDO: " . $e->getMessage());
         }

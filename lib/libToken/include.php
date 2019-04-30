@@ -40,5 +40,5 @@ function increaseTokenExpire() : void {
     $db->preparedQuery("UPDATE users_tokens SET token_expire=? WHERE token=?", [$new_expire, $token]);
 
     if($printDebug->isDebug())
-        $response['response_data']['debug']['expire'] = $new_expire;
+        $response['debug']['expire'] = $new_expire;
 }

@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Get the list of clients present in the DB
  */

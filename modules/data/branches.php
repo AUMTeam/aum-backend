@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Get the list of branches present in the DB
  */

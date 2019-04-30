@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Send a new update to the clients
  */
@@ -14,19 +12,19 @@ $exec = function (array $data, array $data_init) : array {
         throw new UnauthorizedException("The current user is not authorized to perform this action!");
 
     //Check if all fields are in place
-    if (!isset($data['id']) || !isset($data['install_link']))
+    if (empty($data['id']) || empty($data['install_link']))
         throw new InvalidRequestException();
 
 
     //Check if the send request is present and if it hasn't already been validated
-    $entry = $db->preparedQuery("SELECT is_approved FROM requests WHERE request_id=?", [$data['id']]);
+    $entry = $db->preparedQuery("SELECT approval_status FROM requests WHERE request_id=?", [$data['id']]);
     if (count($entry) == 0)
         throw new InvalidArgumentException("id not found");
-    else if ($entry[0]['is_approved'] != 1)
+    else if ($entry[0]['approval_status'] != 1)
         throw new InvalidRequestException("The request approval status is invalid");
 
     $now = time();
-    $db->preparedQuery("UPDATE requests SET is_approved='2', install_link=?, send_date=FROM_UNIXTIME(?) WHERE request_id=?", [$data['install_link'], $now, $data['id']]);
+    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_date=FROM_UNIXTIME(?) WHERE request_id=?", [$data['install_link'], $now, $data['id']]);
 
 
     //Send an email to the clients

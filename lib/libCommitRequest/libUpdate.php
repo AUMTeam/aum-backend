@@ -11,7 +11,6 @@ function getUpdates(array $data, string $type) : array {
     //Check parameter presence
     if(!isset($data['latest_update_timestamp']))
         throw new InvalidRequestException("latest_update_timestamp cannot be blank", 3001);
-    $time = $data['latest_update_timestamp'];
 
     //Check $type
     $id_name;
@@ -28,14 +27,14 @@ function getUpdates(array $data, string $type) : array {
 
     //Get the last added commit' timestamp -- $type is safe here
     $approv = $db->preparedQuery("SELECT MAX(approvation_date) as latest_timestamp FROM $type");
-    //$new_count = $db->preparedQuery("SELECT COUNT(*) as new_commit FROM commits WHERE ? < creation_date", [$time]);
+    //$new_count = $db->preparedQuery("SELECT COUNT(*) as new_commit FROM commits WHERE ? < creation_date", [$data['latest_update_timestamp']]);
 
     $out = [
         "latest_update_timestamp" => strtotime($approv[0]['latest_timestamp']),
         //"new_count" => $new_count[0]['new_commit']
     ];
     //Boolean condition
-    $out['updates_found'] = $out['latest_update_timestamp'] > $time;
+    $out['updates_found'] = $out['latest_update_timestamp'] > $data['latest_update_timestamp'];
 
     return $out;
 }

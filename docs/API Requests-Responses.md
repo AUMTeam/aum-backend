@@ -577,15 +577,21 @@ Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il cam
     "count_total": 1,
     "list": [
       {
-        "id": "4",
-        "title":"title",
-        "description": "Assimilated intangible functionalities",
-        "install_type": "0",
-        "install_link": "https://example.com",
-        "install_date": "2019-03-18 13:52:25",
-        "send_date": "2019-03-16 11:47:12",
-        "install_comment": null
-      }
+        "id": 82,
+        "title": "Palespike Lobelia",
+        "description": "Sed ante. Vivamus tortor. Duis mattis egestas metus.",
+        "branch": "Wrapsafe",
+        "install_type": "1",
+        "install_link": "https:\/\/people.com.cn\/neque\/duis\/bibendum\/morbi\/non\/quam\/nec.json",
+        "install_timestamp": 1534207466,
+        "send_timestamp": 1534185577,
+        "install_status": "1",
+        "install_comment": "Cras mi pede, malesuada in, imperdiet et, ",
+        "approver": {
+          "name": "Test Developer",
+          "email": "dev@aum.com"
+        }
+      },
     ],
     "page": 0,
     "page_total": 0

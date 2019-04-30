@@ -3,10 +3,14 @@
 /**
  * Functions used to catch errors/warnings/notices and print then in 
  *  JSON response (debug=true) or in log files (debug=false)
+ * @param $errno Level of the error
+ * @param $errstr Error message
+ * @param $errfile Filename where the error was raised at
+ * @param $errline Line in the file
  */
 
 //Fatal error handling
-function envi_error_catcher($errno, $errstr, $errfile, $errline) : void {
+function envi_error_catcher(int $errno, string $errstr, string $errfile, int $errline) : bool {
     global $printDebug;
     global $log_path;
 
@@ -26,13 +30,15 @@ function envi_error_catcher($errno, $errstr, $errfile, $errline) : void {
         http_response_code(500);
         die(json_encode($out));
     } else {
-        file_put_contents($log_path."/Error_" . date("d-m-y") . ".log", time() . "Custom error: [$errno] $errstr. Error on line $errline in $errfile");
+        file_put_contents($log_path."/Error_" . date("d-m-y") . ".log", time() . " - Error: [$errno] $errstr. Error on line $errline in $errfile");
         
         $fp=fopen("php://output","w");
         fwrite($fp,json_encode($out));
         http_response_code(500);
         die(fclose($fp));
     }
+
+    return true;
 }
 
 function envi_shutdown_catcher() : void {
@@ -46,7 +52,7 @@ function envi_shutdown_catcher() : void {
 }
 
 //Warning handling
-function envi_warning_catcher($errno, $errstr, $errfile, $errline) : void {
+function envi_warning_catcher(int $errno, string $errstr, string $errfile, int $errline) : bool {
     global $printDebug;
     global $warnings;
     global $log_path;
@@ -58,10 +64,12 @@ function envi_warning_catcher($errno, $errstr, $errfile, $errline) : void {
     } else {
         file_put_contents($log_path."/Warning_".date("d-m-y").".log", time()." - Warning triggered: [$errno] $errstr. Error on line $errline in $errfile");
     }
+
+    return true;
 }
 
 //Notices handling
-function envi_notice_catcher($errno, $errstr, $errfile, $errline) : void {
+function envi_notice_catcher(int $errno, string $errstr, string $errfile, int $errline) : bool {
     global $printDebug;
     global $warnings;
     global $log_path;
@@ -73,4 +81,5 @@ function envi_notice_catcher($errno, $errstr, $errfile, $errline) : void {
     } else {
         file_put_contents($log_path."/Notice_".date("d-m-y").".log", time()." - Notice triggered: [$errno] $errstr. Error on line $errline in $errfile", FILE_APPEND);
     }
+    return true;
 }

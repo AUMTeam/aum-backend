@@ -55,16 +55,12 @@ function getUserInfo($user_id) : array {
     if(!is_null($out['area_id'])) {
         $out['area_name'] = $db->preparedQuery("SELECT area_name FROM areas WHERE area_id=?", [$out['area_id']])[0]['area_name'];
 
-        //Gets the tech area boss
-        $tech = $db->preparedQuery("SELECT users.user_id, name, email FROM users, users_roles WHERE 
+        //Gets the tech area members for the current user
+        $tech = $db->preparedQuery("SELECT users.user_id FROM users, users_roles WHERE 
             users.user_id=users_roles.user_id AND area_id=? AND role_id=?", [$out['area_id'], 2]);
         
         foreach($tech as $entry) {
-            $arr = [
-                'user_id' => $entry['user_id'],
-                'name' => $entry['name']
-            ]; 
-            array_push($out['resp'], $arr);
+            $out['resp'][] = $entry['user_id'];
         }
     }
 
@@ -79,9 +75,10 @@ function getUserIdByRole(string $role_name) : array {
     $out = [];
 
     $query = $db->preparedQuery("SELECT users.user_id as 'id' FROM users, users_roles, roles
-        WHERE roles.role_id=users_roles.role_id AND role_name=?", [$role_name]);
+        WHERE roles.role_id=users_roles.role_id AND users.user_id=users_roles.user_id AND role_name=?", [$role_name]);
+
     foreach($query as $entry)
-        array_push($out, $entry['id']);
+        $out[] = $entry['id'];
 
     return $out;
 }

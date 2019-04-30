@@ -1,7 +1,5 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 $exec = function (array $data, array $data_init) : array {
     //Return the token's expiration date
     return [

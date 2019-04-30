@@ -1,17 +1,16 @@
 <?php
 
-$init = function (array $data) : array { return []; };
-
 /**
  * Log the user into the application
  */
 $exec = function (array $data, array $data_init) : array {
-    global $db;
-    global $max_sessions;
-
     //Check fields presence
-    if(!isset($data['username']) || !isset($data['password']))
+    if(empty($data['username']) || empty($data['password']))
         throw new InvalidRequestException();
+
+    global $db;
+    global $token;
+    global $max_sessions;
 
     //Verify if the user is present in the DB
     $result = $db->preparedQuery("SELECT user_id, hash_pass FROM users WHERE username=?", [$data['username']]);

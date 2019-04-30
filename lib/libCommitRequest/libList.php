@@ -4,7 +4,7 @@
 $listType;
 
 //Validate the user input
-function validateInput(array &$data) : void {
+function validateInput(array $data) : array {
     global $listType;
 
     //Check is fundamental fields are present
@@ -17,7 +17,7 @@ function validateInput(array &$data) : void {
     /* **SORTING**
      * If no sorting option was chosen, sort the commits by timestamp (descending)
      */
-     if(!isset($data['sort']) || !isset($data['sort']['parameter'])) {
+     if(empty($data['sort']) || empty($data['sort']['parameter'])) {
         $data['sort'] = [
             'order' => "DESC",
             'parameter' => "approvation_date"
@@ -25,7 +25,7 @@ function validateInput(array &$data) : void {
     //Else convert the parameter name from the API one to the DB one
     } else {
         $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $listType);
-        if(!isset($data['sort']['order'])) $data['sort']['order'] = "DESC";
+        if(empty($data['sort']['order'])) $data['sort']['order'] = "DESC";
     }
 
     /* --SEARCH--
@@ -34,11 +34,9 @@ function validateInput(array &$data) : void {
      * If 'valueMatches' is present, the 'negate' field will have no content ("")
      * If 'valueDifferentFrom' is present, 'negate' will contain "NOT" and the content of 'valueDifferentFrom' will be copied into 'valueMatches'
      */ 
-    if (isset($data['filter']['attribute'])) {
-        if(isset($data['filter']['valueDifferentFrom']) && isset($data['filter']['valueMatches']))
-            throw new InvalidRequestException("valueMatches and valueDifferentFrom cannot be specified in the same request!");
+    if (!empty($data['filter']['attribute'])) {
         //valueDifferentFrom was passed 
-        else if(isset($data['filter']['valueDifferentFrom'])) {
+        if(isset($data['filter']['valueDifferentFrom'])) {
             $data['filter']['valueMatches'] = $data['filter']['valueDifferentFrom'];
             $data['filter']['negate'] = "NOT";
         //valueMatches was passed
@@ -53,6 +51,7 @@ function validateInput(array &$data) : void {
             //OK - convert the attribute name from the API one to the DB one
             $data['filter']['attribute'] = translateName($data['filter']['attribute'], $listType);
     }
+    return $data;
 }
 
 //Translates the names from the API one to the DB one
@@ -78,7 +77,7 @@ function translateName(string $attribute) : string {
         case "reviewrer":
             return "approver_user_id";
         case "approval_status":
-            return "is_approved";
+            return "approval_status";
         case "components":
             return "components";
         case "branch":
@@ -94,7 +93,7 @@ function translateName(string $attribute) : string {
 function get_list(string $type, array $data) : array {
     global $listType;
     $listType = $type;
-    validateInput($data);
+    $data = validateInput($data);
     
     //Check the $type parameter
     switch ($listType) {
@@ -127,9 +126,9 @@ function get_list(string $type, array $data) : array {
         $query = getInternalQuery($data, $user['user_id'], $user['role_name'], $params);
     
     //If filter was set, add it to the query
-    if (isset($data['filter']['attribute'])) {   //Attribute and Negate are safe
+    if (!empty($data['filter']['attribute'])) {   //Attribute and Negate are safe
         $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE ?";
-        array_push($params, "%{$data['filter']['valueMatches']}%");
+        $params[] = "%{$data['filter']['valueMatches']}%";
     }
     
     //Order the result based on 'sort' array in request (parameter and order are safe)
@@ -137,8 +136,9 @@ function get_list(string $type, array $data) : array {
 
     //Limit the query from the offset to the number of elements requested
     $query .= " LIMIT ?, ?";
-    array_push($params, $offset);
-    array_push($params, $data['limit']);
+    $params[] = $offset;
+    $params[] = $data['limit'];
+
 
     //Execute the query and get the count of elements
     $queryResult = $db->preparedQuery($query, $params);
@@ -154,9 +154,14 @@ function get_list(string $type, array $data) : array {
                 'branch' => $entry['branch_name'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
-                'install_date' => is_null($entry['send_date']) ? null : strtotime($entry['install_date']),
+                'install_timestamp' => is_null($entry['install_timestamp']) ? null : strtotime($entry['install_timestamp']),
                 'send_timestamp' => is_null($entry['send_date']) ? null : strtotime($entry['send_date']),
-                'install_comment' => $entry['comment']
+                'install_status' => $entry['install_status'],
+                'install_comment' => $entry['comment'],
+                'approver' => [
+                    'name' => $entry['name'],
+                    'email' => $entry['email']
+                ]
             ];
             $out['list'][] = $temp;
         }
@@ -171,7 +176,7 @@ function get_list(string $type, array $data) : array {
                 'update_timestamp' => is_null($entry['approvation_date']) ? null : strtotime($entry['approvation_date']),
                 'components' => $entry['components'],
                 'branch' => $entry['branch_name'],
-                'approval_status' => $entry['is_approved'],
+                'approval_status' => $entry['approval_status'],
                 'author' => [
                     'name' => $entry['au_name'],
                     'email' => $entry['au_email']
@@ -216,11 +221,13 @@ function get_list(string $type, array $data) : array {
 }
 
 function getClientQuery(int $cur_user_id, array &$params) : string {
-    $params = [$cur_user_id];
+    //$params = [$cur_user_id];
     
-    return "SELECT requests.request_id as 'id', title, description, install_type, install_date, comment, install_link, branch_name, send_date 
-        FROM requests_clients, requests, branches
-        WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND is_approved=2 AND client_user_id=?";
+    return "SELECT requests.request_id as 'id', title, description, install_type, install_status, install_timestamp, 
+        comment, install_link, branch_name, send_date, name, email 
+        FROM requests_clients, requests, branches, users
+        WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND users.user_id=requests.approver_user_id
+            AND approval_status='2'"; //AND client_user_id=?";
 }
 
 function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, array &$params) : string {
@@ -235,15 +242,15 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
     WHERE $listType.author_user_id=author.user_id AND branches.branch_id=$listType.branch_id";
 
     //If the user is part of the tech area (2), select only users in the same area  TODO: Tech Area users can access also other areas' requests
-    if (isset($data['role']) && $data['role'] == ROLE_REVOFFICE) {
-        $query .= " AND is_approved IN ('1','2')";
+    if (!empty($data['role']) && $data['role'] == ROLE_REVOFFICE) {
+        $query .= " AND approval_status IN ('1','2')";
     } else if (in_array(ROLE_TECHAREA, $cur_user_role)) {
         $area = $db->preparedQuery("SELECT area_id FROM users WHERE user_id=?", [$cur_user_id])[0]['area_id'];
         $query .= " AND (SELECT area_id FROM users WHERE author_user_id = user_id) = {$area}";
     //If the user is a programmer (1), show only his commits
     } else if (in_array(ROLE_DEVELOPER, $cur_user_role)) {
         $query .= " AND author_user_id=?";
-        array_push($params, $cur_user_id);
+        $params[] = $cur_user_id;
     }
 
     return $query;
