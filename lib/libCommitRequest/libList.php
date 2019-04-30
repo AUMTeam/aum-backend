@@ -227,7 +227,7 @@ function getClientQuery(int $cur_user_id, array &$params) : string {
         comment, install_link, branch_name, send_date, name, email 
         FROM requests_clients, requests, branches, users
         WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND users.user_id=requests.approver_user_id
-            AND approval_status='2'"; //AND client_user_id=?";
+            AND approval_status='2' AND client_user_id=?";
 }
 
 function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, array &$params) : string {
