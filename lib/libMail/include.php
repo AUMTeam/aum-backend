@@ -24,48 +24,52 @@ foreach ($dir as $file) {
  *  with a specific '$type'
  */
 function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCommit = TYPE_REQUEST) : void {
-    global $db;
-    global $user;
+    global $mail_enabled;
 
-    $idType;
-    switch($typeCommit) {
-        case TYPE_COMMIT:
-            $idType = TYPE_COMMIT_ID;
-            break;
-        case TYPE_REQUEST:
-            $idType = TYPE_REQUEST_ID;
-            break;
+    if ($mail_enabled) {
+        global $db;
+        global $user;
+
+        $idType;
+        switch($typeCommit) {
+            case TYPE_COMMIT:
+                $idType = TYPE_COMMIT_ID;
+                break;
+            case TYPE_REQUEST:
+                $idType = TYPE_REQUEST_ID;
+                break;
+        }
+
+        //Get the user infos
+        $from = $user;
+        $to = getUserInfo($to_user_id);
+        
+        //Istantiate the mail class based on the $mailType parameter
+        $mail;
+        switch($mailType) {
+            case MAIL_APPROVED:
+                $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idType, $id);
+                break;
+            case MAIL_NEW_ENTRY:
+                $mail = new NewCommitMail($from['name'], $to['name'], $typeCommit, $idType, $id);
+                break;
+            case MAIL_NEW_PATCH:
+                $mail = new NewPatchMail($from['name'], $to['name']);
+                break;
+            default:
+                throw new InvalidRequestException("Invalid mail type!");
+                break;
+        }
+
+        //Build the mail with the given fields
+        $subject = $mail->getSubject();
+        $message = $mail->getMsg();
+
+        $headers = "MIME-Version: 1.0" . "\r\n";
+        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+        $headers .= "From: <${from['email']}>" . "\r\n";
+
+        //Send the mail - TODO: change the destination address
+        mail("aum.coopcisf@gmail.com", $subject, $message, $headers);
     }
-
-    //Get the user infos
-    $from = $user;
-    $to = getUserInfo($to_user_id);
-    
-    //Istantiate the mail class based on the $mailType parameter
-    $mail;
-    switch($mailType) {
-        case MAIL_APPROVED:
-            $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idType, $id);
-            break;
-        case MAIL_NEW_ENTRY:
-            $mail = new NewCommitMail($from['name'], $to['name'], $typeCommit, $idType, $id);
-            break;
-        case MAIL_NEW_PATCH:
-            $mail = new NewPatchMail($from['name'], $to['name']);
-            break;
-        default:
-            throw new InvalidRequestException("Invalid mail type!");
-            break;
-    }
-
-    //Build the mail with the given fields
-    $subject = $mail->getSubject();
-    $message = $mail->getMsg();
-
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-    $headers .= "From: <${from['email']}>" . "\r\n";
-
-    //Send the mail - TODO: change the destination address
-    mail("aum.coopcisf@gmail.com", $subject, $message, $headers);
 }

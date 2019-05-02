@@ -19,6 +19,9 @@ $config = [
     'db_name' => "my_aum",
 ];
 
+
+//Flag to indicate whether mail sending is enabled or not
+$mail_enabled = false;
 //URL to the Front-End, used in mails
 $gui_url = "https://coopcisf.github.io/aum-frontend/";
 
