@@ -8,11 +8,10 @@ $exec = function (array $data, array $data_init) : array {
     global $db;
     $out = [];
 
-    $res = $db->preparedQuery("SELECT commit_id FROM commits WHERE author_user_id=?", [$user['user_id']]);
+    $res = $db->preparedQuery("SELECT commit_id, title FROM commits WHERE author_user_id=?", [$user['user_id']]);
 
     foreach($res as $entry)
-        $out[] = $entry['commit_id'];
-
+        $out[] = $entry;
     return [
         "response_data" => $out,
         "status_code" => 200,

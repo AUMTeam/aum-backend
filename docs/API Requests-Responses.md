@@ -403,9 +403,14 @@ Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
 ```json
 {
   "response_data": [
-    3,
-    4,
-    [...]
+    {
+      "commit_id": 3,
+      "title": "Common Marsh Bedstraw"
+    },
+    {
+      "commit_id": 4,
+      "title": "Yellow Nightshade Groundcherry"
+    },
   ],
   "status_code": 200
 }
