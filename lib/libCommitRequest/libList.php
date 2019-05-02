@@ -58,6 +58,20 @@ function validateInput(array $data) : array {
 function translateName(string $attribute) : string {
     global $listType;
     
+    //Check for attributes allowed only in request
+    if ($listType==TYPE_REQUEST) {
+        if ($attribute=="send_timestamp" || $attribute=="install_type" 
+                || $attribute=="install_link")
+            return $attribute;
+    }
+
+    //Check for attributes allowed only in client list
+    if ($listType==TYPE_CLIENT) {
+        if ($attribute=="send_timestamp" || $attribute=="install_timestamp" || $attribute=="install_status" || $attribute=="install_type" 
+                || $attribute=="install_link" || $attribute=="install_comment")
+            return $attribute;
+    }
+
     switch($attribute) {
         case "id":
             if ($listType == TYPE_COMMIT)
@@ -221,7 +235,7 @@ function get_list(string $type, array $data) : array {
 }
 
 function getClientQuery(int $cur_user_id, array &$params) : string {
-    //$params = [$cur_user_id];
+    $params = [$cur_user_id];
     
     return "SELECT requests.request_id as 'id', title, description, install_type, install_status, install_timestamp, 
         comment, install_link, branch_name, send_date, name, email 

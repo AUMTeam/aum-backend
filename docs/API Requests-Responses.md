@@ -203,7 +203,7 @@ Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: No
 
 Restituisce la lista dei commit presenti nel database sotto forma di pagine. E' necessario specificare *limit* (numero di elementi per pagina) e *page* (numero di pagina).
 
-Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id (id dei commit), description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, reviewer, approval_status, component, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo l'id dei commit.
+Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id (id dei commit), title, description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, reviewer, approval_status, components, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo l'id dei commit.
 
 E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
 
@@ -548,6 +548,9 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 ## sendRequest/list
 
 Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a 'client' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a 'revisionOfficeManager' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+
+L'elenco dei campi di filtraggio ammessi prevede anche send_timestamp (data di invio della patch ai clienti), install_type (tipo di installazione, 0 per a freddo ed 1 per a caldo), install_link (link di installazione).
+Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprastanti, anche install_timestamp (data di installazione della patch da parte del cliente), install_status (stato di installazione; 0 non installato, 1 installato e -1 errore nell'installazione); install_comment (feedback rilasciato dal cliente). 
 
 #### Richiesta
 ```json
