@@ -10,7 +10,7 @@ function getUpdates(array $data, string $type) : array {
     
     //Check parameter presence
     if(!isset($data['latest_update_timestamp']))
-        throw new InvalidRequestException("latest_update_timestamp cannot be blank", 3001);
+        throw new InvalidRequestException("latest_update_timestamp cannot be blank", "ERROR_COMMIT_UPDATE_NO_TIMESTAMP");
 
     //Check $type
     $id_name;

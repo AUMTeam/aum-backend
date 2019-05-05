@@ -158,7 +158,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
             require_once __DIR__ . "/modules/$module/$action.php";
 
             //Execute the init function if present
-            if(isset($init))
+            if(!is_null($init))
                 $data_init = $init($request_data);
             else
                 $data_init = [];

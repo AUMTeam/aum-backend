@@ -26,9 +26,9 @@ function approve(array $data, string $type) : void {
     
     //Checks fields integrity
     if(empty($data['id']))
-        throw new InvalidRequestException("Commit ID cannot be omitted", 3007);
+        throw new InvalidRequestException("Commit ID cannot be omitted", "ERROR_COMMIT_APPROVE_INVALID_REQUEST");
     if(empty($data['approve_flag']) || ($data['approve_flag'] != -1 && $data['approve_flag'] != 1))     //1: Approved / -1: Rejected
-        throw new InvalidRequestException("Invalid approved flag!", 3007);
+        throw new InvalidRequestException("Invalid approved flag!", "ERROR_COMMIT_APPROVE_INVALID_REQUEST");
     //Approvation_comment is not mandatory: check if it's present
     $approvation_comment = "";
     if (!empty($data['approvation_comment']))
@@ -38,9 +38,9 @@ function approve(array $data, string $type) : void {
     //Check if commit_id is valid and whether the commit has already been approved - $type is safe
     $query = $db->preparedQuery("SELECT approval_status, author_user_id FROM $type WHERE $id_name=?", [$data['id']]);
     if (count($query) == 0)
-        throw new InvalidRequestException("id doesn't refer to a valid commit!", 3007);
+        throw new InvalidRequestException("id doesn't refer to a valid commit!", "ERROR_COMMIT_APPROVE_INVALID_REQUEST");
     else if ($query[0]['approval_status'] != 0)
-        throw new InvalidRequestException("Already approved!", 3007);
+        throw new InvalidRequestException("Already approved!", "ERROR_COMMIT_APPROVE_INVALID_REQUEST");
 
 
     //Execute the query
