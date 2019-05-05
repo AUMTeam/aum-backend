@@ -15,6 +15,7 @@ $db_type = "mysql"; //Uncomment this for MySQL usage
 //DB configuration
 $db_config = [
     'server' => "127.0.0.1",
+    'port' => "5432",
     'username' => "",
     'password' => "",
     'db_name' => "my_aum",

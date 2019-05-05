@@ -149,9 +149,10 @@ function get_list(string $type, array $data) : array {
     $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
-    $query .= " LIMIT ?, ?";
-    $params[] = $offset;
+    $query .= " LIMIT ?";
     $params[] = $data['limit'];
+    $query .= " OFFSET ?";
+    $params[] = $offset;
 
 
     //Execute the query and get the count of elements
@@ -238,7 +239,7 @@ function get_list(string $type, array $data) : array {
 function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
-    return "SELECT requests.request_id as 'id', title, description, install_type, install_status, install_timestamp, 
+    return "SELECT requests.request_id as id, title, description, install_type, install_status, install_timestamp, 
         comment, install_link, branch_name, send_date, name, email, components
         FROM requests_clients, requests, branches, users
         WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND users.user_id=requests.approver_user_id
@@ -284,9 +285,9 @@ function getCount(string $query, array $data, array $queryResult, array $params)
     $countQuery = substr($query, strpos($query, 'FROM'));                //Strip SELECT * part
     $countQuery = substr($countQuery, 0, strpos($countQuery, 'ORDER'));  //Strip ORDER BY part
 
-    $countQuery = "SELECT COUNT(*) AS 'count' " . $countQuery;           //Add COUNT in SELECT
+    $countQuery = "SELECT COUNT(*) AS c " . $countQuery;           //Add COUNT in SELECT
     //Get the total number of elements
-    $countTotal = (int) $db->preparedQuery($countQuery, $params)[0]['count'];
+    $countTotal = (int) $db->preparedQuery($countQuery, $params)[0]['c'];
 
     //Calculate the number of max pages based on the limit (if it's a float number, round by excess)
     if ($countTotal > 0) {

@@ -21,7 +21,7 @@ function getMyInfo() : array {
 /**
  * Get the infos of an user with a defined user_id
  */
-function getUserInfo($user_id) : array {
+function getUserInfo(int $user_id) : array {
     global $db;
 
     //Retrive data from the DB

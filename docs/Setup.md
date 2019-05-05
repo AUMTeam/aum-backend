@@ -13,7 +13,7 @@ For **Debian**:
 apt-get install php php-fpm php-cgi php-pgsql apache2
 ```
 
-PHP has to support PCNTL with --enable-pcntl flag
+PHP has to support PCNTL with --enable-pcntl flag and LDAP with --enable-ldap flag
 
 
 ## Apache configuration
@@ -96,5 +96,16 @@ Open ```config.php```:
     'port' => 587,
     'username' => '',
     'password' => ''
+  ];
+  ```
+
+-Edit the LDAP configuration:
+  ```php
+//--LDAP Configuration--
+  $ldap_config = [
+      'enabled' => false,
+      'server' => "ldaps://localhost:389",
+      'domain' => 'mydomain',
+      'tld' => '.com'
   ];
   ```
