@@ -20,7 +20,7 @@ function validateInput(array $data) : array {
      if(empty($data['sort']) || empty($data['sort']['parameter'])) {
         $data['sort'] = [
             'order' => "DESC",
-            'parameter' => "approvation_date"
+            'parameter' => "approvation_timestamp"
         ];
     //Else convert the parameter name from the API one to the DB one
     } else {
@@ -83,12 +83,12 @@ function translateName(string $attribute) : string {
         case "description":
             return "description";
         case "timestamp":
-            return "creation_date";
+            return "creation_timestamp";
         case "update_timestamp":
-            return "approvation_date";
+            return "approvation_timestamp";
         case "author":
             return "author_user_id";
-        case "reviewrer":
+        case "approver":
             return "approver_user_id";
         case "approval_status":
             return "approval_status";
@@ -171,7 +171,7 @@ function get_list(string $type, array $data) : array {
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
                 'install_timestamp' => is_null($entry['install_timestamp']) ? null : strtotime($entry['install_timestamp']),
-                'send_timestamp' => is_null($entry['send_date']) ? null : strtotime($entry['send_date']),
+                'send_timestamp' => is_null($entry['send_timestamp']) ? null : strtotime($entry['send_timestamp']),
                 'install_status' => $entry['install_status'],
                 'install_comment' => $entry['comment'],
                 'approver' => [
@@ -188,8 +188,8 @@ function get_list(string $type, array $data) : array {
                 'id' => $entry[$id],
                 'title' => $entry['title'],
                 'description' => $entry['description'],
-                'timestamp' => strtotime($entry['creation_date']),
-                'update_timestamp' => is_null($entry['approvation_date']) ? null : strtotime($entry['approvation_date']),
+                'timestamp' => strtotime($entry['creation_timestamp']),
+                'update_timestamp' => is_null($entry['approvation_timestamp']) ? null : strtotime($entry['approvation_timestamp']),
                 'components' => $entry['components'],
                 'branch' => $entry['branch_name'],
                 'approval_status' => $entry['approval_status'],
@@ -213,7 +213,7 @@ function get_list(string $type, array $data) : array {
                 $temp += [
                     'install_link' => $entry['install_link'],
                     'install_type' => $entry['install_type'],
-                    'send_timestamp' => is_null($entry['send_date']) ? 0 : strtotime($entry['send_date'])
+                    'send_timestamp' => is_null($entry['send_timestamp']) ? 0 : strtotime($entry['send_timestamp'])
                 ];
 
                 //Get the list of commits
@@ -240,7 +240,7 @@ function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
     return "SELECT requests.request_id as id, title, description, install_type, install_status, install_timestamp, 
-        comment, install_link, branch_name, send_date, name, email, components
+        comment, install_link, branch_name, send_timestamp, name, email, components
         FROM requests_clients, requests, branches, users
         WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND users.user_id=requests.approver_user_id
             AND approval_status='2' AND client_user_id=?";

@@ -3,14 +3,14 @@
 ## Installazione dei programmi di base
 Installare i seguenti pacchetti: 
 
-Per **Arch Linux**:
-```bash
-pacman -S php php-fpm php-cgi php-pgsql apache
-```
-
 Per **Debian**:
 ```bash
-apt-get install php php-fpm php-cgi php-pgsql apache2
+apt-get install php php-fpm php-cgi php-pgsql apache2 postgresql postgresql-client
+```
+
+Per **Arch Linux**:
+```bash
+pacman -S php php-fpm php-cgi php-pgsql apache postgresql
 ```
 
 PHP deve essere compilato con i flag ```--enable-pcntl``` e ```--enable-ldap```
@@ -63,8 +63,8 @@ extension=pgsql
 ## Abilitazione dei servizi
 
 ```bash
-systemctl enable php-fpm httpd postgres
-systemctl start php-fpm httpd postgres
+systemctl enable php-fpm httpd postgresql
+systemctl start php-fpm httpd postgresql
 ```
 
 ## Configurazione interna del progetto
@@ -107,3 +107,6 @@ Aprire ```config.php``` e modificare i seguenti campi:
       'tld' => '.com'
   ];
   ```
+
+Eseguire il seguente comando:
+```php composer.phar install```

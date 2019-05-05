@@ -26,7 +26,7 @@ function getUpdates(array $data, string $type) : array {
     }
 
     //Get the last added commit' timestamp -- $type is safe here
-    $approv = $db->preparedQuery("SELECT MAX(approvation_date) as latest_timestamp FROM $type");
+    $approv = $db->preparedQuery("SELECT MAX(approvation_timestamp) as latest_timestamp FROM $type");
     //$new_count = $db->preparedQuery("SELECT COUNT(*) as new_commit FROM commits WHERE ? < creation_date", [$data['latest_update_timestamp']]);
 
     $out = [

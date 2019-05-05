@@ -2,6 +2,9 @@
 ## A cosa ci serve?
 Serve a comunicare con il server per vari cambiamenti di dati o accessi avvenuti tramite client (nel nostro caso web-application).
 
+## Installazione e configurazione iniziale
+Vedere il file 'Setup.md'
+
 ## Struttura dati richiesta e risposta
 Vi sono due vie per creare la richiesta:
 1. **Richiesta codificata in JSON**

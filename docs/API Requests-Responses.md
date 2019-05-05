@@ -632,7 +632,7 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
             },
             "install_link": "www.ciaone.it",
             "install_type": "0",
-            "send_date": "2019-04-29 14:06:44",
+            "send_timestamp": "2019-04-29 14:06:44",
             "commits": [
                 {
                     "id": 23,
