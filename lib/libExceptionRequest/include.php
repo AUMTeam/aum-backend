@@ -27,6 +27,20 @@ abstract class ExceptionRequest extends Exception {
             "status_code" => $this->status_code
         ];
     }
+
+    //Getters
+
+    public function getIntMessage() {
+        return $this->message;
+    }
+
+    public function getErrorCode() {
+        return $this->error_code;
+    }
+
+    public function getStatusCode() {
+        return $this->status_code;
+    }
 }
 
 //Include all the child exceptions

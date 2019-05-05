@@ -28,6 +28,17 @@ class PrintDebug {
     }
 
     /**
+     * Prints on the JSON response, given that we are in debug mode
+     * @param string $input String you want to print
+     */
+    public function printDebugJSON(array $input) {
+        global $response;
+
+        if ($this->debug_flag)
+            $response['debug'][] = $input;    
+    }
+
+    /**
      * Prints on body/CLI some debug string, given that we are in debug mode
      * @param string $input String you want to print
      * @return string '$input' if debug_flag=true, "" otherwise

@@ -521,7 +521,7 @@ Vedasi commit/approve
 
 ## sendRequest/install
 
-Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client; il campo 'feedback' è facoltativo
+Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client. Il campo 'feedback' è facoltativo, mentre il campo "install_status" può avere valore 1 (installazione avvenuta con successo) o -1 (installazione fallita).
 
 #### Richiesta
 ```json
@@ -530,6 +530,7 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 	"action":"install",
 	"request_data": {
 		"id":4,
+        "install_status":1,
 		"feedback":"Test Feedback"
 	}
 }
@@ -631,7 +632,7 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
             },
             "install_link": "www.ciaone.it",
             "install_type": "0",
-            "send_date": "2019-04-29 14:06:44",
+            "send_timestamp": "2019-04-29 14:06:44",
             "commits": [
                 {
                     "id": 23,

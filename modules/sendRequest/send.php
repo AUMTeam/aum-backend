@@ -24,7 +24,7 @@ $exec = function (array $data, array $data_init) : array {
         throw new InvalidRequestException("The request approval status is invalid");
 
     $now = time();
-    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_date=FROM_UNIXTIME(?) WHERE request_id=?", [$data['install_link'], $now, $data['id']]);
+    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=FROM_UNIXTIME(?) WHERE request_id=?", [$data['install_link'], $now, $data['id']]);
 
 
     //Send an email to the clients

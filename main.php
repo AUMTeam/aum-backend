@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . "/config.php";
+require_once __DIR__ . "/configPsw.php";    //File containing passwords for mail and DB
 
 //Initializing debug mode
 require_once __DIR__ . "/lib/libPrintDebug/PrintDebug.php";
@@ -34,7 +35,7 @@ else
 
 
 //GZIP compression
-header("Content-Encoding: gzip");
+//header("Content-Encoding: gzip");
 if(!ob_start("ob_gzhandler")) ob_start();
 
 
@@ -70,7 +71,7 @@ if (!($_SERVER['REQUEST_METHOD'] === 'POST')) {
         $db = null;
         try {
             //Connect to the database
-            $db = new DatabaseWrapper($db_type, $config);
+            $db = new DatabaseWrapper($db_type, $db_config);
 
             //**JSON Parsing**
             //Decodes JSON if present

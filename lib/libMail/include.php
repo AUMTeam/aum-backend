@@ -18,6 +18,9 @@ foreach ($dir as $file) {
             break;
     }
 }
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 /**
  * Send a mail from the current user to '$to_user_id' user,
@@ -65,11 +68,44 @@ function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCom
         $subject = $mail->getSubject();
         $message = $mail->getMsg();
 
-        $headers = "MIME-Version: 1.0" . "\r\n";
-        $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
-        $headers .= "From: <${from['email']}>" . "\r\n";
+        //Try to create a parallel process
+        $pid;
+        if (!function_exists("pcntl_fork") || ($pid = pcntl_fork()) == -1) { //Cannot fork, send the mail on the main process
+            $printDebug->printDebugJSON(array("mail" => "Warning: Mail is sent on the main process. Expect slowdowns!"));
+            sendPHPMailer($from, $to, $subject, $message);
+        }
+        else if ($pid != 0) //Successfully forked, we are the children
+            sendPHPMailer($from, $to, $subject, $message);
+    }
+}
 
-        //Send the mail - TODO: change the destination address
-        mail("aum.coopcisf@gmail.com", $subject, $message, $headers);
+//Send a mail using PHPMailer
+function sendPHPMailer(array $from, array $to, string $subject, string $message) : void {
+    global $mail_config;
+
+    $mail = new PHPMailer(TRUE);
+    try {
+        //Server parameters configuration
+        $mail->IsSMTP();
+        $mail->Host = $mail_config['server'];
+        $mail->SMTPSecure = $mail_config['protocol'];
+        $mail->Port = $mail_config['port'];
+        $mail->SMTPAuth = TRUE;
+        $mail->Username = $mail_config['username'];
+        $mail->Password = $mail_config['password'];
+
+        //Mail parameters configuration
+        $mail->setFrom($from['email'], $from['name']);
+        $mail->addAddress("aum.coopcisf@gmail.com", $to['name']);
+        $mail->isHTML(TRUE);
+        $mail->Subject = $subject;
+        $mail->Body = $message;
+        $mail->AltBody = "Questa mail richiede l'utilizzo di un client con supporto ad HTML";
+    
+        //Finally, send the mail
+        $mail->send();
+    }
+    catch (Exception $e) {
+        echo $e->errorMessage();
     }
 }
