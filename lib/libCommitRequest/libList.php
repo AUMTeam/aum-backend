@@ -166,6 +166,7 @@ function get_list(string $type, array $data) : array {
                 'title' => $entry['title'],
                 'description' => $entry['description'],
                 'branch' => $entry['branch_name'],
+                'components' => $entry['components'],
                 'install_type' => $entry['install_type'],
                 'install_link' => $entry['install_link'],
                 'install_timestamp' => is_null($entry['install_timestamp']) ? null : strtotime($entry['install_timestamp']),
@@ -238,7 +239,7 @@ function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
     return "SELECT requests.request_id as 'id', title, description, install_type, install_status, install_timestamp, 
-        comment, install_link, branch_name, send_date, name, email 
+        comment, install_link, branch_name, send_date, name, email, components
         FROM requests_clients, requests, branches, users
         WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND users.user_id=requests.approver_user_id
             AND approval_status='2' AND client_user_id=?";
