@@ -1,7 +1,7 @@
-*beta2*
-*db/*
 *.htaccess
-*.gitignore
 *.jpg
 .vscode
 *log/*
+configPsw.php
+vendor/*
+composer.lock

@@ -6,24 +6,34 @@ $version = "0.50b";
 //Flag for maintenance mode
 $maintenance_state = false;
 
-//DB type
+
+//--DB CONFIGURATION--
 //$db_type = "pgsql"; //Uncomment this for PostgreSQL usage
 //$db_type = "sqlite"; //Uncomment this for SQLite3 usage
 $db_type = "mysql"; //Uncomment this for MySQL usage
 
 //DB configuration
-$config = [
+$db_config = [
     'server' => "127.0.0.1",
-    'username' => "root",
+    'username' => "",
     'password' => "",
     'db_name' => "my_aum",
 ];
 
 
+//--MAIL CONFIGURATION--
 //Flag to indicate whether mail sending is enabled or not
 $mail_enabled = false;
 //URL to the Front-End, used in mails
 $gui_url = "https://coopcisf.github.io/aum-frontend/";
+//Mail server parameters
+$mail_config = [
+    'server' => 'smtp.google.com',
+    'protocol' => 'tls', //or ssl
+    'port' => 587,
+    'username' => '',
+    'password' => ''
+];
 
 
 //Flag for debug/release mode
