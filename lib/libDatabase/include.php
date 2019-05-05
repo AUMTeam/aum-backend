@@ -81,6 +81,18 @@ class DatabaseWrapper {
         }
     }
 
+    public function beginTransaction() : bool {
+        return $this->handler->beginTransaction();
+    }
+
+    public function commit() {
+        return $this->handler->commit();
+    }
+
+    public function rollback() {
+        return $this->handler->rollback();
+    }
+
     public function __destruct() {
         $this->handler = null;
     }
