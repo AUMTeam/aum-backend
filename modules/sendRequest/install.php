@@ -26,7 +26,7 @@ $exec = function (array $data, array $data_init) : array {
     $now = time();
     //Update the DB
     $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=FROM_UNIXTIME(?), install_status=?
-        WHERE request_id=? AND client_user_id=?", [$feedback, $now, $data['id'], $data['install_status'], $user['user_id']]);
+        WHERE request_id=? AND client_user_id=?", [$feedback, $now, $data['install_status'], $data['id'], $user['user_id']]);
     
 
     return [
