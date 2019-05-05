@@ -34,7 +34,7 @@ else
 
 
 //GZIP compression
-header("Content-Encoding: gzip");
+//header("Content-Encoding: gzip");
 if(!ob_start("ob_gzhandler")) ob_start();
 
 
