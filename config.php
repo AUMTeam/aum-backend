@@ -35,6 +35,13 @@ $mail_config = [
     'password' => ''
 ];
 
+//--LDAP Configuration--
+$ldap_config = [
+    'enabled' => false,
+    'server' => "ldaps://localhost:389",
+    'domain' => 'mydomain',
+    'tld' => '.com'
+];
 
 //Flag for debug/release mode
 $debug_mode = true;
