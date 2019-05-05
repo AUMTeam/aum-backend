@@ -1,24 +1,24 @@
-# Setup of the project
+# Impostazioni iniziali del progetto
 
-## Package installation
-Install the following packets: 
+## Installazione dei programmi di base
+Installare i seguenti pacchetti: 
 
-For **Arch Linux**:
+Per **Arch Linux**:
 ```bash
 pacman -S php php-fpm php-cgi php-pgsql apache
 ```
 
-For **Debian**:
+Per **Debian**:
 ```bash
 apt-get install php php-fpm php-cgi php-pgsql apache2
 ```
 
-PHP has to support PCNTL with --enable-pcntl flag and LDAP with --enable-ldap flag
+PHP deve essere compilato con i flag ```--enable-pcntl``` e ```--enable-ldap```
 
 
-## Apache configuration
+## Configurazione di apache
 
-Create ```/etc/httpd/conf/extra/php-fpm.conf``` with:
+Creare ```/etc/httpd/conf/extra/php-fpm.conf``` ed inserire:
 
 ```ini
 DirectoryIndex index.php index.html
@@ -29,9 +29,9 @@ DirectoryIndex index.php index.html
 
 
 
-Open ```/etc/httpd/conf/httpd.conf``` with your favourite text editor and:
+Modificare ```/etc/httpd/conf/httpd.conf``` e:
 
-- Add the following modules:
+- Aggiungere i seguenti moduli:
 
   ```ini
   LoadModule proxy_module modules/mod_proxy.so
@@ -40,19 +40,19 @@ Open ```/etc/httpd/conf/httpd.conf``` with your favourite text editor and:
   ```
 
 
-- Add this lines at the end of the file:
+- Aggiungere le seguenti linee alla fine del file:
 
   ```ini
   Include conf/extra/php-fpm.conf
   Protocols h2 http/1.1
   ```
 
-Http2 is not strictly required, but it should increase performance.
+HTTP2 non è strettamente necessario, ma dovrebbe aumentare le performance del sito.
 
 
-## PHP Configuration
+## Configurazione di PHP
 
-Create ```/etc/php/conf.d/db.ini``` with:
+Creare ```/etc/php/conf.d/db.ini```:
 
 ```
 extension=pdo_pgsql
@@ -60,18 +60,16 @@ extension=pgsql
 ```
 
 
-## Service enable
-
-Issue the following commands:
+## Abilitazione dei servizi
 
 ```bash
 systemctl enable php-fpm httpd postgres
 systemctl start php-fpm httpd postgres
 ```
 
-## Project configuration
-Open ```config.php```:
-- Edit the DB configuration:
+## Configurazione interna del progetto
+Aprire ```config.php``` e modificare i seguenti campi:
+- Configurazione del database:
   ```php
   //$db_type = "pgsql"; //Uncomment this for PostgreSQL usage
   $db_type = "mysql"; //Uncomment this for MySQL usage
@@ -85,7 +83,7 @@ Open ```config.php```:
   ];
   ```
 
-- Edit the mail configuration:
+- Configurazione del servizio mail:
   ```php
   //URL to the Front-End, used in mails
   $gui_url = "";
@@ -99,9 +97,9 @@ Open ```config.php```:
   ];
   ```
 
--Edit the LDAP configuration:
+- Configurazione del server LDAP:
   ```php
-//--LDAP Configuration--
+  //--LDAP Configuration--
   $ldap_config = [
       'enabled' => false,
       'server' => "ldaps://localhost:389",
