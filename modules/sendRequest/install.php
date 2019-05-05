@@ -12,17 +12,21 @@ $exec = function (array $data, array $data_init) : array {
         throw new UnauthorizedException("The current user is not authorized to perform this action!");
 
     //Check fields presence
-    if (empty($data['id']))
-        throw new InvalidRequestException("Missing 'id' parameter!");
+    if (empty($data['id']) || empty($data['install_status']) || ($data['install_status'] != -1 && $data['install_status'] != 1))
+        throw new InvalidRequestException();
     $feedback = "";     //Feedback is not mandatory
     if (!empty($data['feedback']))
         $feedback = $data['feedback'];
 
+    //Check if the ID is valid
+    $req = $db->preparedQuery("SELECT request_id, install_status FROM requests_clients WHERE request_id=? AND client_user_id=?", [$data['id'], $user['user_id']]);
+    if (count($req) == 0)
+        throw new InvalidRequestException("Error: request id not found!");
     
     $now = time();
     //Update the DB
-    $db->preparedQuery("UPDATE requests_clients SET comment=?, install_date=FROM_UNIXTIME(?), install_status=1
-        WHERE request_id=? AND client_user_id=?", [$feedback, $now, $data['id'], $user['user_id']]);
+    $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=FROM_UNIXTIME(?), install_status=?
+        WHERE request_id=? AND client_user_id=?", [$feedback, $now, $data['id'], $data['install_status'], $user['user_id']]);
     
 
     return [
