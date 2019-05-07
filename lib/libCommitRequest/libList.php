@@ -9,9 +9,9 @@ function validateInput(array $data) : array {
 
     //Check is fundamental fields are present
     if(!isset($data['limit']))
-        throw new InvalidRequestException("limit cannot be blank", 3000);
+        throw new InvalidRequestException("limit cannot be blank", "ERROR_COMMIT_LIST_NO_LIMIT");
     if(!isset($data['page']))
-        throw new InvalidRequestException("page cannot be blank", 3000);
+        throw new InvalidRequestException("page cannot be blank", "ERROR_COMMIT_LIST_NO_LIMIT");
 
     
     /* **SORTING**

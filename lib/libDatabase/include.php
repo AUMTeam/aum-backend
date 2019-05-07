@@ -25,7 +25,7 @@ class DatabaseWrapper {
         }
     }
 
-    //Execute a query. WARNING: this is SQL-Injection insafe
+    //Execute a query. WARNING: this is SQL-Injection unsafe
     public function query(string $query) : array {
         $out = [];
 
