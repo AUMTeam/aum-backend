@@ -26,8 +26,8 @@ class DatabaseWrapper {
     }
 
     //Execute a query. WARNING: this is SQL-Injection unsafe
-    public function query(string $query) : array {
-        $out = [];
+    public function query(string $query) {
+        $out = null;
 
         try {
             //We need to get results only from SELECT queries
@@ -45,9 +45,9 @@ class DatabaseWrapper {
     }
 
     //Executes a parametrized query, SQL Injection Safe
-    public function preparedQuery(string $query, array $params = null) : array {
+    public function preparedQuery(string $query, array $params = null) {
         try {
-            $out = [];
+            $out = null;
             $stmt = $this->handler->prepare($query);
 
             if ($params != null) {
