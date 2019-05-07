@@ -27,9 +27,9 @@ require_once __DIR__ . "/../../vendor/autoload.php";
  *  with a specific '$type'
  */
 function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCommit = TYPE_REQUEST) : void {
-    global $mail_enabled;
+    global $mail_config;
 
-    if ($mail_enabled) {
+    if ($mail_config['enabled']) {
         global $db;
         global $user;
 
