@@ -18,10 +18,16 @@ function validateInput(array $data) : array {
      * If no sorting option was chosen, sort the commits by timestamp (descending)
      */
      if(empty($data['sort']) || empty($data['sort']['parameter'])) {
-        $data['sort'] = [
-            'order' => "DESC",
-            'parameter' => "approvation_timestamp"
-        ];
+        if ($listType == TYPE_CLIENT)   //Sort by send_timestamp for client list
+            $data['sort'] = [
+                'order' => "DESC",
+                'parameter' => "send_timestamp"
+            ];
+        else
+            $data['sort'] = [
+                'order' => "DESC",
+                'parameter' => "approvation_timestamp"
+            ];
     //Else convert the parameter name from the API one to the DB one
     } else {
         $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $listType);
