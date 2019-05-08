@@ -20,12 +20,12 @@ require_once __DIR__ . "/lib/libDatabase/include.php";
 require_once __DIR__ . "/lib/libToken/include.php";
 require_once __DIR__ . "/lib/libUserInfo/include.php";
 require_once __DIR__ . "/lib/libMail/include.php";
+require_once __DIR__ . "/../../vendor/autoload.php";
 
 
 //Set basic headers
 date_default_timezone_set('Europe/Rome');
 header("Access-Control-Allow-Origin: *");
-header("Strict-Transport-Security: max-age=31536000");
 header("Access-Control-Allow-Headers: Content-Type, X-Auth-Header, Accept-Encoding");
 header("Server-Version: $version");
 if($printDebug->isDebug())

@@ -55,7 +55,7 @@ function loginWithInternalDB(array $data) : array {
     //Verify if the user is present in the DB
     $result = $db->preparedQuery("SELECT user_id, hash_pass FROM users WHERE username=?", [$data['username']]);
     if(count($result) == 0)
-        throw new UserNotFoundException("", "ERROR_LOGIN_INVALID_CREDENTIALS");
+        throw new UserNotFoundException();
     
     //Verify if the password correspond
     if(!password_verify($data['password'], $result[0]['hash_pass']))

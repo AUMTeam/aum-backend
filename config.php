@@ -72,3 +72,4 @@ define("ROLE_DEVELOPER", "developer");
 define("ROLE_TECHAREA", "technicalAreaManager");
 define("ROLE_REVOFFICE", "revisionOfficeManager");
 define("ROLE_CLIENT", "client");
+define("ROLE_POWERUSER", "powerUser");

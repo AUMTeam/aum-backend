@@ -19,14 +19,13 @@ $exec = function (array $data, array $data_init) : array {
         $feedback = $data['feedback'];
 
     //Check if the ID is valid
-    $req = $db->preparedQuery("SELECT request_id, install_status FROM requests_clients WHERE request_id=? AND client_user_id=?", [$data['id'], $user['user_id']]);
+    $req = $db->preparedQuery("SELECT request_id, install_status FROM requests_clients WHERE request_id=? AND client_user_id=? AND install_status NOT IN('1', '-1')", [$data['id'], $user['user_id']]);
     if (count($req) == 0)
-        throw new InvalidRequestException("Error: request id not found!");
+        throw new InvalidRequestException("Error: request not found or request already approved");
     
-    $now = time();
     //Update the DB
-    $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=FROM_UNIXTIME(?), install_status=?
-        WHERE request_id=? AND client_user_id=?", [$feedback, $now, $data['install_status'], $data['id'], $user['user_id']]);
+    $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=now(), install_status=?
+        WHERE request_id=? AND client_user_id=?", [$feedback, $data['install_status'], $data['id'], $user['user_id']]);
     
 
     return [

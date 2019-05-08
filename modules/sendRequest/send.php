@@ -17,14 +17,11 @@ $exec = function (array $data, array $data_init) : array {
 
 
     //Check if the send request is present and if it hasn't already been validated
-    $entry = $db->preparedQuery("SELECT approval_status FROM requests WHERE request_id=?", [$data['id']]);
+    $entry = $db->preparedQuery("SELECT approval_status FROM requests WHERE request_id=? AND approval_status NOT IN ('-1')", [$data['id']]);
     if (count($entry) == 0)
-        throw new InvalidArgumentException("id not found");
-    else if ($entry[0]['approval_status'] != 1)
-        throw new InvalidRequestException("The request approval status is invalid");
+        throw new InvalidArgumentException("id not found or request already sent");
 
-    $now = time();
-    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=FROM_UNIXTIME(?) WHERE request_id=?", [$data['install_link'], $now, $data['id']]);
+    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=now() WHERE request_id=?", [$data['install_link'], $data['id']]);
 
 
     //Send an email to the clients

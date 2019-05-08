@@ -20,7 +20,6 @@ foreach ($dir as $file) {
 }
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
-require_once __DIR__ . "/../../vendor/autoload.php";
 
 /**
  * Send a mail from the current user to '$to_user_id' user,
@@ -32,6 +31,7 @@ function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCom
     if ($mail_config['enabled']) {
         global $db;
         global $user;
+        global $printDebug;
 
         $idType;
         switch($typeCommit) {
@@ -96,7 +96,7 @@ function sendPHPMailer(array $from, array $to, string $subject, string $message)
 
         //Mail parameters configuration
         $mail->setFrom($from['email'], $from['name']);
-        $mail->addAddress("aum.coopcisf@gmail.com", $to['name']);
+        $mail->addAddress("aum.coopcisf@gmail.com", $to['name']);   //TODO: change mail address
         $mail->isHTML(TRUE);
         $mail->Subject = $subject;
         $mail->Body = $message;
@@ -104,8 +104,7 @@ function sendPHPMailer(array $from, array $to, string $subject, string $message)
     
         //Finally, send the mail
         $mail->send();
-    }
-    catch (Exception $e) {
-        echo $e->errorMessage();
+    } catch (Exception $e) {
+        throw new MailException("Error while sending mail: ". $e->errorMessage());
     }
 }

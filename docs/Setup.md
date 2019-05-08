@@ -13,7 +13,7 @@ Per **Arch Linux**:
 pacman -S php php-fpm php-cgi php-pgsql apache postgresql
 ```
 
-PHP deve essere compilato con i flag ```--enable-pcntl``` e ```--enable-ldap```
+E' richiesto PHP con versione minima 7 e compilato con i flag ```--enable-pcntl``` e ```--enable-ldap```
 
 
 ## Configurazione di apache
@@ -89,6 +89,7 @@ Aprire ```config.php``` e modificare i seguenti campi:
   $gui_url = "";
   //Mail server parameters
   $mail_config = [
+    'enabled' => true,
     'server' => '',
     'protocol' => 'tls', //or ssl
     'port' => 587,
