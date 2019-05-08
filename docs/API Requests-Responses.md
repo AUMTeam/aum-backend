@@ -60,7 +60,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 
 
 ## auth/login
-Accede utilizzando username e password. Il token non è richiesto.
+Accede utilizzando username e password; il token non è richiesto. Se la password è uguale a 'cambiami', è necessario anche specificare la nuova password il campo 'new_password' pena l'esclusione dal sistema.
 
 #### Richiesta
 ```json
@@ -304,6 +304,28 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
         "updates_found":false
     },
     "status_code": 200
+}
+```
+
+## data/addBranch
+Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (ruolo Power User)
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"addBranch",
+    "request_data":{
+        "branch_name":"test"
+    }
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [],
+  "status_code": 200
 }
 ```
 
@@ -698,6 +720,65 @@ Vedasi *commit/update*
     "request_data":{
         "latest_update_timestamp":1555745875
     }
+}
+```
+
+## user/add
+
+Aggiunge un nuovo utente al database. E' necessario specificare username, nome completo, email, ruolo/i ed in modo facoltativo l'identificativo dell'area di riferimento. La password sarà impostata di default a 'cambiami'; sarà quindi necessario cambiarla al primo accesso.
+
+#### Richiesta
+```json
+{
+    "module":"user",
+    "access":"add",
+    "request_data":{
+        "username":"mario.rossi",
+        "name":"Mario Rossi",
+        "email":"mario@rossi.it",
+        "roles": [
+            "developer"
+        ],
+        "area_name":"Area 2"
+    }
+}
+```
+
+#### Risposte
+
+* Aggiunta andata a buon fine 
+```json
+{
+  "response_data": [],
+  "status_code": 200
+}
+```
+
+## user/changePsw
+
+Cambia la password di un utente. Se l'utente attualmente connesso è un amministratore (ruolo Power User), egli ha la possibilità di modificare le password di altri utenti (campo username) senza inserire la vecchia password (campo old_password).
+Un utente normale può invece modificare la sua password (new_password) solo inserendo la vecchia password (old_password).
+
+#### Richiesta
+```json
+{
+    "module":"user",
+    "access":"changePsw",
+    "request_data":{
+        "username":"mario.rossi",   //Solo per amministratori
+        "old_password":"ciao",      //Solo per utenti normali
+        "new_password":"pippo"
+    }
+}
+```
+
+#### Risposte
+
+* Modifica andata a buon fine 
+```json
+{
+  "response_data": [],
+  "status_code": 200
 }
 ```
 

@@ -20,7 +20,7 @@ require_once __DIR__ . "/lib/libDatabase/include.php";
 require_once __DIR__ . "/lib/libToken/include.php";
 require_once __DIR__ . "/lib/libUserInfo/include.php";
 require_once __DIR__ . "/lib/libMail/include.php";
-require_once __DIR__ . "/../../vendor/autoload.php";
+require_once __DIR__ . "/vendor/autoload.php";
 
 
 //Set basic headers

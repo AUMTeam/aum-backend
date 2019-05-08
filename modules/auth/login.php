@@ -61,11 +61,19 @@ function loginWithInternalDB(array $data) : array {
     if(!password_verify($data['password'], $result[0]['hash_pass']))
         throw new InvalidCredentialsException("Credentials are wrong", "ERROR_LOGIN_INVALID_CREDENTIALS");
 
+    if ($data['password']=="cambiami") {
+        require_once __DIR__."/../user/changePsw.php";
+        if (!empty($data['new_password']))
+            $res = $exec(array (
+                'username' => $data['username'],
+                'old_password' => $data['password'],
+                'new_password' => $data['new_password']
+            ), []);
+        else
+            throw new InvalidRequestException("Error: you have to change your password, but 'new_password' is missing!");
+    }
 
-    //Get the ID of the user
-    $user_id = $result[0]['user_id'];
-
-    return setToken($user_id);
+    return setToken($result[0]['user_id']);
 }
 
 function setToken(int $user_id) : array {
