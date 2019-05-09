@@ -4,10 +4,9 @@ Lista codici errore. I codici errore possono essere trovati qua:
 
 ```json
 {
-  "response_data":{
-    "error_code":100 //Qua si trova il nostro codice errore
-  },
-  "status_code":401
+  "response_data":{},
+  "error":"ERROR_GLOBAL_SAMPLE_ERROR", //Qua si trova il nostro codice errore
+  "status_code":500
 }
 ```
 

@@ -10,8 +10,9 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```json
 {
     "response_data":{
-        "error_code":100
+        
     },
+    "error":"ERROR_GLOBAL_MISSING_TOKEN",
     "status_code":401
 }
 ```
@@ -20,8 +21,9 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```json
 {
     "response_data":{
-        "error_code":102
+        
     },
+    "error":"ERROR_GLOBAL_INVALID_TOKEN",
     "status_code":401
 }
 ```
@@ -30,8 +32,9 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```json
 {
     "response_data":{
-        "error_code":103
+        
     },
+    "error":"ERROR_GLOBAL_NOT_IMPLEMENTED",
     "status_code":404
 }
 ```
@@ -40,8 +43,9 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```json
 {
     "response_data":{
-        "error_code":1001
+        
     },
+    "error":"ERROR_LOGIN_INVALID_REQUEST",
     "message":"Richiesta invalida",
     "status_code":400
 }
@@ -51,8 +55,9 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 ```json
 {
     "response_data":{
-        "error_code":103
+        
     },
+    "error":"ERROR_GLOBAL_UNAUTHORIZED_USER",
     "message":"Unhautorized",
     "status_code":403
 }
@@ -91,8 +96,9 @@ Accede utilizzando username e password; il token non è richiesto. Se la passwor
 ```json
 {
     "response_data":{
-        "error_code":1000
+        
     },
+    "error":"ERROR_LOGIN_INVALID_CREDENTIALS",
     "message":"Credenziali errate",
     "status_code":401
 }
@@ -127,8 +133,9 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 ```json
 {
     "response_data":{
-        "error_code":1002
+        
     },
+    "error":"ERROR_LOGIN_INVALID_TOKEN",
     "message":"Token non valido",
     "status_code":401
 }
@@ -191,9 +198,8 @@ Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: No
 * Il commit è già stato approvato
 ```json
 {
-    "response_data":{
-        "error_code":3007
-    },
+    "response_data":{},
+    "error": "ERROR_COMMIT_APPROVE_INVALID_REQUEST",
     "message":"Commit already approved!",
     "status_code":400
 }
@@ -830,9 +836,10 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 ```json
 {
     "response_data":{
-        "error_code":104,
-        "error_message":"Utente non trovato"
+        
     },
+    "error":"ERROR_USER_INFO_NOT_FOUND",
+    "error_message":"Utente non trovato",
     "status_code":404
 }
 ```
@@ -864,7 +871,7 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 ```json
 {
     "response_data":{
-        "error_code":3007
+        "error":3007
     },
     "message":"Commit_id doesn't refer to a valid commit!",
     "status_code":400
@@ -875,8 +882,9 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 ```json
 {
     "response_data":{
-        "error_code":3007
+        
     },
+    "error":"ERROR_COMMIT_APPROVE_INVALID_REQUEST",
     "message":"Commit already approved!",
     "status_code":400
 }
@@ -938,7 +946,7 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
     "module":"commit",
     "access":"update",
     "request_data":{
-        "latest_update_timestamp":
+        "latest_update_timestamp": 0
     }
 }
 ```
