@@ -270,7 +270,7 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
 ## commit/update
 
 Utilizzato per richiedere se vi sono nuovi commit data una certa data.
-E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggiornamento ricevuto.
+E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggiornamento ricevuto e section, la sezione nella quale si trova l'utente. I parametri ammessi in 'section' sono le stinghe corrispondenti ai ruoli utente (developer, technicalAreaManager).
 
 #### Richiesta
 ```json
@@ -278,7 +278,8 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
     "module":"commit",
     "access":"update",
     "request_data":{
-        "latest_update_timestamp":1555745875
+        "latest_update_timestamp":1555745875,
+        "section":"developer"
     }
 }
 ```
@@ -710,7 +711,7 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 
 ## sendRequest/update
 
-Vedasi *commit/update*
+Vedasi *commit/update*. I parametri ammessi in 'section' sono *developer*, *technicalAreaManager*, *revisionOfficeManager*, *client*.
 
 #### Richiesta
 ```json
@@ -718,7 +719,8 @@ Vedasi *commit/update*
     "module":"sendRequest",
     "access":"update",
     "request_data":{
-        "latest_update_timestamp":1555745875
+        "latest_update_timestamp":1555745875,
+        "section":"client"
     }
 }
 ```
@@ -926,29 +928,6 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
         ],
         "page": 6,
         "page_total": 6
-    },
-    "status_code": 200
-}
-```
-
-#commit/update
-#### Richiesta
-```json
-{
-    "module":"commit",
-    "access":"update",
-    "request_data":{
-        "latest_update_timestamp":
-    }
-}
-```
-
-#### Risposte
-
-```json
-{
-    "response_data": {
-        "updates_found":true
     },
     "status_code": 200
 }
