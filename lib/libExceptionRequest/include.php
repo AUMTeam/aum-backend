@@ -20,9 +20,8 @@ abstract class ExceptionRequest extends Exception {
      */
     public function getErrorResponse() : array {
         return [
-            "response_data" => [
-                'error' => $this->error_code, //TODO CONFIRM CHANGE
-            ],
+            "response_data" => [],
+            'error' => $this->error_code, //TODO CONFIRM CHANGE
             "message" => $this->message,
             "status_code" => $this->status_code
         ];
