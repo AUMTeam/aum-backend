@@ -68,7 +68,7 @@ define("TYPE_REQUEST_ID", "request_id");
 define("TYPE_CLIENT", "client");
 
 //User types
-define("ROLE_DEVELOPER", "developer");
+define("ROLE_DEVELOPER", "programmer");
 define("ROLE_TECHAREA", "technicalAreaManager");
 define("ROLE_REVOFFICE", "revisionOfficeManager");
 define("ROLE_CLIENT", "client");
