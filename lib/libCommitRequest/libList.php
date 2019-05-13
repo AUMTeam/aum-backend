@@ -150,7 +150,9 @@ function get_list(string $type, array $data) : array {
     }
     
     //Order the result based on 'sort' array in request (parameter and order are safe)
-    $order = "COALESCE(" . implode(", ", $data['sort']['parameter']) . ")"; //parameter can hold more than one attribute
+    $order = $data['sort']['parameter'];
+    if (is_array($data['sort']['parameter']))
+        $order = "COALESCE(" . implode(", ", $data['sort']['parameter']) . ")"; //parameter can hold more than one attribute
     $query .= " ORDER BY {$order} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
