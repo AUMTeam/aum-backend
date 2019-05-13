@@ -1,5 +1,15 @@
 {
-	"require": {
-		"phpmailer/phpmailer": "^6.0"
-	}
+    "name": "aum/backend",
+    "description": "Backend for Authorization Manager",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "CoopCISF",
+            "email": "aum.coopcisf@gmail.com"
+        }
+    ]
 }

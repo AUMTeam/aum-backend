@@ -1,7 +1,7 @@
 <?php
 
 //Version of the server
-$version = "0.50b";
+$version = "0.9";
 
 //Flag for maintenance mode
 $maintenance_state = false;
@@ -28,7 +28,7 @@ $gui_url = "https://coopcisf.github.io/aum-frontend/";
 //Mail server parameters
 $mail_config = [
     'enabled' => false,
-    'server' => 'smtp.google.com',
+    'server' => 'smtp.gmail.com',
     'protocol' => 'tls', //or ssl
     'port' => 587,
     'username' => '',
