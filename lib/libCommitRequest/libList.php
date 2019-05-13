@@ -18,16 +18,14 @@ function validateInput(array $data) : array {
      * If no sorting option was chosen, sort the commits by timestamp (descending)
      */
      if(empty($data['sort']) || empty($data['sort']['parameter'])) {
+        $data['sort'] = [
+            'order' => "DESC",
+            'parameter' => ["approvation_timestamp, creation_timestamp"]
+        ];
         if ($listType == TYPE_CLIENT)   //Sort by send_timestamp for client list
-            $data['sort'] = [
-                'order' => "DESC",
-                'parameter' => "send_timestamp"
-            ];
-        else
-            $data['sort'] = [
-                'order' => "DESC",
-                'parameter' => "approvation_timestamp"
-            ];
+            $data['sort']['parameter'] = "send_timestamp";
+        else if ($data['role'] == ROLE_REVOFFICE)
+            $data['sort']['parameter'] = ["send_timestamp, approvation_timestamp"];
     //Else convert the parameter name from the API one to the DB one
     } else {
         $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $listType);
@@ -126,7 +124,7 @@ function get_list(string $type, array $data) : array {
         case TYPE_CLIENT:
             break;
         default:
-            throw new Exception("Impossible to use the list");
+            throw new InvalidRequestException("Impossible to use the list");
     }
 
     global $db;
@@ -152,7 +150,8 @@ function get_list(string $type, array $data) : array {
     }
     
     //Order the result based on 'sort' array in request (parameter and order are safe)
-    $query .= " ORDER BY {$data['sort']['parameter']} {$data['sort']['order']}";
+    $order = "COALESCE(" . implode(", ", $data['sort']['parameter']) . ")"; //parameter can hold more than one attribute
+    $query .= " ORDER BY {$order} {$data['sort']['order']}";
 
     //Limit the query from the offset to the number of elements requested
     $query .= " LIMIT ?";
