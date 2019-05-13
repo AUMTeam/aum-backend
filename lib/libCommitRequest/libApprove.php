@@ -55,6 +55,6 @@ function approve(array $data, string $type) : void {
         $revOffice = getUserIdByRole(ROLE_REVOFFICE);
         
         foreach($revOffice as $entry)
-            sendMail($entry, MAIL_NEW_ENTRY, $data['id'], TYPE_REQUEST);
+            sendMail($entry, MAIL_REQ_APPROVED, $data['id'], TYPE_REQUEST);
     }
 }

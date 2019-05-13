@@ -1,8 +1,11 @@
 <?php
 
-define("MAIL_APPROVED", 1);
-define("MAIL_NEW_ENTRY", 2);
-define("MAIL_NEW_PATCH", 3);
+define("MAIL_NEW_ENTRY", 1);
+define("MAIL_APPROVED", 2);
+define("MAIL_REQ_APPROVED", 3);
+define("MAIL_PATCH_SENT", 4);
+define("MAIL_NEW_PATCH", 5);
+define("MAIL_FEEDBACK_ADDED", 6);
 
 //Include all the mail files
 $dir = scandir(__DIR__);
@@ -50,14 +53,23 @@ function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCom
         //Istantiate the mail class based on the $mailType parameter
         $mail;
         switch($mailType) {
+            case MAIL_NEW_ENTRY:
+                $mail = new NewEntryMail($from['name'], $to['name'], $typeCommit, $idType, $id);
+                break;
             case MAIL_APPROVED:
                 $mail = new ApprovedMail($from['name'], $to['name'], $typeCommit, $idType, $id);
                 break;
-            case MAIL_NEW_ENTRY:
-                $mail = new NewCommitMail($from['name'], $to['name'], $typeCommit, $idType, $id);
+            case MAIL_REQ_APPROVED:
+                $mail = new ReqApprovedMail($from['name'], $to['name'], $typeCommit, $idType, $id);
+                break;
+            case MAIL_PATCH_SENT:
+                $mail = new PatchSentMail($from['name'], $to['name'], $typeCommit, $idType, $id);
                 break;
             case MAIL_NEW_PATCH:
-                $mail = new NewPatchMail($from['name'], $to['name']);
+                $mail = new NewPatchMail($from['name'], $to['name'], $typeCommit, $idType, $id);
+                break;
+            case MAIL_FEEDBACK_ADDED:
+                $mail = new FeedbackAddedMail($from['name'], $to['name'], $typeCommit, $idType, $id);
                 break;
             default:
                 throw new InvalidRequestException("Invalid mail type!");

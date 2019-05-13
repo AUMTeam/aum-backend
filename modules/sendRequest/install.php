@@ -27,6 +27,11 @@ $exec = function (array $data, array $data_init) : array {
     $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=now(), install_status=?
         WHERE request_id=? AND client_user_id=?", [$feedback, $data['install_status'], $data['id'], $user['user_id']]);
     
+    //Send a mail to the author, to the approver and to the sender
+    $users = $db->preparedQuery("SELECT author_user_id, sender_user_id, approver_user_id FROM requests WHERE request_id=?", [$data['id']])[0];
+    sendMail($users['approver_user_id'], MAIL_FEEDBACK_ADDED, $data['id']);
+    sendMail($users['author_user_id'], MAIL_FEEDBACK_ADDED, $data['id']);
+    sendMail($users['sender_user_id'], MAIL_FEEDBACK_ADDED, $data['id']);
 
     return [
         "response_data" => [],

@@ -3,27 +3,12 @@
 /**
  * Mail used to communicate that there's a new commit/request to the tech area members
  */
-class NewCommitMail extends AbstractMail {
-    private $title;
-    private $desc;
-    private $typeCommit;
-
-    public function __construct(string $from, string $to, string $type, string $idType, int $id) {
-        parent::__construct($from, $to);
-        global $db;
-
-        //Gets title and description from the current commit/sendRequest
-        $out = $db->preparedQuery("SELECT title, description FROM $type WHERE $idType=?", [$id])[0];
-        $this->title = $out['title'];
-        $this->desc = $out['description'];
-        $this->typeCommit = $type;
-    }
-
+class NewEntryMail extends AbstractMail {
     public function getSubject() : string {
         if ($this->typeCommit==TYPE_COMMIT)
-            return "AUM - Nuovo commit pubblicato da " . $this->to;
+            return "AUM - Nuovo commit pubblicato da " . $this->from;
         else
-            return "AUM - Nuova richiesta di invio pubblicata da " . $this->to;
+            return "AUM - Nuova richiesta di invio pubblicata da " . $this->from;
     }
 
     public function getTitle() : string {
@@ -35,7 +20,6 @@ class NewCommitMail extends AbstractMail {
     
     public function getContent() : string {
         return "
-            <h4>Contenuto:</h4>
             <table>
             <tr><td><b>Titolo: </b></td><td>$this->title</td></tr>
             <tr><td><b>Descrizione: </b></td><td>$this->desc</td></tr>

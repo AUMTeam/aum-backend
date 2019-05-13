@@ -21,7 +21,8 @@ $exec = function (array $data, array $data_init) : array {
     if (count($entry) == 0)
         throw new InvalidArgumentException("id not found or request already sent");
 
-    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=now() WHERE request_id=?", [$data['install_link'], $data['id']]);
+    $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=now(), sender_user_id=?
+        WHERE request_id=?", [$data['install_link'], $user['user_id'], $data['id']]);
 
 
     //Send an email to the clients
@@ -29,6 +30,11 @@ $exec = function (array $data, array $data_init) : array {
     foreach($cli as $entry)
         sendMail($entry['client_user_id'], MAIL_NEW_PATCH, $data['id']);
     
+    //Send an email to the approver and to the original author (programmer)
+    $users = $db->preparedQuery("SELECT approver_user_id, author_user_id FROM requests WHERE request_id=?", [$data['id']])[0];
+    sendMail($users['approver_user_id'], MAIL_PATCH_SENT, $data['id']);
+    sendMail($users['author_user_id'], MAIL_PATCH_SENT, $data['id']);
+
     return [
         "response_data" => [],
         "status_code" => 200
