@@ -141,6 +141,45 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 }
 ```
 
+## branches/add
+Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (ruolo Power User)
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"addBranch",
+    "request_data":{
+        "branch_name":"test"
+    }
+}
+```
+
+## branches/list
+Restituisce l'elenco delle branch
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"branches"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "id": 1,
+      "name": "Tres-Zap"
+    },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
 ## commit/add
 
 Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori.
@@ -273,6 +312,35 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
 }
 ```
 
+## commit/shortList
+
+Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"commits"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "commit_id": 3,
+      "title": "Common Marsh Bedstraw"
+    },
+    {
+      "commit_id": 4,
+      "title": "Yellow Nightshade Groundcherry"
+    },
+  ],
+  "status_code": 200
+}
+```
+
 ## commit/update
 
 Utilizzato per richiedere se vi sono nuovi commit data una certa data.
@@ -314,133 +382,10 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 }
 ```
 
-## data/addBranch
-Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (ruolo Power User)
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"addBranch",
-    "request_data":{
-        "branch_name":"test"
-    }
-}
-```
-
 #### Risposta
 ```json
 {
   "response_data": [],
-  "status_code": 200
-}
-```
-
-## data/areas
-Restituisce l'elenco delle aree funzionali
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"areas"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "area_id": 1,
-      "area_string": "Area 1"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## data/branches
-Restituisce l'elenco delle branch
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"branches"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "id": 1,
-      "name": "Tres-Zap"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## data/clients
-Restituisce l'elenco dei clienti
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"clients"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "email": "client@aum.com",
-      "role": [
-        4
-      ],
-      "area": null,
-      "user_id": 3,
-      "name": "Test Client User"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## data/commits
-
-Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"commits"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "commit_id": 3,
-      "title": "Common Marsh Bedstraw"
-    },
-    {
-      "commit_id": 4,
-      "title": "Yellow Nightshade Groundcherry"
-    },
-  ],
   "status_code": 200
 }
 ```
@@ -468,31 +413,6 @@ Restituisce i tipi di installazione
       "id": 1,
       "desc": "A Freddo"
     }
-  ],
-  "status_code": 200
-}
-```
-
-## data/roles
-Restituisce l'elenco dei ruoli in uso
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"roles"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "role_id": 1,
-      "role_string": "Developer"
-    },
-    [...]
   ],
   "status_code": 200
 }
@@ -762,6 +682,31 @@ Aggiunge un nuovo utente al database. E' necessario specificare username, nome c
 }
 ```
 
+## user/areas
+Restituisce l'elenco delle aree funzionali
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"areas"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "area_id": 1,
+      "area_string": "Area 1"
+    },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
 ## user/changePsw
 
 Cambia la password di un utente. Se l'utente attualmente connesso è un amministratore (ruolo Power User), egli ha la possibilità di modificare le password di altri utenti (campo username) senza inserire la vecchia password (campo old_password).
@@ -786,6 +731,36 @@ Un utente normale può invece modificare la sua password (new_password) solo ins
 ```json
 {
   "response_data": [],
+  "status_code": 200
+}
+```
+
+## user/clients
+Restituisce l'elenco dei clienti
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"clients"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "email": "client@aum.com",
+      "role": [
+        4
+      ],
+      "area": null,
+      "user_id": 3,
+      "name": "Test Client User"
+    },
+    [...]
+  ],
   "status_code": 200
 }
 ```
@@ -846,96 +821,27 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 }
 ```
 
-## commit/approve
+## user/roles
+Restituisce l'elenco dei ruoli in uso
+
 #### Richiesta
 ```json
 {
-    "module":"commit",
-    "access":"approve",
-    "request_data":{
-        "id":1,
-        "approve_flag":1
-    }
+	"module":"data",
+	"action":"roles"
 }
 ```
 
-#### Risposte
-
-* Commit approvato correttamente
+#### Risposta
 ```json
 {
-    "response_data":{},
-    "status_code":200
-}
-```
-
-* L'ID del commit non è valido
-```json
-{
-    "response_data":{
-        "error":3007
+  "response_data": [
+    {
+      "role_id": 1,
+      "role_string": "Developer"
     },
-    "message":"Commit_id doesn't refer to a valid commit!",
-    "status_code":400
+    [...]
+  ],
+  "status_code": 200
 }
 ```
-
-* Il commit è già stato approvato
-```json
-{
-    "response_data":{
-        
-    },
-    "error":"ERROR_COMMIT_APPROVE_INVALID_REQUEST",
-    "message":"Commit already approved!",
-    "status_code":400
-}
-```
-
-## commit/list
-#### Richiesta
-```json
-{
-    "module":"commit",
-    "access":"list",
-    "request_data":{
-        "limit":1,
-        "page":1,
-        "sort":{
-            "parameter":"",
-            "order":""
-        },
-        "filter":{
-            "attribute":"",
-            "valueMatches":"",
-            "valueDifferentFrom":"",
-        }
-    }
-}
-```
-
-#### Risposte
-
-```json
-{
-    "response_data": {
-        "count": 5,
-        "count_total": 35,
-        "list": [
-            {
-                "approval_status": "0",
-                "author": {
-                    "name": "Test of Client user",
-                    "user_id": "3",
-                    "username": "client.test"
-                },
-                "description": "Self-enabling systematic analyzer",
-                "id": "27",
-                "timestamp": 1520488563
-            },
-        ],
-        "page": 6,
-        "page_total": 6
-    },
-    "status_code": 200
-}
