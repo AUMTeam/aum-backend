@@ -109,4 +109,4 @@ $init = function (array $data) {
 $exec = function (array $data, array $init_data = NULL) : array {
 	//Questa è la funzione necessaria per eseguire qualunque cosa debba fare l’azione.
 }
-```
+``` 
