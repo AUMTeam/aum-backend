@@ -11,23 +11,25 @@ Vi sono due vie per creare la richiesta:
 	I parametri "module" ed "action" sono obbligatori:
 	```json
 		POST aum.altervista.org/main.php
-
-		"module":"auth",
-		"action":"login",
-		"request_data":[
-			"username":"mario.rossi",
-			"password":"mario"
-		]
+		{
+			"module":"auth",
+			"action":"login",
+			"request_data":{
+				"username":"mario.rossi",
+				"password":"mario"
+			}
+		}
 	```
 2. **Richiesta ad un modulo specifico**
 	In questo caso "module" ed "action" sono specificati direttamente nell'URL:
 	```json
 		POST aum.altervista.org/main.php/auth/login
-
-		"request_data":[
-			"username":"mario.rossi",
-			"password":"mario"
-		]
+		{
+			"request_data":{
+				"username":"mario.rossi",
+				"password":"mario"
+			}
+		}
 	```
 
 La risposta, invece, sarà necessariamente un JSON. La struttura di default delle risposte è:

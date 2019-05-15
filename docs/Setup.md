@@ -1,6 +1,6 @@
 # Impostazioni iniziali del progetto
 
-## Installazione dei programmi di base
+## Installazione degli applicativi di base
 Installare i seguenti pacchetti: 
 
 Per **Debian**:
@@ -13,7 +13,7 @@ Per **Arch Linux**:
 pacman -S php php-fpm php-cgi php-pgsql apache postgresql
 ```
 
-E' richiesto PHP con versione minima 7 e compilato con i flag ```--enable-pcntl``` e ```--enable-ldap```
+E' richiesto PHP con versione minima 7 e compilato con il flag ```--enable-pcntl```
 
 
 ## Configurazione di apache
@@ -59,6 +59,12 @@ extension=pdo_pgsql
 extension=pgsql
 ```
 
+## Configurazione del database
+Viene fornito un database dump contenente solo la struttura (*db_base.sql*) ed uno già popolato con campi di test (*db_full.sql*), che vanno opportunamente caricati sul sistema in uso. In entrambi casi il sistema prevede un utente amministratore di default, con nome utente "admin" e password "admin".
+
+Se viene utilizzato *Postgres*, è necessario modificare alcune query all'interno del progetto.
+In particolare:
+  
 
 ## Abilitazione dei servizi
 
@@ -95,17 +101,6 @@ Aprire ```config.php``` e modificare i seguenti campi:
     'port' => 587,
     'username' => '',
     'password' => ''
-  ];
-  ```
-
-- Configurazione del server LDAP:
-  ```php
-  //--LDAP Configuration--
-  $ldap_config = [
-      'enabled' => false,
-      'server' => "ldaps://localhost:389",
-      'domain' => 'mydomain',
-      'tld' => '.com'
   ];
   ```
 
