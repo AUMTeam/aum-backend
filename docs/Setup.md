@@ -2,7 +2,7 @@
 
 ## Configurazione degli applicativi
 
-Per poter funzionare correttamente, il sistema necessita di un **Web Server**, dell'interprete **PHP** e di un **DBMS** (MySQL o PostgreSQL).
+Per poter funzionare correttamente, il sistema necessita di un **Web Server**, dell'interprete **PHP**, di **composer** per la gestione delle dipendenze e di un **DBMS** (MySQL o PostgreSQL).
 
 Di seguito viene riportata la configurazione in ambiente *linux*. Se questi applicativi sono già stati installati, è possibile andare direttamente alla sezione successiva.
 
@@ -12,12 +12,12 @@ Installare i seguenti pacchetti:
 
 Per **Debian**:
 ```bash
-apt-get install php php-fpm php-cgi php-pgsql apache2 postgresql postgresql-client
+apt-get install php php-fpm php-cgi php-pgsql apache2 postgresql postgresql-client composer
 ```
 
 Per **Arch Linux**:
 ```bash
-pacman -S php php-fpm php-cgi php-pgsql apache postgresql
+pacman -S php php-fpm php-cgi php-pgsql apache postgresql composer
 ```
 
 E' richiesto PHP con versione minima 7 e compilato con il flag ```--enable-pcntl```
