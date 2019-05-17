@@ -2,6 +2,6 @@
 *.jpg
 .vscode
 *log/*
-configPsw.php
 vendor/*
+configPsw.php
 composer.lock

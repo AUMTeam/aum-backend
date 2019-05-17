@@ -100,7 +100,8 @@ function sendPHPMailer(array $from, array $to, string $subject, string $message)
         //Server parameters configuration
         $mail->IsSMTP();
         $mail->Host = $mail_config['server'];
-        $mail->SMTPSecure = $mail_config['protocol'];
+        if ($mail_config['protocol'] == "tls" || $mail_config['protocol'] == "ssl")
+            $mail->SMTPSecure = $mail_config['protocol'];
         $mail->Port = $mail_config['port'];
         $mail->SMTPAuth = TRUE;
         $mail->Username = $mail_config['username'];
@@ -108,7 +109,7 @@ function sendPHPMailer(array $from, array $to, string $subject, string $message)
 
         //Mail parameters configuration
         $mail->setFrom($from['email'], $from['name']);
-        $mail->addAddress("aum.coopcisf@gmail.com", $to['name']);   //TODO: change mail address
+        $mail->addAddress("aum.coopcisf@gmail.com", $to['name']);   //TODO: change mail address to '$to['email']'
         $mail->isHTML(TRUE);
         $mail->Subject = $subject;
         $mail->Body = $message;

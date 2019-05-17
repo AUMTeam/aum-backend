@@ -1,9 +1,24 @@
 # Authorization Manager API
-## A cosa ci serve?
-Serve a comunicare con il server per vari cambiamenti di dati o accessi avvenuti tramite client (nel nostro caso web-application).
 
 ## Installazione e configurazione iniziale
-Vedere il file 'Setup.md'
+Si rimanda al file 'Setup.md'
+
+## Struttura del progetto
+Il progetto è strutturato nel seguente modo:
+```
+* main.php
+* multi.php
+* lib/
+- * libDatabase/
+(...)
+* modules/
+- * auth/
+- - * login.php
+- - * logout.php
+(...)
+```
+Le richieste sono possibili specificando un particolare **modulo** (insieme di azioni con uno stesso scopo, come *auth*) e di un'**azione** (operazione che si intende eseguire, come *login*).
+
 
 ## Struttura dati richiesta e risposta
 Vi sono due vie per creare la richiesta:
@@ -11,23 +26,25 @@ Vi sono due vie per creare la richiesta:
 	I parametri "module" ed "action" sono obbligatori:
 	```json
 		POST aum.altervista.org/main.php
-
-		"module":"auth",
-		"action":"login",
-		"request_data":[
-			"username":"mario.rossi",
-			"password":"mario"
-		]
+		{
+			"module":"auth",
+			"action":"login",
+			"request_data":{
+				"username":"mario.rossi",
+				"password":"mario"
+			}
+		}
 	```
 2. **Richiesta ad un modulo specifico**
 	In questo caso "module" ed "action" sono specificati direttamente nell'URL:
 	```json
 		POST aum.altervista.org/main.php/auth/login
-
-		"request_data":[
-			"username":"mario.rossi",
-			"password":"mario"
-		]
+		{
+			"request_data":{
+				"username":"mario.rossi",
+				"password":"mario"
+			}
+		}
 	```
 
 La risposta, invece, sarà necessariamente un JSON. La struttura di default delle risposte è:
@@ -43,7 +60,7 @@ Per la spiegazione dei vari parametri, andare nella sezione `Parametri di rispos
 
 ## Parametri di richiesta
 
-* **module**: insieme di "azioni" con uno stesso scopo (esempio: `commit` per add,list,update,...)
+* **module**: insieme di "azioni" con uno stesso scopo (esempio: `commits` per add,list,update,...)
 * **action**: azione che l'utente intende eseguire (esempio: `list`)
 * **request_data**: serie di dati strutturati come richiesto dall’entrypoint (può anche essere vuoto)
 
@@ -76,20 +93,7 @@ Nella sezione `Parametri di risposta` è stato introdotto il parametro `status_c
 * `500` : `Internal Server Error`, ovvero il server ha riscontrato un problema nella processione dell’azione. Se la risposta corrisponde a un JSON, significa che è un errore dell'API. Tale errore può essere rintracciato se segnato l’ID errore univoco ricevuto. In caso di sviluppo e manutenzione, è possibile ottenere uno stack trace dell’eccezione. Se la risposta non è un JSON, si tratta di un errore interno del sistema del server per problemi di varia natura.
 * `503` : `Service Unavailable`, ovvero il server non è al momento disponibile per motivi di manutenzione. E' tuttavia possibile bypassarlo tramite un parametro e un account abilitato a fare questo tipo di test per motivi di sicurezza.
 
-## Come andiamo a implementare le azioni per l’API?
-Per l’implementazione di un’azione bisogna tenere in mente il seguente pattern directory:
-```
-* main.php
-* multi.php
-* lib/
-- * libDatabase/
-(...)
-* modules/
-- * login/
-- - * auth.php
-- - * access.php
-(...)
-```
+## Implementazione di nuove azioni
 
 I nomi dei moduli sono le cartelle che contengono i codici delle azioni possibili fare per il server. In codice PHP si traduce in:
 ```php
@@ -98,7 +102,7 @@ I nomi dei moduli sono le cartelle che contengono i codici delle azioni possibil
 require_once “./modules/$module/$action.php”;
 ```
 
-Affinché sia possibile usufruire dell’entrypoint `multi.php` dobbiamo rendere le azioni più modulari possibile. E questo è possibile grazie alle funzioni anonime salvate in una variabile.
+Le azioni devno essere il più modulari possibile. E questo è possibile grazie alle funzioni anonime salvate in una variabile.
 
 Il pattern da seguire sarà: 
 ```php
@@ -109,4 +113,4 @@ $init = function (array $data) {
 $exec = function (array $data, array $init_data = NULL) : array {
 	//Questa è la funzione necessaria per eseguire qualunque cosa debba fare l’azione.
 }
-```
+``` 

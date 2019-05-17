@@ -141,7 +141,76 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 }
 ```
 
-## commit/add
+## branches/add
+Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (ruolo Power User)
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"addBranch",
+    "request_data":{
+        "branch_name":"test"
+    }
+}
+```
+
+## branches/shortList
+Restituisce l'elenco delle branch
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"branches"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "id": 1,
+      "name": "Tres-Zap"
+    },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
+## clients/shortList
+Restituisce l'elenco dei clienti
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"clients"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "email": "client@aum.com",
+      "role": [
+        4
+      ],
+      "area": null,
+      "user_id": 3,
+      "name": "Test Client User"
+    },
+    [...]
+  ],
+  "status_code": 200
+}
+```
+
+## commits/add
 
 Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori.
 
@@ -169,7 +238,7 @@ Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obblig
 }
 ```
 
-## commit/approve
+## commits/approve
 
 Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: Non Approvato)
 
@@ -205,7 +274,7 @@ Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: No
 }
 ```
 
-## commit/list
+## commits/list
 
 Restituisce la lista dei commit presenti nel database sotto forma di pagine. E' necessario specificare *limit* (numero di elementi per pagina) e *page* (numero di pagina).
 
@@ -273,7 +342,36 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
 }
 ```
 
-## commit/update
+## commits/shortList
+
+Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"commits"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "commit_id": 3,
+      "title": "Common Marsh Bedstraw"
+    },
+    {
+      "commit_id": 4,
+      "title": "Yellow Nightshade Groundcherry"
+    },
+  ],
+  "status_code": 200
+}
+```
+
+## commits/update
 
 Utilizzato per richiedere se vi sono nuovi commit data una certa data.
 E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggiornamento ricevuto e section, la sezione nella quale si trova l'utente. I parametri ammessi in 'section' sono le stinghe corrispondenti ai ruoli utente (developer, technicalAreaManager).
@@ -314,20 +412,6 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 }
 ```
 
-## data/addBranch
-Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (ruolo Power User)
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"addBranch",
-    "request_data":{
-        "branch_name":"test"
-    }
-}
-```
-
 #### Risposta
 ```json
 {
@@ -336,169 +420,7 @@ Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (
 }
 ```
 
-## data/areas
-Restituisce l'elenco delle aree funzionali
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"areas"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "area_id": 1,
-      "area_string": "Area 1"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## data/branches
-Restituisce l'elenco delle branch
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"branches"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "id": 1,
-      "name": "Tres-Zap"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## data/clients
-Restituisce l'elenco dei clienti
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"clients"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "email": "client@aum.com",
-      "role": [
-        4
-      ],
-      "area": null,
-      "user_id": 3,
-      "name": "Test Client User"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## data/commits
-
-Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"commits"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "commit_id": 3,
-      "title": "Common Marsh Bedstraw"
-    },
-    {
-      "commit_id": 4,
-      "title": "Yellow Nightshade Groundcherry"
-    },
-  ],
-  "status_code": 200
-}
-```
-
-## data/installType
-Restituisce i tipi di installazione
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"installType"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "id": 0,
-      "desc": "A Caldo"
-    },
-    {
-      "id": 1,
-      "desc": "A Freddo"
-    }
-  ],
-  "status_code": 200
-}
-```
-
-## data/roles
-Restituisce l'elenco dei ruoli in uso
-
-#### Richiesta
-```json
-{
-	"module":"data",
-	"action":"roles"
-}
-```
-
-#### Risposta
-```json
-{
-  "response_data": [
-    {
-      "role_id": 1,
-      "role_string": "Developer"
-    },
-    [...]
-  ],
-  "status_code": 200
-}
-```
-
-## sendRequest/add
+## sendRequests/add
 
 Utilizzato per aggiungere una nuova richiesta di invio al database.
 *install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio.
@@ -532,9 +454,9 @@ Tutti i campi tranne *commits* sono obbligatori.
 }
 ```
 
-## sendRequest/approve
+## sendRequests/approve
 
-Vedasi commit/approve
+Vedasi commits/approve
 
 #### Richiesta
 ```json
@@ -548,7 +470,7 @@ Vedasi commit/approve
 }
 ```
 
-## sendRequest/install
+## sendRequests/install
 
 Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client. Il campo 'feedback' è facoltativo, mentre il campo "install_status" può avere valore 1 (installazione avvenuta con successo) o -1 (installazione fallita).
 
@@ -575,9 +497,37 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 }
 ```
 
-## sendRequest/list
+## sendRequests/installType
+Restituisce i tipi di installazione
 
-Il funzionamento è uguale a quello di *commit/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a 'client' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a 'revisionOfficeManager' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"installType"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "id": 0,
+      "desc": "A Caldo"
+    },
+    {
+      "id": 1,
+      "desc": "A Freddo"
+    }
+  ],
+  "status_code": 200
+}
+```
+
+## sendRequests/list
+
+Il funzionamento è uguale a quello di *commits/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a 'client' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a 'revisionOfficeManager' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 L'elenco dei campi di filtraggio ammessi prevede anche send_timestamp (data di invio della patch ai clienti), install_type (tipo di installazione, 0 per a freddo ed 1 per a caldo), install_link (link di installazione).
 Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprastanti, anche install_timestamp (data di installazione della patch da parte del cliente), install_status (stato di installazione; 0 non installato, 1 installato e -1 errore nell'installazione); install_comment (feedback rilasciato dal cliente). 
@@ -639,7 +589,7 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
 ```
 
 ##### Risposta con role_id!=4
-Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se la richiesta deve essere ancora valutata, *1* se è stata approvata e *-1* se è stata respinta e **2** se è stata inviata ai clienti.
+Uguale a *commits/list* con l'eccezione di *approval_status*: è uguale a *0* se la richiesta deve essere ancora valutata, *1* se è stata approvata e *-1* se è stata respinta e **2** se è stata inviata ai clienti.
 ```json
 {
     "response_data": {
@@ -688,7 +638,7 @@ Uguale a *commit/list* con l'eccezione di *approval_status*: è uguale a *0* se 
 }
 ```
 
-## sendRequest/send
+## sendRequests/send
 
 Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio revisioni possono effettuare tale azione.
 
@@ -715,9 +665,9 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 }
 ```
 
-## sendRequest/update
+## sendRequests/update
 
-Vedasi *commit/update*. I parametri ammessi in 'section' sono *developer*, *technicalAreaManager*, *revisionOfficeManager*, *client*.
+Vedasi *commits/update*. I parametri ammessi in 'section' sono *developer*, *technicalAreaManager*, *revisionOfficeManager*, *client*.
 
 #### Richiesta
 ```json
@@ -758,6 +708,31 @@ Aggiunge un nuovo utente al database. E' necessario specificare username, nome c
 ```json
 {
   "response_data": [],
+  "status_code": 200
+}
+```
+
+## user/areas
+Restituisce l'elenco delle aree funzionali
+
+#### Richiesta
+```json
+{
+	"module":"data",
+	"action":"areas"
+}
+```
+
+#### Risposta
+```json
+{
+  "response_data": [
+    {
+      "area_id": 1,
+      "area_string": "Area 1"
+    },
+    [...]
+  ],
   "status_code": 200
 }
 ```
@@ -846,96 +821,27 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 }
 ```
 
-## commit/approve
+## user/roles
+Restituisce l'elenco dei ruoli in uso
+
 #### Richiesta
 ```json
 {
-    "module":"commit",
-    "access":"approve",
-    "request_data":{
-        "id":1,
-        "approve_flag":1
-    }
+	"module":"data",
+	"action":"roles"
 }
 ```
 
-#### Risposte
-
-* Commit approvato correttamente
+#### Risposta
 ```json
 {
-    "response_data":{},
-    "status_code":200
-}
-```
-
-* L'ID del commit non è valido
-```json
-{
-    "response_data":{
-        "error":3007
+  "response_data": [
+    {
+      "role_id": 1,
+      "role_string": "Developer"
     },
-    "message":"Commit_id doesn't refer to a valid commit!",
-    "status_code":400
+    [...]
+  ],
+  "status_code": 200
 }
 ```
-
-* Il commit è già stato approvato
-```json
-{
-    "response_data":{
-        
-    },
-    "error":"ERROR_COMMIT_APPROVE_INVALID_REQUEST",
-    "message":"Commit already approved!",
-    "status_code":400
-}
-```
-
-## commit/list
-#### Richiesta
-```json
-{
-    "module":"commit",
-    "access":"list",
-    "request_data":{
-        "limit":1,
-        "page":1,
-        "sort":{
-            "parameter":"",
-            "order":""
-        },
-        "filter":{
-            "attribute":"",
-            "valueMatches":"",
-            "valueDifferentFrom":"",
-        }
-    }
-}
-```
-
-#### Risposte
-
-```json
-{
-    "response_data": {
-        "count": 5,
-        "count_total": 35,
-        "list": [
-            {
-                "approval_status": "0",
-                "author": {
-                    "name": "Test of Client user",
-                    "user_id": "3",
-                    "username": "client.test"
-                },
-                "description": "Self-enabling systematic analyzer",
-                "id": "27",
-                "timestamp": 1520488563
-            },
-        ],
-        "page": 6,
-        "page_total": 6
-    },
-    "status_code": 200
-}

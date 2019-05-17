@@ -26,25 +26,6 @@ class DatabaseWrapper {
         $this->handler->exec("SET NAMES 'utf8';");
     }
 
-    //Execute a query. WARNING: this is SQL-Injection unsafe
-    public function query(string $query) {
-        $out = null;
-
-        try {
-            //We need to get results only from SELECT queries
-            if (strpos($query, "SELECT") !== false) {
-                $stmt = $this->handler->query($query);
-                $out = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
-            else
-                $this->handler->exec($query);
-        } catch (PDOException $e) {
-            throw new Exception("Error in executing query '$query' : ". $e->getMessage());
-        }
-
-        return $out;
-    }
-
     //Executes a parametrized query, SQL Injection Safe
     public function preparedQuery(string $query, array $params = null) {
         try {
@@ -82,6 +63,10 @@ class DatabaseWrapper {
             //Print the exception in the JSON response
             throw new DBException("Error in executing query: '$query' -- Message: " . $ex->getMessage());
         }
+    }
+
+    public function getLastInsertId(string $name = NULL) : string {
+        return $this->handler->lastInsertId($name);
     }
 
     public function beginTransaction() : bool {
