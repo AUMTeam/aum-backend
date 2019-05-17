@@ -26,7 +26,7 @@ $exec = function (array $data, array $data_init) : array {
         //Add the request into the database, and get the ID of the just added request
         $db->preparedQuery("INSERT INTO requests(title, description, install_type, author_user_id, components, branch_id) VALUES 
                 (?, ?, ?, ?, ?, ?)", [$data['title'], $data['description'], $data['install_type'], $author_user_id, $data['components'], $data['branch']]); 
-        $request_id = $db->preparedQuery("SELECT LAST_INSERT_ID() as request_id")[0]['request_id'];
+        $request_id = $db->getLastInsertId();
 
         //Destination clients and Commits are in separated tables: add the data also in those tables using the received request_id
         $clients = $data['dest_clients'];

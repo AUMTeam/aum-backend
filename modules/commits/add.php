@@ -22,7 +22,7 @@ $exec = function (array $data, array $data_init) : array {
     //Add the commit into the database and get its ID
     $db->preparedQuery("INSERT INTO commits(title, description, components, branch_id, author_user_id)
         VALUES (?, ?, ?, ?, ?)", [$data['title'], $data['description'], $data['components'], $data['branch'], $author_user_id]);
-    $id = $db->preparedQuery("SELECT LAST_INSERT_ID() as id FROM commits")[0]['id'];
+    $id = $db->getLastInsertId();
     
     
     //Send the email to the tech area responsibles

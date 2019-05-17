@@ -28,7 +28,7 @@ $exec = function (array $data, array $data_init) : array {
 
         $db->preparedQuery("INSERT INTO users(username, hash_pass, name, email, area_id) VALUES (?, ?, ?, ?, ?)", 
             [$data['username'], $default_psw, $data['name'], $data['email'], $area_id]);
-        $user_id = $db->preparedQuery("SELECT LAST_INSERT_ID() as id FROM users")[0]['id'];
+        $user_id = $db->getLastInsertId();
 
         foreach($data['roles'] as $entry) {   //One user can have multiple roles
             $role = $db->preparedQuery("SELECT role_id FROM roles WHERE role_name=?", [$entry]);
