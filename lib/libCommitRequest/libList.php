@@ -225,7 +225,7 @@ function get_list(string $type, array $data) : array {
 
                 //Get the list of commits
                 $temp += [
-                    'commits' => $db->preparedQuery("SELECT commits.commit_id as 'id', title FROM commits, requests_commits
+                    'commits' => $db->preparedQuery("SELECT commits.commit_id as id, title FROM commits, requests_commits
                     WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']])
                 ];
 
