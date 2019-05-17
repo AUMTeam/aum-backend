@@ -1,7 +1,7 @@
 # Authorization Manager API
 
 ## Installazione e configurazione iniziale
-Si rimanda al file 'Setup.md'
+Si rimanda al file [Setup.md](setup/Setup.md)
 
 ## Struttura del progetto
 Il progetto è strutturato nel seguente modo:
