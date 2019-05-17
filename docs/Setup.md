@@ -1,6 +1,13 @@
 # Impostazioni iniziali del progetto
 
-## Installazione degli applicativi di base
+## Configurazione degli applicativi
+
+Per poter funzionare correttamente, il sistema necessita di un **Web Server**, dell'interprete **PHP** e di un **DBMS** (MySQL o PostgreSQL).
+
+Di seguito viene riportata la configurazione in ambiente *linux*. Se questi applicativi sono già stati installati, è possibile andare direttamente alla sezione successiva.
+
+### Installazione degli applicativi di base
+
 Installare i seguenti pacchetti: 
 
 Per **Debian**:
@@ -16,7 +23,7 @@ pacman -S php php-fpm php-cgi php-pgsql apache postgresql
 E' richiesto PHP con versione minima 7 e compilato con il flag ```--enable-pcntl```
 
 
-## Configurazione di apache
+### Configurazione di apache
 
 Creare ```/etc/httpd/conf/extra/php-fpm.conf``` ed inserire:
 
@@ -50,7 +57,7 @@ Modificare ```/etc/httpd/conf/httpd.conf``` e:
 HTTP2 non è strettamente necessario, ma dovrebbe aumentare le performance del sito.
 
 
-## Configurazione di PHP
+### Configurazione di PHP
 
 Creare ```/etc/php/conf.d/db.ini```:
 
@@ -59,26 +66,28 @@ extension=pdo_pgsql
 extension=pgsql
 ```
 
-## Configurazione del database
-Viene fornito un database dump contenente solo la struttura (*db_base.sql*) ed uno già popolato con campi di test (*db_full.sql*), che vanno opportunamente caricati sul sistema in uso. In entrambi casi il sistema prevede un utente amministratore di default, con nome utente "admin" e password "admin".
-
-Se viene utilizzato *Postgres*, è necessario modificare alcune query all'interno del progetto.
-In particolare:
-  
-
-## Abilitazione dei servizi
+### Abilitazione dei servizi
 
 ```bash
 systemctl enable php-fpm httpd postgresql
 systemctl start php-fpm httpd postgresql
 ```
 
+
+## Configurazione del database
+
+Viene fornito un *database dump* contenente solo la struttura (*db_base.sql*) ed uno già popolato con campi di test (*db_full.sql*), che vanno opportunamente caricati sul sistema in uso. In entrambi casi il sistema prevede un utente amministratore di default, con nome utente "admin" e password "admin".
+  
+
 ## Configurazione interna del progetto
-Aprire ```config.php``` e modificare i seguenti campi:
+
+Viene predisposto un file di configurazione centrale, ```config.php``` , dove sono presenti tutti i parametri fondamentali del progetto. E' invece possibile modificare i parametri di connessione al database ed al servizio mail in ```configPsw.php``` , file non tracciato da git.
+
+Aprire ```configPsw.php``` e modificare i seguenti campi:
 - Configurazione del database:
   ```php
-  //$db_type = "pgsql"; //Uncomment this for PostgreSQL usage
-  $db_type = "mysql"; //Uncomment this for MySQL usage
+  //$db_type = "pgsql"; //Utilizzo di PostgreSQL
+  $db_type = "mysql"; //Utilizzo di MySQL
 
   //DB configuration
   $db_config = [
@@ -91,18 +100,17 @@ Aprire ```config.php``` e modificare i seguenti campi:
 
 - Configurazione del servizio mail:
   ```php
-  //URL to the Front-End, used in mails
-  $gui_url = "";
+  $gui_url = "";    //Indirizzo web che punta al front-end
   //Mail server parameters
   $mail_config = [
     'enabled' => true,
     'server' => '',
-    'protocol' => 'tls', //or ssl
+    'protocol' => 'tls', //o ssl
     'port' => 587,
     'username' => '',
     'password' => ''
   ];
   ```
 
-Eseguire il seguente comando:
+In ultimo, eseguire il seguente comando per scaricare la libreria *PHPMailer*:
 ```php composer.phar install```
