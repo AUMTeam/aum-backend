@@ -21,7 +21,7 @@ function remove(string $type, array $data) : void {
     global $db;
 
     //Get the element
-    $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=?", [$id]);
+    $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=?", [$data['id']]);
     if (count($elem) == 0)
         throw new InvalidRequestException("ID not found or element already approved");
 
