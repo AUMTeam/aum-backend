@@ -21,7 +21,7 @@ function approve(array $data, string $type) : void {
             $id_name = TYPE_REQUEST_ID;
             break;
         default:
-            throw new Exception("Impossible to use the endpoint");
+            throw new InvalidRequestException("Impossible to use the endpoint");
     }
     
     //Checks fields integrity

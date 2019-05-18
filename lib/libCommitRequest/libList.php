@@ -151,7 +151,7 @@ function get_list(string $type, array $data) : array {
     
     //Order the result based on 'sort' array in request (parameter and order are safe)
     $order = $data['sort']['parameter'];
-    if (is_array($data['sort']['parameter']))
+    if (is_array($order))
         $order = "COALESCE(" . implode(", ", $data['sort']['parameter']) . ")"; //parameter can hold more than one attribute
     $query .= " ORDER BY {$order} {$data['sort']['order']}";
 
