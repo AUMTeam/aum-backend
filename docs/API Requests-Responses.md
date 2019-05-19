@@ -280,7 +280,7 @@ Restituisce la lista dei commit presenti nel database sotto forma di pagine. E' 
 
 Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id (id dei commit), title, description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, reviewer, approval_status, components, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo l'id dei commit.
 
-E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
+E' poi possibile impostare facoltativamente un **filtro** di ricerca, con la possibilità di filtrare per più campi. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
 
 #### Richiesta
 ```json
@@ -294,11 +294,16 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca. Si specifi
             "parameter":"id",
             "order":"DESC"
         },
-        "filter":{
+        "filter" : [
+          {
             "attribute":"",
-            "valueMatches":"",
-            "valueDifferentFrom":"",
-        }
+            "valueMatches":""
+          },
+          {
+            "attribute":"",
+            "valueDifferentFrom":""
+          }
+      ]
     }
 }
 ```

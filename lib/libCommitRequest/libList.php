@@ -24,11 +24,11 @@ function validateInput(array $data) : array {
         ];
         if ($listType == TYPE_CLIENT)   //Sort by send_timestamp for client list
             $data['sort']['parameter'] = "send_timestamp";
-        else if ($data['role'] == ROLE_REVOFFICE)
+        else if (!empty($data['role']) && $data['role'] == ROLE_REVOFFICE)
             $data['sort']['parameter'] = ["send_timestamp, approvation_timestamp"];
     //Else convert the parameter name from the API one to the DB one
     } else {
-        $data['sort']['parameter'] = translateName(strtolower($data['sort']['parameter']), $listType);
+        $data['sort']['parameter'] = translateName($data['sort']['parameter'], $listType);
         if(empty($data['sort']['order'])) $data['sort']['order'] = "DESC";
     }
 
@@ -38,22 +38,21 @@ function validateInput(array $data) : array {
      * If 'valueMatches' is present, the 'negate' field will have no content ("")
      * If 'valueDifferentFrom' is present, 'negate' will contain "NOT" and the content of 'valueDifferentFrom' will be copied into 'valueMatches'
      */ 
-    if (!empty($data['filter']['attribute'])) {
-        //valueDifferentFrom was passed 
-        if(isset($data['filter']['valueDifferentFrom'])) {
-            $data['filter']['valueMatches'] = $data['filter']['valueDifferentFrom'];
-            $data['filter']['negate'] = "NOT";
-        //valueMatches was passed
-        } else if(isset($data['filter']['valueMatches'])) {
-            $data['filter']['negate'] = "";
-        } else
-            throw new InvalidRequestException("valueMatches nor valueDifferentFrom were specified!");
+    if (!empty($data['filter'])) {
+        foreach($data['filter'] as &$elem) {
+            //valueDifferentFrom was passed 
+            if(isset($elem['valueDifferentFrom'])) {
+                $elem['valueMatches'] = $elem['valueDifferentFrom'];
+                $elem['negate'] = "NOT";
+            //valueMatches was passed
+            } else if(isset($elem['valueMatches'])) {
+                $elem['negate'] = "";
+            } else
+                throw new InvalidRequestException("valueMatches nor valueDifferentFrom were specified!");
 
-        if (strlen($data['filter']['valueMatches']) == 0)
-            throw new InvalidRequestException("filter parameter must have at least length one byte");
-        else
             //OK - convert the attribute name from the API one to the DB one
-            $data['filter']['attribute'] = translateName($data['filter']['attribute'], $listType);
+            $elem['attribute'] = translateName($elem['attribute'], $listType);
+        }
     }
     return $data;
 }
@@ -83,9 +82,10 @@ function translateName(string $attribute) : string {
             else
                 return TYPE_REQUEST_ID;
         case "title":
-            return "title";
         case "description":
-            return "description";
+        case "approval_status":
+        case "components":
+            return $attribute;
         case "timestamp":
             return "creation_timestamp";
         case "update_timestamp":
@@ -94,10 +94,6 @@ function translateName(string $attribute) : string {
             return "author_user_id";
         case "approver":
             return "approver_user_id";
-        case "approval_status":
-            return "approval_status";
-        case "components":
-            return "components";
         case "branch":
             return "branch_id";
         default:
@@ -144,9 +140,11 @@ function get_list(string $type, array $data) : array {
         $query = getInternalQuery($data, $user['user_id'], $user['role_name'], $params);
     
     //If filter was set, add it to the query
-    if (!empty($data['filter']['attribute'])) {   //Attribute and Negate are safe
-        $query .= " AND {$data['filter']['attribute']} {$data['filter']['negate']} LIKE ?";
-        $params[] = "%{$data['filter']['valueMatches']}%";
+    if (!empty($data['filter'])) {   //Attribute and Negate are safe
+        foreach($data['filter'] as $elem) {
+            $query .= " AND {$elem['attribute']} {$elem['negate']} LIKE ?";
+            $params[] = "%{$elem['valueMatches']}%";
+        }
     }
     
     //Order the result based on 'sort' array in request (parameter and order are safe)
