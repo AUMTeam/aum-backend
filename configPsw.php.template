@@ -10,19 +10,19 @@ $db_config = [
     'server' => '127.0.0.1',
     'port' => '5432',
     'db_name' => 'my_aum',
-    'username' => '',
+    'username' => 'root',
     'password' => ''
 ];
 
 
 //--MAIL CONFIGURATION--
 //URL to the Front-End, used in mails
-$gui_url = "https://coopcisf.github.io/aum-frontend/";
+$gui_url = "https://aumteam.github.io/aum-frontend/";
 //Mail server parameters
 $mail_config = [
     'enabled' => false,
     'server' => 'smtp.gmail.com',
-    'protocol' => 'tls', //or ssl
+    'protocol' => 'tls', //or ssl, or '' for plain-text communication
     'port' => 587,
     'username' => '',
     'password' => ''

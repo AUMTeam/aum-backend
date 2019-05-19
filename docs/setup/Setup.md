@@ -83,7 +83,7 @@ Viene fornito un *database dump* contenente solo la struttura (*db_base.sql*) ed
 
 Viene predisposto un file di configurazione centrale, ```config.php``` , dove sono presenti tutti i parametri fondamentali del progetto. E' invece possibile modificare i parametri di connessione al database ed al servizio mail in ```configPsw.php``` , file non tracciato da git.
 
-Aprire ```configPsw.php``` e modificare i seguenti campi:
+Rinominare ```configPsw.php.template``` in ```configPsw.php``` e modificare i seguenti campi:
 - Configurazione del database:
   ```php
   //$db_type = "pgsql"; //Utilizzo di PostgreSQL
@@ -105,7 +105,7 @@ Aprire ```configPsw.php``` e modificare i seguenti campi:
   $mail_config = [
     'enabled' => true,
     'server' => '',
-    'protocol' => 'tls', //o ssl
+    'protocol' => 'tls', //o ssl, o '' per comunicazione in plain-text
     'port' => 587,
     'username' => '',
     'password' => ''
