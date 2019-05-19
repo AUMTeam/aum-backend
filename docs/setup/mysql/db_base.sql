@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `hash_pass`, `email`, `name`, `area_id`) VALUES
-(1, 'admin', '$2y$10$autYx1CjNHiMTaMst4d/3u801S17cocdlVRle217eNjJh2b7Mff.K', 'admin@aum.com', 'Test Admin', 1),
+(1, 'admin', '$2y$10$autYx1CjNHiMTaMst4d/3u801S17cocdlVRle217eNjJh2b7Mff.K', 'admin@aum.com', 'Test Admin', 1);
 
 -- --------------------------------------------------------
 
@@ -272,8 +272,8 @@ ALTER TABLE `requests_clients`
 -- Constraints for table `requests_commits`
 --
 ALTER TABLE `requests_commits`
-  ADD CONSTRAINT `requests_commits_ibfk_1` FOREIGN KEY (`commit_id`) REFERENCES `commits` (`commit_id`),
-  ADD CONSTRAINT `requests_commits_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`);
+  ADD CONSTRAINT `requests_commits_ibfk_1` FOREIGN KEY (`commit_id`) REFERENCES `commits` (`commit_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `requests_commits_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `users`

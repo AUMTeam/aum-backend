@@ -22,8 +22,16 @@ function remove(string $type, array $data) : void {
 
     //Get the element
     $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=?", [$data['id']]);
+    
     if (count($elem) == 0)
         throw new InvalidRequestException("ID not found or element already approved");
+
+    //If the element is a commit, check if it hasn't already been included in a send request
+    if ($type == TYPE_COMMIT) {
+        $comm = $db->preparedQuery("SELECT $id_name FROM requests_commits WHERE $id_name=?", [$data['id']]);
+        if (count($comm) > 0)
+            throw new InvalidRequestException("Commit already included in a send request");
+    }
 
     $elem = $elem[0][$id_name];
 

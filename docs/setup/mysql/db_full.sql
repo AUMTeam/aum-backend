@@ -191,7 +191,7 @@ INSERT INTO `commits` (`commit_id`, `creation_timestamp`, `title`, `description`
 (97, '2018-07-02 08:49:13', 'Capejewels', 'Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla. Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.', 2, 'Donec diam neque, vestibulum eget, vulputate ut, ultrices vel, augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque.', 4, '0', NULL, NULL, NULL),
 (98, '2019-04-20 20:10:45', 'Clovenlip Toadflax', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.', 2, 'Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.', 5, '1', '2018-11-27 22:25:10', '', 2),
 (99, '2018-10-08 15:09:07', 'Bigpod Ceanothus', 'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.', 2, 'Praesent blandit. Nam nulla. Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede.', 5, '0', NULL, NULL, NULL),
-(100, '2018-05-12 21:44:22', 'Holboell''s Rockcress', 'Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', 1, 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.', 3, '1', '2018-07-20 05:58:32', '', 2),
+(100, '2018-05-12 21:44:22', 'Holboell''s Rockcress', 'Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.', 1, 'Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.', 3, '1', '2018-07-20 05:58:32', '', 2);
 
 --
 -- Triggers `commits`
@@ -340,7 +340,7 @@ INSERT INTO `requests` (`request_id`, `title`, `description`, `components`, `bra
 (97, 'Feltleaf Willow', 'Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.', 'Maecenas tristique, est et tempus semper, est quam pharetra magna, ac consequat metus sapien ut nunc. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Mauris viverra diam vitae quam. Suspendisse potenti.', 3, 1, '2018-05-24 14:32:12', '0', NULL, NULL, NULL, NULL, NULL, '0', NULL),
 (98, 'Hairy Gumweed', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.', 'Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat.', 4, 1, '2018-06-16 14:35:34', '0', NULL, NULL, NULL, NULL, NULL, '1', NULL),
 (99, 'Rim Lichen', 'Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', 'Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.', 4, 2, '2019-01-16 20:01:27', '-1', '2019-05-13 15:20:35', '', 2, NULL, NULL, '0', NULL),
-(100, 'Oahu Stenogyne', 'Fusce consequat. Nulla nisl. Nunc nisl.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.', 4, 1, '2018-11-28 02:47:22', '-1', '2019-05-13 15:20:35', '', 2, NULL, NULL, '1', NULL),
+(100, 'Oahu Stenogyne', 'Fusce consequat. Nulla nisl. Nunc nisl.', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.', 4, 1, '2018-11-28 02:47:22', '-1', '2019-05-13 15:20:35', '', 2, NULL, NULL, '1', NULL);
 
 --
 -- Triggers `requests`
@@ -383,8 +383,7 @@ INSERT INTO `requests_clients` (`request_id`, `client_user_id`, `install_timesta
 (43, 3, '2018-07-02 09:51:06', '1', 'Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.'),
 (45, 3, NULL, '0', NULL),
 (59, 3, '2018-12-18 06:44:00', '1', 'Aenean lectus. Pellentesque eget nunc. Donec quis orci eget orci vehicula condimentum.'),
-(72, 3, NULL, '0', NULL),
-(101, 1, '2019-05-14 12:20:59', '1', ''),
+(72, 3, NULL, '0', NULL);
 
 -- --------------------------------------------------------
 
@@ -396,6 +395,7 @@ CREATE TABLE IF NOT EXISTS `requests_commits` (
   `request_id` mediumint(10) unsigned NOT NULL,
   `commit_id` mediumint(10) unsigned NOT NULL,
   PRIMARY KEY (`request_id`,`commit_id`),
+  KEY `request_id` (`request_id`),
   KEY `commit_id` (`commit_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -413,7 +413,6 @@ INSERT INTO `requests_commits` (`request_id`, `commit_id`) VALUES
 (41, 4),
 (70, 4),
 (84, 4),
-(101, 4),
 (58, 6),
 (97, 7),
 (60, 8),
@@ -597,7 +596,7 @@ INSERT INTO `requests_commits` (`request_id`, `commit_id`) VALUES
 (83, 99),
 (8, 100),
 (12, 100),
-(16, 100),
+(16, 100);
 
 -- --------------------------------------------------------
 
@@ -728,8 +727,8 @@ ALTER TABLE `requests_clients`
 -- Constraints for table `requests_commits`
 --
 ALTER TABLE `requests_commits`
-  ADD CONSTRAINT `requests_commits_ibfk_1` FOREIGN KEY (`commit_id`) REFERENCES `commits` (`commit_id`),
-  ADD CONSTRAINT `requests_commits_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`);
+  ADD CONSTRAINT `requests_commits_ibfk_1` FOREIGN KEY (`commit_id`) REFERENCES `commits` (`commit_id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `requests_commits_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `users`
