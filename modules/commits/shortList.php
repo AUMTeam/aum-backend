@@ -8,7 +8,7 @@ $exec = function (array $data, array $data_init) : array {
     global $db;
     $out = [];
 
-    $res = $db->preparedQuery("SELECT commit_id, title FROM commits WHERE author_user_id=?", [$user['user_id']]);
+    $res = $db->preparedQuery("SELECT commit_id, title FROM commits WHERE approval_status IN ('1') AND author_user_id=?", [$user['user_id']]);
 
     foreach($res as $entry)
         $out[] = $entry;
