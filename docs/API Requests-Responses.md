@@ -542,10 +542,10 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
 {
     "module":"sendRequest",
     "access":"list",
-    "role":4,
     "request_data":{
         "limit":5,
         "page":6,
+        "role":'client',
         "sort":{
             "parameter":"id",
             "order":"DESC"
@@ -561,7 +561,7 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
 
 #### Risposte
 
-##### Risposta con role_id=4
+##### Risposta con role=client
 
 ```json
 {
@@ -581,6 +581,10 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
         "install_status": "1",
         "install_comment": "Cras mi pede, malesuada in, imperdiet et, ",
         "approver": {
+          "name": "Test Admin",
+          "email": "admin@aum.com"
+        },
+        "author": {
           "name": "Test Developer",
           "email": "dev@aum.com"
         }
@@ -593,7 +597,7 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
 }
 ```
 
-##### Risposta con role_id!=4
+##### Risposta con role!=client
 Uguale a *commits/list* con l'eccezione di *approval_status*: è uguale a *0* se la richiesta deve essere ancora valutata, *1* se è stata approvata e *-1* se è stata respinta e **2** se è stata inviata ai clienti.
 ```json
 {

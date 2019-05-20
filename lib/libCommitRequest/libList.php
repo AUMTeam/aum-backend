@@ -2,6 +2,7 @@
 
 //Type of the list (commit/request/client)
 $listType;
+$idType;
 
 //Validate the user input
 function validateInput(array $data) : array {
@@ -102,15 +103,12 @@ function translateName(string $attribute) : string {
 }
 
 /**
- * Retrive the list of commits / send requests / client send requests
+ * Build the query based on $type parameter
  */
-function get_list(string $type, array $data) : array {
-    global $listType;
-    $listType = $type;
-    $data = validateInput($data);
-    
+function getQuery(string $type, array $data, array &$params) : string { 
+    $id = '';
     //Check the $type parameter
-    switch ($listType) {
+    switch ($type) {
         case TYPE_COMMIT:
             $id = TYPE_COMMIT_ID;
             break;
@@ -122,12 +120,12 @@ function get_list(string $type, array $data) : array {
         default:
             throw new InvalidRequestException("Impossible to use the list");
     }
-
-    global $db;
-    global $user;
+    
+    global $listType, $db, $user, $idType;
+    $listType = $type;
+    $idType = $id;
+    $data = validateInput($data);
     $query;
-    $params = [];
-    $out = [];
 
     //Calculate the starting ID (number of commits per page * number of page)
     $data['limit'] = intval($data['limit']);
@@ -159,96 +157,18 @@ function get_list(string $type, array $data) : array {
     $query .= " OFFSET ?";
     $params[] = $offset;
 
-
-    //Execute the query and get the count of elements
-    $queryResult = $db->preparedQuery($query, $params);
-    $out = getCount($query, $data, $queryResult, $params);
-    
-    //Populate the response array based on $listType
-    if ($listType == TYPE_CLIENT) {
-        foreach($queryResult as $entry) {
-            $temp = [
-                'id' => $entry['id'],
-                'title' => $entry['title'],
-                'description' => $entry['description'],
-                'branch' => $entry['branch_name'],
-                'components' => $entry['components'],
-                'install_type' => $entry['install_type'],
-                'install_link' => $entry['install_link'],
-                'install_timestamp' => is_null($entry['install_timestamp']) ? null : strtotime($entry['install_timestamp']),
-                'send_timestamp' => is_null($entry['send_timestamp']) ? null : strtotime($entry['send_timestamp']),
-                'install_status' => $entry['install_status'],
-                'install_comment' => $entry['comment'],
-                'approver' => [
-                    'name' => $entry['name'],
-                    'email' => $entry['email']
-                ]
-            ];
-            $out['list'][] = $temp;
-        }
-    } else {
-        //Populate the response array with each element of the chosen page
-        foreach ($queryResult as $entry) {
-            $temp = [
-                'id' => $entry[$id],
-                'title' => $entry['title'],
-                'description' => $entry['description'],
-                'timestamp' => strtotime($entry['creation_timestamp']),
-                'update_timestamp' => is_null($entry['approvation_timestamp']) ? null : strtotime($entry['approvation_timestamp']),
-                'components' => $entry['components'],
-                'branch' => $entry['branch_name'],
-                'approval_status' => $entry['approval_status'],
-                'author' => [
-                    'name' => $entry['au_name'],
-                    'email' => $entry['au_email']
-                ]
-            ];
-
-            //Add the approver infos if the element was approved
-            if ($temp['approval_status'] != 0)
-                $temp += [
-                    'approver' => [
-                        'name' => $entry['ap_name'],
-                        'email' => $entry['ap_email']
-                    ],
-            ];
-
-            if ($listType==TYPE_REQUEST) {
-                //Get the install type and link
-                $temp += [
-                    'install_link' => $entry['install_link'],
-                    'install_type' => $entry['install_type'],
-                    'send_timestamp' => is_null($entry['send_timestamp']) ? 0 : strtotime($entry['send_timestamp'])
-                ];
-
-                //Get the list of commits
-                $temp += [
-                    'commits' => $db->preparedQuery("SELECT commits.commit_id as id, title FROM commits, requests_commits
-                    WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']])
-                ];
-
-                //Get the destination clients
-                $temp += [
-                    'clients' => $db->preparedQuery("SELECT name, email FROM users, requests_clients
-                    WHERE users.user_id=requests_clients.client_user_id AND request_id=?", [$temp['id']])
-                ];
-
-            }
-            $out['list'][] = $temp;
-        }
-    }
-
-    return $out;
+    return $query;
 }
 
 function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
     return "SELECT requests.request_id as id, title, description, install_type, install_status, install_timestamp, 
-        comment, install_link, branch_name, send_timestamp, name, email, components
-        FROM requests_clients, requests, branches, users
-        WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND users.user_id=requests.approver_user_id
-            AND approval_status='2' AND client_user_id=?";
+        comment, install_link, branch_name, send_timestamp, author.email as au_email, author.name as au_name,
+    approver.email as ap_email, approver.name as ap_name, components
+        FROM requests_clients, requests, branches, users as approver, users as author
+        WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND approver.user_id=requests.approver_user_id
+            AND author.user_id=requests.author_user_id AND approval_status='2' AND client_user_id=?";
 }
 
 function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, array &$params) : string {
@@ -317,6 +237,100 @@ function getCount(string $query, array $data, array $queryResult, array $params)
         'page' => $page,
         'page_total' => $max_page,
     ];
+
+    return $out;
+}
+
+/**
+ * Build the response for commits / send requests / client send requests
+ */
+function get_list(string $type, array $data) : array {
+    $params = [];
+    $out = [];
+    global $db, $listType, $idType;
+    $query = getQuery($type, $data, $params);
+
+    //Execute the query and get the count of elements
+    $queryResult = $db->preparedQuery($query, $params);
+    $out = getCount($query, $data, $queryResult, $params);
+    
+    //Populate the response array based on $listType
+    if ($listType == TYPE_CLIENT) {
+        foreach($queryResult as $entry) {
+            $temp = [
+                'id' => $entry['id'],
+                'title' => $entry['title'],
+                'description' => $entry['description'],
+                'branch' => $entry['branch_name'],
+                'components' => $entry['components'],
+                'install_type' => $entry['install_type'],
+                'install_link' => $entry['install_link'],
+                'install_timestamp' => is_null($entry['install_timestamp']) ? null : strtotime($entry['install_timestamp']),
+                'send_timestamp' => is_null($entry['send_timestamp']) ? null : strtotime($entry['send_timestamp']),
+                'install_status' => $entry['install_status'],
+                'install_comment' => $entry['comment'],
+                'approver' => [
+                    'name' => $entry['ap_name'],
+                    'email' => $entry['ap_email']
+                ],
+                'author' => [
+                    'name' => $entry['au_name'],
+                    'email' => $entry['au_email']
+                ]
+            ];
+            $out['list'][] = $temp;
+        }
+    } else {
+        //Populate the response array with each element of the chosen page
+        foreach ($queryResult as $entry) {
+            $temp = [
+                'id' => $entry[$idType],
+                'title' => $entry['title'],
+                'description' => $entry['description'],
+                'timestamp' => strtotime($entry['creation_timestamp']),
+                'update_timestamp' => is_null($entry['approvation_timestamp']) ? null : strtotime($entry['approvation_timestamp']),
+                'components' => $entry['components'],
+                'branch' => $entry['branch_name'],
+                'approval_status' => $entry['approval_status'],
+                'author' => [
+                    'name' => $entry['au_name'],
+                    'email' => $entry['au_email']
+                ]
+            ];
+
+            //Add the approver infos if the element was approved
+            if ($temp['approval_status'] != 0)
+                $temp += [
+                    'approver' => [
+                        'name' => $entry['ap_name'],
+                        'email' => $entry['ap_email']
+                    ],
+            ];
+
+            if ($listType==TYPE_REQUEST) {
+                //Get the install type and link
+                $temp += [
+                    'install_link' => $entry['install_link'],
+                    'install_type' => $entry['install_type'],
+                    'send_timestamp' => is_null($entry['send_timestamp']) ? 0 : strtotime($entry['send_timestamp'])
+                ];
+
+                //Get the list of commits
+                $temp += [
+                    'commits' => $db->preparedQuery("SELECT commits.commit_id as id, title FROM commits, requests_commits
+                    WHERE commits.commit_id=requests_commits.commit_id AND request_id=?", [$temp['id']])
+                ];
+
+                //Get the destination clients
+                $temp += [
+                    'clients' => $db->preparedQuery("SELECT name, email FROM users, requests_clients
+                    WHERE users.user_id=requests_clients.client_user_id AND request_id=?", [$temp['id']])
+                ];
+
+            }
+            $out['list'][] = $temp;
+        }
+    }
 
     return $out;
 }
