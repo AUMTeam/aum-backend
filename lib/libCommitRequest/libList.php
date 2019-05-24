@@ -164,8 +164,7 @@ function getClientQuery(int $cur_user_id, array &$params) : string {
     $params = [$cur_user_id];
     
     return "SELECT requests.request_id as id, title, description, install_type, install_status, install_timestamp, 
-        comment, install_link, branch_name, send_timestamp, author.email as au_email, author.name as au_name,
-    approver.email as ap_email, approver.name as ap_name, components
+        comment, install_link, branch_name, send_timestamp, author.name as au_name, approver.name as ap_name, components
         FROM requests_clients, requests, branches, users as approver, users as author
         WHERE requests_clients.request_id=requests.request_id AND branches.branch_id=requests.branch_id AND approver.user_id=requests.approver_user_id
             AND author.user_id=requests.author_user_id AND approval_status='2' AND client_user_id=?";
@@ -269,13 +268,9 @@ function get_list(string $type, array $data) : array {
                 'send_timestamp' => is_null($entry['send_timestamp']) ? null : strtotime($entry['send_timestamp']),
                 'install_status' => $entry['install_status'],
                 'install_comment' => $entry['comment'],
-                'approver' => [
-                    'name' => $entry['ap_name'],
-                    'email' => $entry['ap_email']
-                ],
-                'author' => [
-                    'name' => $entry['au_name'],
-                    'email' => $entry['au_email']
+                'resp' => [
+                    $entry['ap_name'],
+                    $entry['au_name']
                 ]
             ];
             $out['list'][] = $temp;

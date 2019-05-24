@@ -545,7 +545,7 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
     "request_data":{
         "limit":5,
         "page":6,
-        "role":'client',
+        "role":"client",
         "sort":{
             "parameter":"id",
             "order":"DESC"
@@ -580,14 +580,10 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
         "send_timestamp": 1534185577,
         "install_status": "1",
         "install_comment": "Cras mi pede, malesuada in, imperdiet et, ",
-        "approver": {
-          "name": "Test Admin",
-          "email": "admin@aum.com"
-        },
-        "author": {
-          "name": "Test Developer",
-          "email": "dev@aum.com"
-        }
+        "resp": [
+          "Test Admin"
+          "Test Developer",
+        ]
       },
     ],
     "page": 0,
