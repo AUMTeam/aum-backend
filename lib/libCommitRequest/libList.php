@@ -273,6 +273,9 @@ function get_list(string $type, array $data) : array {
                     $entry['au_name']
                 ]
             ];
+            //If the approver is also the author, return only one value
+            if ($entry['ap_name'] == $entry['au_name']) $temp['resp'] = [$entry['ap_name']];
+
             $out['list'][] = $temp;
         }
     } else {
