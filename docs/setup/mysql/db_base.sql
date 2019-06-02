@@ -71,9 +71,20 @@ CREATE TABLE IF NOT EXISTS `commits` (
 --
 -- Triggers `commits`
 --
-DROP TRIGGER IF EXISTS `commit_approve`;
+DROP TRIGGER IF EXISTS `commit_approve_update`;
 DELIMITER //
-CREATE TRIGGER `commit_approve` BEFORE UPDATE ON `commits`
+CREATE TRIGGER `commit_approve_update` BEFORE UPDATE ON `commits`
+ FOR EACH ROW BEGIN
+    IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
+    THEN SET NEW.approvation_timestamp = NOW();
+    END IF;
+END
+//
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS `commit_approve_insert`;
+DELIMITER //
+CREATE TRIGGER `commit_approve_insert` BEFORE INSERT ON `commits`
  FOR EACH ROW BEGIN
     IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
     THEN SET NEW.approvation_timestamp = NOW();
@@ -114,9 +125,20 @@ CREATE TABLE IF NOT EXISTS `requests` (
 --
 -- Triggers `requests`
 --
-DROP TRIGGER IF EXISTS `request_approve`;
+DROP TRIGGER IF EXISTS `request_approve_update`;
 DELIMITER //
-CREATE TRIGGER `request_approve` BEFORE UPDATE ON `requests`
+CREATE TRIGGER `request_approve_update` BEFORE UPDATE ON `requests`
+ FOR EACH ROW BEGIN
+    IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
+    THEN SET NEW.approvation_timestamp = NOW();
+    END IF;
+END
+//
+DELIMITER ;
+
+DROP TRIGGER IF EXISTS `request_approve_insert`;
+DELIMITER //
+CREATE TRIGGER `request_approve_insert` BEFORE INSERT ON `requests`
  FOR EACH ROW BEGIN
     IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
     THEN SET NEW.approvation_timestamp = NOW();
@@ -266,7 +288,7 @@ ALTER TABLE `requests`
 --
 ALTER TABLE `requests_clients`
   ADD CONSTRAINT `requests_clients_ibfk_1` FOREIGN KEY (`client_user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `requests_clients_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`);
+  ADD CONSTRAINT `requests_clients_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `requests_commits`

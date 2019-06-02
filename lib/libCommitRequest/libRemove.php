@@ -20,8 +20,12 @@ function remove(string $type, array $data) : void {
     global $user;
     global $db;
 
+    //Only developers can remove commits / send requests
+    if (!in_array(ROLE_DEVELOPER, $user['role_name']))
+        throw new UnauthorizedException();
+
     //Get the element
-    $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=?", [$data['id']]);
+    $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=? AND author_user_id=?", [$data['id'], $user['user_id']]);
     
     if (count($elem) == 0)
         throw new InvalidRequestException("ID not found or element already approved");
