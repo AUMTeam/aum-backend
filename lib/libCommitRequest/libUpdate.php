@@ -7,7 +7,7 @@
 function getUpdates(array $data, string $type) : array {    
     //Check parameters presence
     if(!isset($data['latest_update_timestamp']) || empty($data['section']))
-        throw new InvalidRequestException("latest_update_timestamp cannot be blank", "ERROR_COMMIT_UPDATE_NO_TIMESTAMP");
+        throw new InvalidRequestException("latest_update_timestamp cannot be blank", "ERROR_UPDATE_NO_TIMESTAMP");
 
     //Check $type
     switch ($type) {

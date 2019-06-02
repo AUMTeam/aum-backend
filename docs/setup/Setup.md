@@ -76,7 +76,7 @@ systemctl start php-fpm httpd postgresql
 
 ## Configurazione del database
 
-Viene fornito un *database dump* contenente solo la struttura (*db_base.sql*) ed uno già popolato con righe di test (*db_full.sql*), che vanno opportunamente caricati sul sistema in uso. A seconda del DBMS in uso, è necessario importare i file presenti nella cartella *mysql* o *postgres*. In tutti i casi il sistema prevede un utente amministratore di default, con nome utente "admin" e password "admin".
+Viene fornito un *database dump* contenente solo la struttura (*db_base.sql*) ed uno già popolato con righe di test (*db_full.sql*), che vanno opportunamente caricati sul sistema in uso. A seconda del DBMS in uso, è necessario importare i file presenti nella cartella *mysql* o *postgres*. In tutti i casi il sistema prevede un utente amministratore di default, con nome utente "admin" e password "admin" (password utilizzata anche per gli altri utenti in *db_full.sql*).
   
 
 ## Configurazione interna del progetto

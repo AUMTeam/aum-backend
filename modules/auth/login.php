@@ -6,7 +6,7 @@
 $exec = function (array $data, array $data_init) : array {
     //Check fields presence
     if(empty($data['username']) || empty($data['password']))
-        throw new InvalidRequestException();
+        throw new InvalidRequestException("Invalid Request", "ERROR_LOGIN_INVALID_REQUEST");
     
     global $ldap_config;
     

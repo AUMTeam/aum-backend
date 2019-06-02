@@ -28,13 +28,13 @@ function remove(string $type, array $data) : void {
     $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=? AND author_user_id=?", [$data['id'], $user['user_id']]);
     
     if (count($elem) == 0)
-        throw new InvalidRequestException("ID not found or element already approved");
+        throw new InvalidRequestException("ID not found or element already approved", "ERROR_REMOVE_INVALID_ID");
 
     //If the element is a commit, check if it hasn't already been included in a send request
     if ($type == TYPE_COMMIT) {
         $comm = $db->preparedQuery("SELECT $id_name FROM requests_commits WHERE $id_name=?", [$data['id']]);
         if (count($comm) > 0)
-            throw new InvalidRequestException("Commit already included in a send request");
+            throw new InvalidRequestException("Commit already included in a send request", "ERROR_REMOVE_COMMIT_ALREADY_INCLUDED");
     }
 
     $elem = $elem[0][$id_name];

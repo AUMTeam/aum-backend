@@ -10,9 +10,9 @@ function validateInput(array $data) : array {
 
     //Check is fundamental fields are present
     if(!isset($data['limit']))
-        throw new InvalidRequestException("limit cannot be blank", "ERROR_COMMIT_LIST_NO_LIMIT");
+        throw new InvalidRequestException("limit cannot be blank", "ERROR_LIST_NO_LIMIT");
     if(!isset($data['page']))
-        throw new InvalidRequestException("page cannot be blank", "ERROR_COMMIT_LIST_NO_LIMIT");
+        throw new InvalidRequestException("page cannot be blank", "ERROR_LIST_NO_PAGE");
 
     
     /* **SORTING**
@@ -49,7 +49,7 @@ function validateInput(array $data) : array {
             } else if(isset($elem['valueMatches'])) {
                 $elem['negate'] = "";
             } else
-                throw new InvalidRequestException("valueMatches nor valueDifferentFrom were specified!");
+                throw new InvalidRequestException("valueMatches nor valueDifferentFrom were specified!", "ERROR_LIST_INVALID_PARAMETER");
 
             //OK - convert the attribute name from the API one to the DB one
             $elem['attribute'] = translateName($elem['attribute'], $listType);
@@ -98,7 +98,7 @@ function translateName(string $attribute) : string {
         case "branch":
             return "branch_id";
         default:
-            throw new InvalidRequestException("Invalid sorting/filtring parameter '$attribute'");
+            throw new InvalidRequestException("Invalid sorting/filtring parameter '$attribute'", "ERROR_LIST_INVALID_PARAMETER");
     }
 }
 
