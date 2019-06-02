@@ -51,6 +51,13 @@ function getUserInfo(int $user_id) : array {
        $out['role_name'][$i] = $roles[$i]['role_name'];
     }
 
+    //A tech area member is automatically a developer
+    if (in_array(ROLE_TECHAREA, $out['role_name'])) {
+        $out['role'][] = 1;
+        $out['role_name'][] = ROLE_DEVELOPER;
+    }
+
+
     //Obtaining string for 'area' if needed
     if(!is_null($out['area_id'])) {
         $out['area_name'] = $db->preparedQuery("SELECT area_name FROM areas WHERE area_id=?", [$out['area_id']])[0]['area_name'];
