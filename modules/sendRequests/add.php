@@ -20,12 +20,22 @@ $exec = function (array $data, array $data_init) : array {
     //Get the current user's id, which is the author's id
     $author_user_id = $user['user_id'];
 
+    
+    //If the user is part of the tech area, the send request will be automatically approved
+    $approval_status = "0";
+    $approver_user_id = NULL;
+    if (in_array(ROLE_TECHAREA, $user['role_name'])) {
+        $approval_status = "1";
+        $approver_user_id = $author_user_id;
+    }
+
     $db->beginTransaction();
 
     try {
         //Add the request into the database, and get the ID of the just added request
-        $db->preparedQuery("INSERT INTO requests(title, description, install_type, author_user_id, components, branch_id) VALUES 
-                (?, ?, ?, ?, ?, ?)", [$data['title'], $data['description'], $data['install_type'], $author_user_id, $data['components'], $data['branch']]); 
+        $db->preparedQuery("INSERT INTO requests(title, description, install_type, author_user_id, components, branch_id, approval_status, approver_user_id) VALUES 
+                (?, ?, ?, ?, ?, ?, ?, ?)", 
+                [$data['title'], $data['description'], $data['install_type'], $author_user_id, $data['components'], $data['branch'], $approval_status, $approver_user_id]); 
         $request_id = $db->getLastInsertId();
 
         //Destination clients and Commits are in separated tables: add the data also in those tables using the received request_id
