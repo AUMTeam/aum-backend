@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.2
--- Dumped by pg_dump version 11.2
+-- Dumped from database version 11.3
+-- Dumped by pg_dump version 11.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,6 +12,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
@@ -333,7 +334,7 @@ ALTER TABLE my_aum.users_roles OWNER TO postgres;
 --
 
 CREATE TABLE my_aum.users_tokens (
-    token character varying(255) NOT NULL,
+    token character varying(100) NOT NULL,
     user_id integer NOT NULL,
     token_expire bigint NOT NULL
 );
@@ -404,6 +405,15 @@ ALTER TABLE ONLY my_aum.roles ALTER COLUMN role_id SET DEFAULT nextval('my_aum.r
 
 ALTER TABLE ONLY my_aum.users ALTER COLUMN user_id SET DEFAULT nextval('my_aum.users_user_id_seq'::regclass);
 
+
+--
+-- Data for Name: areas; Type: TABLE DATA; Schema: my_aum; Owner: postgres
+--
+
+COPY my_aum.areas (area_id, area_name) FROM stdin;
+1	Test Area
+\.
+
 --
 -- Data for Name: roles; Type: TABLE DATA; Schema: my_aum; Owner: postgres
 --
@@ -442,7 +452,7 @@ COPY my_aum.users_roles (user_id, role_id) FROM stdin;
 -- Name: areas_area_id_seq; Type: SEQUENCE SET; Schema: my_aum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('my_aum.areas_area_id_seq', 0, false);
+SELECT pg_catalog.setval('my_aum.areas_area_id_seq', 1, true);
 
 
 --
@@ -481,167 +491,174 @@ SELECT pg_catalog.setval('my_aum.users_user_id_seq', 1, true);
 
 
 --
--- Name: areas idx_17839_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: areas idx_18055_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.areas
-    ADD CONSTRAINT idx_17839_primary PRIMARY KEY (area_id);
+    ADD CONSTRAINT idx_18055_primary PRIMARY KEY (area_id);
 
 
 --
--- Name: branches idx_17845_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: branches idx_18061_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.branches
-    ADD CONSTRAINT idx_17845_primary PRIMARY KEY (branch_id);
+    ADD CONSTRAINT idx_18061_primary PRIMARY KEY (branch_id);
 
 
 --
--- Name: commits idx_17851_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: commits idx_18067_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.commits
-    ADD CONSTRAINT idx_17851_primary PRIMARY KEY (commit_id);
+    ADD CONSTRAINT idx_18067_primary PRIMARY KEY (commit_id);
 
 
 --
--- Name: requests idx_17862_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: requests idx_18078_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.requests
-    ADD CONSTRAINT idx_17862_primary PRIMARY KEY (request_id);
+    ADD CONSTRAINT idx_18078_primary PRIMARY KEY (request_id);
 
 
 --
--- Name: requests_clients idx_17872_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: requests_clients idx_18088_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.requests_clients
-    ADD CONSTRAINT idx_17872_primary PRIMARY KEY (request_id, client_user_id);
+    ADD CONSTRAINT idx_18088_primary PRIMARY KEY (request_id, client_user_id);
 
 
 --
--- Name: requests_commits idx_17879_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: requests_commits idx_18095_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.requests_commits
-    ADD CONSTRAINT idx_17879_primary PRIMARY KEY (request_id, commit_id);
+    ADD CONSTRAINT idx_18095_primary PRIMARY KEY (request_id, commit_id);
 
 
 --
--- Name: roles idx_17884_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: roles idx_18100_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.roles
-    ADD CONSTRAINT idx_17884_primary PRIMARY KEY (role_id);
+    ADD CONSTRAINT idx_18100_primary PRIMARY KEY (role_id);
 
 
 --
--- Name: users idx_17890_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: users idx_18106_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.users
-    ADD CONSTRAINT idx_17890_primary PRIMARY KEY (user_id);
+    ADD CONSTRAINT idx_18106_primary PRIMARY KEY (user_id);
 
 
 --
--- Name: users_roles idx_17894_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: users_roles idx_18110_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.users_roles
-    ADD CONSTRAINT idx_17894_primary PRIMARY KEY (user_id, role_id);
+    ADD CONSTRAINT idx_18110_primary PRIMARY KEY (user_id, role_id);
 
 
 --
--- Name: users_tokens idx_17897_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: users_tokens idx_18113_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.users_tokens
-    ADD CONSTRAINT idx_17897_primary PRIMARY KEY (user_id, token);
+    ADD CONSTRAINT idx_18113_primary PRIMARY KEY (user_id, token);
 
 
 --
--- Name: idx_17851_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18067_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17851_approver_user_id ON my_aum.commits USING btree (approver_user_id);
-
-
---
--- Name: idx_17851_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17851_author_user_id ON my_aum.commits USING btree (author_user_id);
+CREATE INDEX idx_18067_approver_user_id ON my_aum.commits USING btree (approver_user_id);
 
 
 --
--- Name: idx_17851_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18067_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17851_branch_id ON my_aum.commits USING btree (branch_id);
-
-
---
--- Name: idx_17862_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17862_approver_user_id ON my_aum.requests USING btree (approver_user_id);
+CREATE INDEX idx_18067_author_user_id ON my_aum.commits USING btree (author_user_id);
 
 
 --
--- Name: idx_17862_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18067_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17862_author_user_id ON my_aum.requests USING btree (author_user_id);
-
-
---
--- Name: idx_17862_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17862_branch_id ON my_aum.requests USING btree (branch_id);
+CREATE INDEX idx_18067_branch_id ON my_aum.commits USING btree (branch_id);
 
 
 --
--- Name: idx_17862_sender_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17862_sender_user_id ON my_aum.requests USING btree (sender_user_id);
-
-
---
--- Name: idx_17872_client_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17872_client_user_id ON my_aum.requests_clients USING btree (client_user_id);
+CREATE INDEX idx_18078_approver_user_id ON my_aum.requests USING btree (approver_user_id);
 
 
 --
--- Name: idx_17872_request_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17872_request_id ON my_aum.requests_clients USING btree (request_id);
-
-
---
--- Name: idx_17879_commit_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17879_commit_id ON my_aum.requests_commits USING btree (commit_id);
+CREATE INDEX idx_18078_author_user_id ON my_aum.requests USING btree (author_user_id);
 
 
 --
--- Name: idx_17890_area_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17890_area_id ON my_aum.users USING btree (area_id);
+CREATE INDEX idx_18078_branch_id ON my_aum.requests USING btree (branch_id);
 
 
 --
--- Name: idx_17894_role_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_sender_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17894_role_id ON my_aum.users_roles USING btree (role_id);
+CREATE INDEX idx_18078_sender_user_id ON my_aum.requests USING btree (sender_user_id);
+
+
+--
+-- Name: idx_18088_client_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18088_client_user_id ON my_aum.requests_clients USING btree (client_user_id);
+
+
+--
+-- Name: idx_18088_request_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18088_request_id ON my_aum.requests_clients USING btree (request_id);
+
+
+--
+-- Name: idx_18095_commit_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18095_commit_id ON my_aum.requests_commits USING btree (commit_id);
+
+
+--
+-- Name: idx_18095_request_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18095_request_id ON my_aum.requests_commits USING btree (request_id);
+
+
+--
+-- Name: idx_18106_area_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18106_area_id ON my_aum.users USING btree (area_id);
+
+
+--
+-- Name: idx_18110_role_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18110_role_id ON my_aum.users_roles USING btree (role_id);
 
 
 --
@@ -681,7 +698,7 @@ ALTER TABLE ONLY my_aum.requests_clients
 --
 
 ALTER TABLE ONLY my_aum.requests_clients
-    ADD CONSTRAINT requests_clients_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT requests_clients_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --
@@ -689,7 +706,7 @@ ALTER TABLE ONLY my_aum.requests_clients
 --
 
 ALTER TABLE ONLY my_aum.requests_commits
-    ADD CONSTRAINT requests_commits_ibfk_1 FOREIGN KEY (commit_id) REFERENCES my_aum.commits(commit_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT requests_commits_ibfk_1 FOREIGN KEY (commit_id) REFERENCES my_aum.commits(commit_id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --
@@ -697,7 +714,7 @@ ALTER TABLE ONLY my_aum.requests_commits
 --
 
 ALTER TABLE ONLY my_aum.requests_commits
-    ADD CONSTRAINT requests_commits_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT requests_commits_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --

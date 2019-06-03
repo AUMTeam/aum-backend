@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.2
--- Dumped by pg_dump version 11.2
+-- Dumped from database version 11.3
+-- Dumped by pg_dump version 11.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,6 +12,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
@@ -333,7 +334,7 @@ ALTER TABLE my_aum.users_roles OWNER TO postgres;
 --
 
 CREATE TABLE my_aum.users_tokens (
-    token character varying(255) NOT NULL,
+    token character varying(100) NOT NULL,
     user_id integer NOT NULL,
     token_expire bigint NOT NULL
 );
@@ -525,7 +526,7 @@ COPY my_aum.commits (commit_id, creation_timestamp, title, description, author_u
 90	2018-08-06 05:59:23+02	Buckroot	Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.	1	Duis consequat dui nec nisi volutpat eleifend. Donec ut dolor. Morbi vel lectus in quam fringilla rhoncus.	4	0	\N	\N	\N
 91	2019-03-13 01:30:51+01	Blue Elderberry	Duis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus.	2	Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.	3	-1	2018-11-07 14:32:36+01	Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.	2
 92	2018-10-20 10:26:41+02	Late Snakeweed	Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.	1	Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat.	1	0	\N	\N	\N
-93	2019-04-08 07:42:41+02	Wahiawa Cyanea	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.	1	Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.	3	0	\N	\N	\N
+93	2019-04-08 07:42:41+02	Wahiawa Cyanea	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.	1	Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.	3	1	2019-05-14 10:29:17+02		1
 94	2019-01-18 10:05:53+01	Cavedwelling Evening Primrose	Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.	2	In sagittis dui vel nisl. Duis ac nibh. Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus.	3	-1	2018-07-28 05:22:02+02	Phasellus in felis. Donec semper sapien a libero. Nam dui.	2
 95	2018-08-12 00:49:53+02	Appalachian Avens	Maecenas ut massa quis augue luctus tincidunt. Nulla mollis molestie lorem. Quisque ut erat.	2	Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.	4	0	\N	\N	\N
 96	2018-05-15 17:37:40+02	Sycamore Fig	Nullam porttitor lacus at turpis. Donec posuere metus vitae ipsum. Aliquam non mauris.	2	In quis justo. Maecenas rhoncus aliquam lacus. Morbi quis tortor id nulla ultrices aliquet.	5	0	\N	\N	\N
@@ -550,7 +551,7 @@ COPY my_aum.requests (request_id, title, description, components, branch_id, aut
 7	Caliche Sandmat	Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.	5	1	2018-12-03 17:31:07+01	0	\N	\N	\N	\N	\N	0	\N
 8	Barnacle Lichen	Sed sagittis. Nam congue, risus semper porta volutpat, quam pede lobortis ligula, sit amet eleifend pede libero quis orci. Nullam molestie nibh in lectus.	Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.	4	1	2018-08-28 07:59:16+02	0	\N	\N	\N	\N	\N	0	\N
 9	Serrate Spurge	Aenean fermentum. Donec ut mauris eget massa tempor convallis. Nulla neque libero, convallis eget, eleifend luctus, ultricies eu, nibh.	Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vivamus vestibulum sagittis sapien. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.	1	2	2019-03-27 12:48:41+01	2	2019-02-07 16:48:08+01		2	5	2019-04-13 23:16:53+02	0	https://friendfeed.com/aliquet/at/feugiat/non/pretium/quis.jsp
-10	Hitchcock's Mock Orange	Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.	Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.	1	2	2019-03-10 19:37:28+01	1	2019-05-13 17:20:35+02	In hac habitasse platea dictumst. Etiam faucibus cursus urna. Ut tellus.	2	\N	\N	0	\N
+10	Hitchcock's Mock Orange	Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.	Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.	1	2	2019-03-10 19:37:28+01	2	2019-05-13 17:20:35+02	In hac habitasse platea dictumst. Etiam faucibus cursus urna. Ut tellus.	2	1	2019-05-14 14:19:52+02	0	hhhh
 11	Northern Catalpa	Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst.	Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat.	2	1	2018-05-18 04:28:28+02	1	2019-05-13 17:20:35+02	Nullam sit amet turpis elementum ligula vehicula consequat. Morbi a ipsum. Integer a nibh.	2	\N	\N	0	\N
 12	Harvey's Hawthorn	Phasellus in felis. Donec semper sapien a libero. Nam dui.	Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.	4	2	2018-12-08 13:17:53+01	0	\N	\N	\N	\N	\N	1	\N
 13	Uinta Mountain Beardtongue	Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.	Maecenas leo odio, condimentum id, luctus nec, molestie sed, justo. Pellentesque viverra pede ac diam. Cras pellentesque volutpat dui.	2	1	2018-11-11 22:06:01+01	-1	2019-05-13 17:20:35+02		2	\N	\N	1	\N
@@ -632,7 +633,7 @@ COPY my_aum.requests (request_id, title, description, components, branch_id, aut
 89	Juan Tomas	Etiam vel augue. Vestibulum rutrum rutrum neque. Aenean auctor gravida sem.	Morbi porttitor lorem id ligula. Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem.	3	1	2019-02-23 00:30:08+01	-1	2019-05-13 17:20:35+02	Duis aliquam convallis nunc. Proin at turpis a pede posuere nonummy. Integer non velit.	2	\N	\N	0	\N
 90	Redroot Amaranth	Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.	Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.	4	2	2018-08-06 21:05:15+02	-1	2019-05-13 17:20:35+02	Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.	2	\N	\N	1	\N
 91	Stahl's Valamuerto	Integer ac leo. Pellentesque ultrices mattis odio. Donec vitae nisi.	Fusce posuere felis sed lacus. Morbi sem mauris, laoreet ut, rhoncus aliquet, pulvinar sed, nisl. Nunc rhoncus dui vel sem.	3	2	2018-12-09 00:22:20+01	1	2019-05-13 17:20:35+02	Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.	2	\N	\N	0	\N
-92	Gaspé Peninsula Bluegrass	Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.	Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.	5	1	2018-06-24 17:14:55+02	-1	2019-05-13 17:20:35+02		2	\N	\N	0	\N
+92	Gaspè Peninsula Bluegrass	Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.	Morbi non lectus. Aliquam sit amet diam in magna bibendum imperdiet. Nullam orci pede, venenatis non, sodales sed, tincidunt eu, felis.	5	1	2018-06-24 17:14:55+02	-1	2019-05-13 20:41:10+02		2	\N	\N	0	\N
 93	California Jointfir	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Proin risus. Praesent lectus.	Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.	1	1	2018-11-15 02:38:04+01	1	2019-05-13 17:20:35+02	Cras mi pede, malesuada in, imperdiet et, commodo vulputate, justo. In blandit ultrices enim. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.	2	\N	\N	0	\N
 94	Elmer's Erigeron	Mauris enim leo, rhoncus sed, vestibulum sit amet, cursus id, turpis. Integer aliquet, massa id lobortis convallis, tortor risus dapibus augue, vel accumsan tellus nisi eu orci. Mauris lacinia sapien quis libero.	Phasellus sit amet erat. Nulla tempus. Vivamus in felis eu sapien cursus vestibulum.	3	2	2018-05-06 22:51:32+02	2	2018-11-16 07:07:42+01		2	5	2019-01-10 13:16:29+01	0	https://answers.com/at/ipsum/ac/tellus/semper/interdum.aspx
 95	Poeltinula Lichen	Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.	Praesent blandit. Nam nulla. Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede.	1	1	2018-10-13 07:38:41+02	0	\N	\N	\N	\N	\N	1	\N
@@ -901,6 +902,15 @@ COPY my_aum.users_roles (user_id, role_id) FROM stdin;
 5	3
 \.
 
+
+--
+-- Data for Name: users_tokens; Type: TABLE DATA; Schema: my_aum; Owner: postgres
+--
+
+COPY my_aum.users_tokens (token, user_id, token_expire) FROM stdin;
+\.
+
+
 --
 -- Name: areas_area_id_seq; Type: SEQUENCE SET; Schema: my_aum; Owner: postgres
 --
@@ -944,167 +954,174 @@ SELECT pg_catalog.setval('my_aum.users_user_id_seq', 5, true);
 
 
 --
--- Name: areas idx_17839_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: areas idx_18055_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.areas
-    ADD CONSTRAINT idx_17839_primary PRIMARY KEY (area_id);
+    ADD CONSTRAINT idx_18055_primary PRIMARY KEY (area_id);
 
 
 --
--- Name: branches idx_17845_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: branches idx_18061_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.branches
-    ADD CONSTRAINT idx_17845_primary PRIMARY KEY (branch_id);
+    ADD CONSTRAINT idx_18061_primary PRIMARY KEY (branch_id);
 
 
 --
--- Name: commits idx_17851_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: commits idx_18067_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.commits
-    ADD CONSTRAINT idx_17851_primary PRIMARY KEY (commit_id);
+    ADD CONSTRAINT idx_18067_primary PRIMARY KEY (commit_id);
 
 
 --
--- Name: requests idx_17862_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: requests idx_18078_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.requests
-    ADD CONSTRAINT idx_17862_primary PRIMARY KEY (request_id);
+    ADD CONSTRAINT idx_18078_primary PRIMARY KEY (request_id);
 
 
 --
--- Name: requests_clients idx_17872_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: requests_clients idx_18088_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.requests_clients
-    ADD CONSTRAINT idx_17872_primary PRIMARY KEY (request_id, client_user_id);
+    ADD CONSTRAINT idx_18088_primary PRIMARY KEY (request_id, client_user_id);
 
 
 --
--- Name: requests_commits idx_17879_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: requests_commits idx_18095_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.requests_commits
-    ADD CONSTRAINT idx_17879_primary PRIMARY KEY (request_id, commit_id);
+    ADD CONSTRAINT idx_18095_primary PRIMARY KEY (request_id, commit_id);
 
 
 --
--- Name: roles idx_17884_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: roles idx_18100_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.roles
-    ADD CONSTRAINT idx_17884_primary PRIMARY KEY (role_id);
+    ADD CONSTRAINT idx_18100_primary PRIMARY KEY (role_id);
 
 
 --
--- Name: users idx_17890_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: users idx_18106_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.users
-    ADD CONSTRAINT idx_17890_primary PRIMARY KEY (user_id);
+    ADD CONSTRAINT idx_18106_primary PRIMARY KEY (user_id);
 
 
 --
--- Name: users_roles idx_17894_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: users_roles idx_18110_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.users_roles
-    ADD CONSTRAINT idx_17894_primary PRIMARY KEY (user_id, role_id);
+    ADD CONSTRAINT idx_18110_primary PRIMARY KEY (user_id, role_id);
 
 
 --
--- Name: users_tokens idx_17897_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
+-- Name: users_tokens idx_18113_primary; Type: CONSTRAINT; Schema: my_aum; Owner: postgres
 --
 
 ALTER TABLE ONLY my_aum.users_tokens
-    ADD CONSTRAINT idx_17897_primary PRIMARY KEY (user_id, token);
+    ADD CONSTRAINT idx_18113_primary PRIMARY KEY (user_id, token);
 
 
 --
--- Name: idx_17851_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18067_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17851_approver_user_id ON my_aum.commits USING btree (approver_user_id);
-
-
---
--- Name: idx_17851_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17851_author_user_id ON my_aum.commits USING btree (author_user_id);
+CREATE INDEX idx_18067_approver_user_id ON my_aum.commits USING btree (approver_user_id);
 
 
 --
--- Name: idx_17851_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18067_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17851_branch_id ON my_aum.commits USING btree (branch_id);
-
-
---
--- Name: idx_17862_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17862_approver_user_id ON my_aum.requests USING btree (approver_user_id);
+CREATE INDEX idx_18067_author_user_id ON my_aum.commits USING btree (author_user_id);
 
 
 --
--- Name: idx_17862_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18067_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17862_author_user_id ON my_aum.requests USING btree (author_user_id);
-
-
---
--- Name: idx_17862_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17862_branch_id ON my_aum.requests USING btree (branch_id);
+CREATE INDEX idx_18067_branch_id ON my_aum.commits USING btree (branch_id);
 
 
 --
--- Name: idx_17862_sender_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_approver_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17862_sender_user_id ON my_aum.requests USING btree (sender_user_id);
-
-
---
--- Name: idx_17872_client_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17872_client_user_id ON my_aum.requests_clients USING btree (client_user_id);
+CREATE INDEX idx_18078_approver_user_id ON my_aum.requests USING btree (approver_user_id);
 
 
 --
--- Name: idx_17872_request_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_author_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17872_request_id ON my_aum.requests_clients USING btree (request_id);
-
-
---
--- Name: idx_17879_commit_id; Type: INDEX; Schema: my_aum; Owner: postgres
---
-
-CREATE INDEX idx_17879_commit_id ON my_aum.requests_commits USING btree (commit_id);
+CREATE INDEX idx_18078_author_user_id ON my_aum.requests USING btree (author_user_id);
 
 
 --
--- Name: idx_17890_area_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_branch_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17890_area_id ON my_aum.users USING btree (area_id);
+CREATE INDEX idx_18078_branch_id ON my_aum.requests USING btree (branch_id);
 
 
 --
--- Name: idx_17894_role_id; Type: INDEX; Schema: my_aum; Owner: postgres
+-- Name: idx_18078_sender_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
 --
 
-CREATE INDEX idx_17894_role_id ON my_aum.users_roles USING btree (role_id);
+CREATE INDEX idx_18078_sender_user_id ON my_aum.requests USING btree (sender_user_id);
+
+
+--
+-- Name: idx_18088_client_user_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18088_client_user_id ON my_aum.requests_clients USING btree (client_user_id);
+
+
+--
+-- Name: idx_18088_request_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18088_request_id ON my_aum.requests_clients USING btree (request_id);
+
+
+--
+-- Name: idx_18095_commit_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18095_commit_id ON my_aum.requests_commits USING btree (commit_id);
+
+
+--
+-- Name: idx_18095_request_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18095_request_id ON my_aum.requests_commits USING btree (request_id);
+
+
+--
+-- Name: idx_18106_area_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18106_area_id ON my_aum.users USING btree (area_id);
+
+
+--
+-- Name: idx_18110_role_id; Type: INDEX; Schema: my_aum; Owner: postgres
+--
+
+CREATE INDEX idx_18110_role_id ON my_aum.users_roles USING btree (role_id);
 
 
 --
@@ -1144,7 +1161,7 @@ ALTER TABLE ONLY my_aum.requests_clients
 --
 
 ALTER TABLE ONLY my_aum.requests_clients
-    ADD CONSTRAINT requests_clients_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT requests_clients_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --
@@ -1152,7 +1169,7 @@ ALTER TABLE ONLY my_aum.requests_clients
 --
 
 ALTER TABLE ONLY my_aum.requests_commits
-    ADD CONSTRAINT requests_commits_ibfk_1 FOREIGN KEY (commit_id) REFERENCES my_aum.commits(commit_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT requests_commits_ibfk_1 FOREIGN KEY (commit_id) REFERENCES my_aum.commits(commit_id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --
@@ -1160,7 +1177,7 @@ ALTER TABLE ONLY my_aum.requests_commits
 --
 
 ALTER TABLE ONLY my_aum.requests_commits
-    ADD CONSTRAINT requests_commits_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE RESTRICT;
+    ADD CONSTRAINT requests_commits_ibfk_2 FOREIGN KEY (request_id) REFERENCES my_aum.requests(request_id) ON UPDATE RESTRICT ON DELETE CASCADE;
 
 
 --

@@ -30,7 +30,10 @@ CREATE TABLE IF NOT EXISTS `areas` (
   `area_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `area_name` varchar(50) NOT NULL,
   PRIMARY KEY (`area_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=2 ;
+
+INSERT INTO `areas` (`area_id`, `area_name`) VALUES
+(1, 'Test Area');
 
 -- --------------------------------------------------------
 
