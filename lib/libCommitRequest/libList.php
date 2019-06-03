@@ -9,14 +9,14 @@ function validateInput(array $data) : array {
     global $listType;
 
     //Check is fundamental fields are present
-    if(!isset($data['limit']))
-        throw new InvalidRequestException("limit cannot be blank", "ERROR_LIST_NO_LIMIT");
+    if(!isset($data['limit']) || $data['limit'] > 100)
+        throw new InvalidRequestException("limit blank or greater than 100");
     if(!isset($data['page']))
-        throw new InvalidRequestException("page cannot be blank", "ERROR_LIST_NO_PAGE");
+        throw new InvalidRequestException("page cannot be blank");
 
     
     /* **SORTING**
-     * If no sorting option was chosen, sort the commits by timestamp (descending)
+     * If no sorting option was chosen, sort the commits by last modified timestamp (descending)
      */
      if(empty($data['sort']) || empty($data['sort']['parameter'])) {
         $data['sort'] = [
@@ -25,7 +25,7 @@ function validateInput(array $data) : array {
         ];
         if ($listType == TYPE_CLIENT)   //Sort by send_timestamp for client list
             $data['sort']['parameter'] = "send_timestamp";
-        else if (!empty($data['role']) && $data['role'] == ROLE_REVOFFICE)
+        else if (!empty($data['role']) && $data['role'] == ROLE_REVOFFICE)  //Sort by send_timestamp, approvation_timestamp for revision office list
             $data['sort']['parameter'] = ["send_timestamp, approvation_timestamp"];
     //Else convert the parameter name from the API one to the DB one
     } else {

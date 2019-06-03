@@ -38,9 +38,9 @@ function approve(array $data, string $type) : void {
     //Check if commit_id is valid and whether the commit has already been approved - $type is safe
     $query = $db->preparedQuery("SELECT approval_status, author_user_id FROM $type WHERE $id_name=?", [$data['id']]);
     if (count($query) == 0)
-        throw new InvalidRequestException("id doesn't refer to a valid commit!", "ERROR_APPROVE_INVALID_ID");
+        throw new InvalidRequestException("id doesn't refer to a valid element!", "ERROR_INVALID_ID");
     else if ($query[0]['approval_status'] != 0)
-        throw new InvalidRequestException("Already approved!", "ERROR_APPROVE_ALREADY_APPROVED");
+        throw new InvalidRequestException("Already approved!", "ERROR_WRONG_APP_STATUS");
 
 
     //Execute the query

@@ -8,7 +8,7 @@ abstract class ExceptionRequest extends Exception {
     protected $error_code;   //Internal error code
     protected $status_code;  //HTTP Error Code
 
-    public function __construct(string $message = "", string $error_code = "", int $status_code = 400) {
+    public function __construct(string $message = "", string $error_code, int $status_code = 400) {
         parent::__construct($message, 0, null);
         $this->status_code = $status_code;
         $this->message = $message;
@@ -21,7 +21,7 @@ abstract class ExceptionRequest extends Exception {
     public function getErrorResponse() : array {
         return [
             "response_data" => [],
-            'error' => $this->error_code, //TODO CONFIRM CHANGE
+            'error' => $this->error_code,
             "message" => $this->message,
             "status_code" => $this->status_code
         ];

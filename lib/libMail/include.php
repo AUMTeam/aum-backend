@@ -44,6 +44,9 @@ function sendMail(int $to_user_id, string $mailType, $id = null, string $typeCom
             case TYPE_REQUEST:
                 $idType = TYPE_REQUEST_ID;
                 break;
+            default:
+                throw new InvalidRequestException("Error: impossible to use mail system");
+                break;
         }
 
         //Get the user infos
@@ -109,7 +112,7 @@ function sendPHPMailer(array $from, array $to, string $subject, string $message)
 
         //Mail parameters configuration
         $mail->setFrom($from['email'], $from['name']);
-        $mail->addAddress("aum.coopcisf@gmail.com", $to['name']);   //TODO: change mail address to '$to['email']'
+        $mail->addAddress($to['email'], $to['name']);
         $mail->isHTML(TRUE);
         $mail->Subject = $subject;
         $mail->Body = $message;

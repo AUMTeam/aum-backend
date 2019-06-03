@@ -14,10 +14,9 @@ class DatabaseWrapper {
         try {
             if ($db_type == "sqlite")
                 $this->handler = new PDO("{$db_type}:{$config['db_name']}", $options);
-            
             else if ($db_type == "mysql")
-                $this->handler = new PDO("{$db_type}:host={$config['server']};dbname={$config['db_name']};charset=utf8mb4", $config['username'], $config['password'], $options);
-            else if ($db_type == "pgsql")   //pgsql:host=localhost;port=5432;dbname=testdb;user=bruce;password=mypass
+                $this->handler = new PDO("{$db_type}:host={$config['server']}; dbname={$config['db_name']}; charset=utf8mb4", $config['username'], $config['password'], $options);
+            else if ($db_type == "pgsql")
                 $this->handler = new PDO("{$db_type}:host={$config['server']}; port={$config['port']}; dbname={$config['db_name']};
                     user={$config['username']}; password={$config['password']}", $config['username'], $config['password'], $options);
         } catch (PDOException $e) {

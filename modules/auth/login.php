@@ -6,7 +6,7 @@
 $exec = function (array $data, array $data_init) : array {
     //Check fields presence
     if(empty($data['username']) || empty($data['password']))
-        throw new InvalidRequestException("Invalid Request", "ERROR_LOGIN_INVALID_REQUEST");
+        throw new InvalidRequestException();
     
     global $ldap_config;
     
@@ -16,6 +16,9 @@ $exec = function (array $data, array $data_init) : array {
         return loginWithInternalDB($data);  //Authentication using internal DB
 };
 
+/**
+ * Login with LDAP - Warning: this function is untested!
+ */
 function loginWithLDAP(array $data) : array {
     global $ldap_config;
 

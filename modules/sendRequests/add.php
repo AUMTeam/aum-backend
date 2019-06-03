@@ -14,7 +14,7 @@ $exec = function (array $data, array $data_init) : array {
     //Check if all the fields are in place
     if(empty($data['title']) || empty($data['description']) || !isset($data['install_type']) || $data['install_type'] < 0 || $data['install_type'] > 1
         || empty($data['dest_clients']) || empty($data['components']) || empty($data['branch']))
-        throw new InvalidRequestException("Invalid request", "ERROR_COMMIT_LIST_NO_LIMIT");
+        throw new InvalidRequestException();
     
 
     //Get the current user's id, which is the author's id

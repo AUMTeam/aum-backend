@@ -9,7 +9,7 @@ $exec = function (array $data, array $data_init) : array {
 
     //Only clients can execute this endpoint
     if (!in_array(ROLE_CLIENT, $user['role_name']))
-        throw new UnauthorizedException("The current user is not authorized to perform this action!");
+        throw new UnauthorizedException();
 
     //Check fields presence
     if (empty($data['id']) || empty($data['install_status']) || ($data['install_status'] != -1 && $data['install_status'] != 1))
@@ -19,9 +19,11 @@ $exec = function (array $data, array $data_init) : array {
         $feedback = $data['feedback'];
 
     //Check if the ID is valid
-    $req = $db->preparedQuery("SELECT request_id, install_status FROM requests_clients WHERE request_id=? AND client_user_id=? AND install_status NOT IN('1', '-1')", [$data['id'], $user['user_id']]);
+    $req = $db->preparedQuery("SELECT request_id, install_status, approval_status FROM requests_clients WHERE request_id=? AND client_user_id=?", [$data['id'], $user['user_id']]);
     if (count($req) == 0)
-        throw new InvalidRequestException("Error: request not found or request already approved");
+        throw new InvalidRequestException("Send request not found", "ERROR_INVALID_ID");
+    else if ($req[0]['approval_status'] != 2)
+        throw new InvalidRequestException("The current send request was not sent to the client", "ERROR_WRONG_APP_STATUS");
     
     //Update the DB
     $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=now(), install_status=?

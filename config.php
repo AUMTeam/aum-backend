@@ -1,7 +1,7 @@
 <?php
 
 //Version of the server
-$version = "0.9";
+$version = "1.0";
 
 //Flag for maintenance mode
 $maintenance_state = false;

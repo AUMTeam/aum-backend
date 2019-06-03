@@ -9,7 +9,7 @@ $exec = function (array $data, array $data_init) : array {
 
     //Only member of the Revision Office can execute this endpoint
     if (!in_array(ROLE_REVOFFICE, $user['role_name']))
-        throw new UnauthorizedException("The current user is not authorized to perform this action!");
+        throw new UnauthorizedException();
 
     //Check if all fields are in place
     if (empty($data['id']) || empty($data['install_link']))
@@ -17,9 +17,11 @@ $exec = function (array $data, array $data_init) : array {
 
 
     //Check if the send request is present and if it hasn't already been validated
-    $entry = $db->preparedQuery("SELECT approval_status FROM requests WHERE request_id=? AND approval_status NOT IN ('-1')", [$data['id']]);
+    $entry = $db->preparedQuery("SELECT approval_status FROM requests WHERE request_id=?", [$data['id']]);
     if (count($entry) == 0)
-        throw new InvalidArgumentException("id not found or request already sent");
+        throw new InvalidRequestException("id not found", "ERROR_INVALID_ID");
+    else if ($entry[0]['approval_status'] != 1)
+        throw new InvalidRequestException("The send request hasn't been approved by a tech area member", "ERROR_WRONG_APP_STATUS");
 
     $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=now(), sender_user_id=?
         WHERE request_id=?", [$data['install_link'], $user['user_id'], $data['id']]);

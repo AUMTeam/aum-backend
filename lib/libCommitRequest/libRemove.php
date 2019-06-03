@@ -25,10 +25,12 @@ function remove(string $type, array $data) : void {
         throw new UnauthorizedException();
 
     //Get the element
-    $elem = $db->preparedQuery("SELECT $id_name FROM $type WHERE approval_status IN ('0') AND $id_name=? AND author_user_id=?", [$data['id'], $user['user_id']]);
+    $elem = $db->preparedQuery("SELECT $id_name, approval_status FROM $type WHERE $id_name=? AND author_user_id=?", [$data['id'], $user['user_id']]);
     
     if (count($elem) == 0)
-        throw new InvalidRequestException("ID not found or element already approved", "ERROR_REMOVE_INVALID_ID");
+        throw new InvalidRequestException("ID not found or element already approved", "ERROR_INVALID_ID");
+    else if ($elem[0]['approval_status'] != 0)
+        throw new InvalidRequestException("Element already approved: you cannot remove it", "ERROR_WRONG_APP_STATUS");
 
     //If the element is a commit, check if it hasn't already been included in a send request
     if ($type == TYPE_COMMIT) {

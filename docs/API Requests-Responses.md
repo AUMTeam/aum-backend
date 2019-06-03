@@ -1,17 +1,28 @@
-# Request/Response pattern
+# Elenco di richieste e risposte per gli endpoint
 
-In tutte le richieste, salvo quella di login, è necessario specificare il token nell'header **X-Auth-Header**.
+Le richieste e le risposte sono strutturate in formato JSON. In tutte le richieste, salvo quella di login, è necessario specificare il token nell'header **X-Auth-Header**.
 
-## Errori globali
+## Risposte globali
 
-Gli errori globali possono apparire in ogni azione (salvo alcune per svariate eccezioni).
+### Risposta positiva
+
+Se la richiesta è andata a buon fine, il risultato sarà il seguente:
+
+```json
+{
+    "response_data":{},
+    "status_code":200
+}
+```
+
+### Errori globali
+
+Questi errori possono apparire in ogni azione e pertanto non verranno riportati per ogni singolo endpoint.
 
 * Token assente.
 ```json
 {
-    "response_data":{
-        
-    },
+    "response_data":{},
     "error":"ERROR_GLOBAL_MISSING_TOKEN",
     "status_code":401
 }
@@ -20,9 +31,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 * Token invalido. L'utente deve rifare l'accesso.
 ```json
 {
-    "response_data":{
-        
-    },
+    "response_data":{},
     "error":"ERROR_GLOBAL_INVALID_TOKEN",
     "status_code":401
 }
@@ -31,9 +40,7 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 * Azione richiesta non implementata. Controllare che si stia cercando di accedere ad un'azione implementata.
 ```json
 {
-    "response_data":{
-        
-    },
+    "response_data":{},
     "error":"ERROR_GLOBAL_NOT_IMPLEMENTED",
     "status_code":404
 }
@@ -42,32 +49,41 @@ Gli errori globali possono apparire in ogni azione (salvo alcune per svariate ec
 * Dati impostati in modo scorretto
 ```json
 {
-    "response_data":{
-        
-    },
-    "error":"ERROR_LOGIN_INVALID_REQUEST",
-    "message":"Richiesta invalida",
+    "response_data":{},
+    "error":"ERROR_GLOBAL_INVALID_REQUEST",
+    "message":"Invalid Request",
     "status_code":400
 }
 ```
 
+* La richiesta non è un JSON
+```json
+{
+    "response_data":{},
+    "error":"ERROR_REQUEST_NOT_JSON",
+    "status_code":400
+}
+
 * L'utente non è autorizzato ad eseguire questa azione
 ```json
 {
-    "response_data":{
-        
-    },
-    "error":"ERROR_GLOBAL_UNAUTHORIZED_USER",
+    "response_data":{},
+    "error":"ERROR_GLOBAL_UNAUTHORIZED",
     "message":"Unhautorized",
     "status_code":403
 }
 ```
 
 
-## auth/login
+
+## Elenco degli endpoint
+
+Di seguito verranno riportate solamente risposte dove l'array 'response_data' è valorizzato. 
+
+### auth/login
 Accede utilizzando username e password; il token non è richiesto. Se la password è uguale a 'cambiami', è necessario anche specificare la nuova password il campo 'new_password' pena l'esclusione dal sistema.
 
-#### Richiesta
+##### Richiesta
 ```json
 {
     "module":"auth",
@@ -79,8 +95,7 @@ Accede utilizzando username e password; il token non è richiesto. Se la passwor
 }
 ```
 
-#### Risposte
-
+##### Risposte
 * Login eseguito con successo. Viene fornito un nuovo token dal server che verrà usato per la sessione.
 ```json
 {
@@ -92,33 +107,39 @@ Accede utilizzando username e password; il token non è richiesto. Se la passwor
 }
 ```
 
-* Login fallito. Credenziali errate.
+* Login fallito. Nome utente o password errati.
 ```json
 {
-    "response_data":{
-        
-    },
+    "response_data":{},
     "error":"ERROR_LOGIN_INVALID_CREDENTIALS",
     "message":"Credenziali errate",
     "status_code":401
 }
 ```
 
-## auth/validateToken
+### auth/logout
+Disconnette l'utente eliminando il token della sessione corente
 
-Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere di fare l'accesso. Il token deve essere presente nell'header "X-Auth-Header".
-
-#### Richiesta
+##### Richiesta
 ```json
 {
     "module":"auth",
-    "access":"validateToken",
-    "request_data":{}
+    "access":"logout"
 }
 ```
 
-#### Risposte
+### auth/validateToken
+Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere di fare l'accesso. Il token deve essere presente nell'header "X-Auth-Header".
 
+##### Richiesta
+```json
+{
+    "module":"auth",
+    "access":"validateToken"
+}
+```
+
+##### Risposte
 * Token valido. L'utente può proseguire con la sessione.
 ```json
 {
@@ -132,41 +153,39 @@ Verifica che il token sia (ancora) valido. Se così non fosse, allora richiedere
 * Token invalido. L'utente deve rifare l'accesso.
 ```json
 {
-    "response_data":{
-        
-    },
+    "response_data":{},
     "error":"ERROR_LOGIN_INVALID_TOKEN",
     "message":"Token non valido",
     "status_code":401
 }
 ```
 
-## branches/add
+### branches/add
 Aggiunge un nuovo branch al database, eseguibile solo da utenti amministratori (ruolo Power User)
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-	"module":"data",
-	"action":"addBranch",
+	"module":"branches",
+	"action":"add",
     "request_data":{
         "branch_name":"test"
     }
 }
 ```
 
-## branches/shortList
+### branches/shortList
 Restituisce l'elenco delle branch
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-	"module":"data",
-	"action":"branches"
+	"module":"branches",
+	"action":"shortList"
 }
 ```
 
-#### Risposta
+##### Risposta
 ```json
 {
   "response_data": [
@@ -180,18 +199,18 @@ Restituisce l'elenco delle branch
 }
 ```
 
-## clients/shortList
+### clients/shortList
 Restituisce l'elenco dei clienti
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-	"module":"data",
-	"action":"clients"
+	"module":"clients",
+	"action":"shortList"
 }
 ```
 
-#### Risposta
+##### Risposta
 ```json
 {
   "response_data": [
@@ -210,14 +229,13 @@ Restituisce l'elenco dei clienti
 }
 ```
 
-## commits/add
+### commits/add
+Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori; se l'utente è un referente dell'area tecnica, il commit verrà automaticamente approvato.
 
-Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obbligatori.
-
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"commit",
+    "module":"commits",
     "access":"add",
     "request_data":{
         "title":"title",
@@ -228,24 +246,13 @@ Utilizzato per aggiungere un nuovo commit al database. Tutti i campi sono obblig
 }
 ```
 
-#### Risposta
-
-* Inserimento andato a buon fine
-```json
-{
-    "response_data": {},
-    "status_code": 200
-}
-```
-
-## commits/approve
-
+### commits/approve
 Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: Non Approvato)
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"commit",
+    "module":"commits",
     "access":"approve",
     "request_data":{
         "id":1,
@@ -254,38 +261,41 @@ Va specificato l'ID del commit ed il flag di approvazione (1: Approvato / -1: No
 }
 ```
 
-#### Risposte
-
-* Commit approvato correttamente
+##### Risposte
+* ID non valido
 ```json
 {
     "response_data":{},
-    "status_code":200
-}
-```
-
-* Il commit è già stato approvato
-```json
-{
-    "response_data":{},
-    "error": "ERROR_COMMIT_APPROVE_INVALID_REQUEST",
-    "message":"Commit already approved!",
+    "error":"ERROR_INVALID_ID",
+    "message":"id doesn't refer to a valid element!",
     "status_code":400
 }
 ```
 
-## commits/list
+* Elemento già approvato
+```json
+{
+    "response_data":{},
+    "error":"ERROR_WRONG_APP_STATUS",
+    "message":"Already approved!",
+    "status_code":400
+}
+```
 
-Restituisce la lista dei commit presenti nel database sotto forma di pagine. E' necessario specificare *limit* (numero di elementi per pagina) e *page* (numero di pagina).
+### commits/list
+Restituisce la lista dei commit presenti nel database sotto forma di pagine.
+Se l'utente è un programmatore, verrà restituita la lista di commit creati da lui; se l'utente è un referente di area tecnica, esso vedrà la lista dei commit aggiunti da tutti gli utenti della sua area.
 
-Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id (id dei commit), title, description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, reviewer, approval_status, components, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo l'id dei commit.
+E' necessario specificare *limit* (numero di elementi per pagina - massimo 100) e *page* (numero di pagina).
+
+Facoltativamente è possibile specificare **l'ordinamento** ascendente o discendente (order=ASC/DESC) secondo secondo i parametri:  id, title, description, timestamp (data creazione), update_timestamp (data di ultima modifica), author, approver, approval_status, components, branch. Se *sort* non è specificato, la lista viene ordinata in maniera discendente secondo la data di ultima modifica.
 
 E' poi possibile impostare facoltativamente un **filtro** di ricerca, con la possibilità di filtrare per più campi. Si specifica *attribute* (parametro sul quale ricercare; l'elenco di parametri ammessi è lo stesso di quelli di sorting) e valueMatches (query da ricercare) oppure valueDifferentFrom (il valore deve essere diverso da).
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"commit",
+    "module":"commits",
     "access":"list",
     "request_data":{
         "limit":5,
@@ -308,9 +318,9 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca, con la pos
 }
 ```
 
-#### Risposta
-
-*count* contiene il conteggio degli elementi nella risposta per la pagina corrente, mentre *count_total* contiene il numero totale di elementi per la query effettuata. Il conteggio per *page* e *page_total* parte da 0. *approval_status* è uguale a *0* se il commit deve essere ancora valutato, *1* se è stato approvato e *-1* se è stato respinto.
+##### Risposta
+*count* contiene il conteggio degli elementi per la pagina corrente, mentre *count_total* contiene il numero totale di elementi per la query effettuata (considerando quindi eventuali filtri).
+Ugualmente, *page* contiene il numero di pagina e *page_total* il numero di pagine totali; questi due valori partono da 0. *approval_status* è uguale a *0* se il commit deve essere ancora valutato, *1* se è stato approvato e *-1* se è stato respinto.
 
 ```json
 {
@@ -328,15 +338,13 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca, con la pos
                 "branch": 2,
                 "approval_status": "1",
                 "author": {
-                    "user_id": 1,
-                    "username": "admin",
-                    "name": "Test Admin"
+                  "name": "Test Admin",
+                  "email": "admin@aum.com"
                 },
                 "approver": {
-                    "user_id": 2,
-                    "username": "dev.test",
-                    "name": "Test Developer"
-                }
+                  "name": "Test Admin",
+                  "email": "admin@aum.com"
+                },
             }
             [...]
         ],
@@ -347,19 +355,63 @@ E' poi possibile impostare facoltativamente un **filtro** di ricerca, con la pos
 }
 ```
 
-## commits/shortList
+### commits/remove
+Rimuove un commit a patto che lo stesso non sia già stato approvato
 
-Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
-
-#### Richiesta
+##### Richiesta
 ```json
 {
-	"module":"data",
-	"action":"commits"
+	"module":"commits",
+	"action":"remove",
+  "request_data": {
+    "id":1
+  }
 }
 ```
 
-#### Risposta
+##### Risposte
+* ID non valido
+```json
+{
+    "response_data":{},
+    "error":"ERROR_INVALID_ID",
+    "message":"id doesn't refer to a valid element!",
+    "status_code":400
+}
+```
+
+* Elemento già approvato (non è possibile rimuovere commit già approvati)
+```json
+{
+    "response_data":{},
+    "error":"ERROR_WRONG_APP_STATUS",
+    "message":"Already approved!",
+    "status_code":400
+}
+```
+
+* Commit già incluso in una richiesta di invio
+```json
+{
+    "response_data":{},
+    "error":"ERROR_REMOVE_COMMIT_ALREADY_INCLUDED",
+    "message":"Commit already included in a send request",
+    "status_code":400
+}
+```
+
+### commits/shortList
+Restituisce la lista dell'ID e del titolo dei commit aggiunti dallo sviluppatore corrente ed approvati da un referente
+
+##### Richiesta
+```json
+{
+	"module":"commits",
+	"action":"shortList"
+}
+```
+
+##### Risposta
 ```json
 {
   "response_data": [
@@ -376,15 +428,14 @@ Restituisce la lista degli ID dei commit aggiunti dallo sviluppatore corrente
 }
 ```
 
-## commits/update
-
+### commits/update
 Utilizzato per richiedere se vi sono nuovi commit data una certa data.
 E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggiornamento ricevuto e section, la sezione nella quale si trova l'utente. I parametri ammessi in 'section' sono le stinghe corrispondenti ai ruoli utente (developer, technicalAreaManager).
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"commit",
+    "module":"commits",
     "access":"update",
     "request_data":{
         "latest_update_timestamp":1555745875,
@@ -393,14 +444,12 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 }
 ```
 
-#### Risposte
-
+##### Risposte
 * Aggiornamenti trovati
 ```json
 {
   "response_data": {
     "latest_update_timestamp": 1555745875,
-    "new_count": 65,
     "updates_found": true
   },
   "status_code": 200
@@ -411,31 +460,23 @@ E' necessario specificare latest_update_timestamp, il timestamp dall'ultimo aggi
 ```json
 {
     "response_data": {
-        "updates_found":false
+      "latest_update_timestamp": 1555745875,
+      "updates_found":false
     },
     "status_code": 200
 }
 ```
 
-#### Risposta
-```json
-{
-  "response_data": [],
-  "status_code": 200
-}
-```
-
-## sendRequests/add
-
+### sendRequests/add
 Utilizzato per aggiungere una nuova richiesta di invio al database.
-*install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio.
+*install_type* indica il tipo di installazione: 0 (A Caldo) / 1 (A Freddo); *dest_clients* gli ID degli utenti destinatari e *commits* l'elenco dei commit inclusi nella richiesta di invio (facoltativo)
 
 Tutti i campi tranne *commits* sono obbligatori.
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"sendRequest",
+    "module":"sendRequests",
     "access":"add",
     "request_data":{
         "title":"title string",
@@ -449,24 +490,13 @@ Tutti i campi tranne *commits* sono obbligatori.
 }
 ```
 
-#### Risposta
-
-* Inserimento andato a buon fine
-```json
-{
-    "response_data": {},
-    "status_code": 200
-}
-```
-
-## sendRequests/approve
-
+### sendRequests/approve
 Vedasi commits/approve
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"sendRequest",
+    "module":"sendRequests",
     "access":"approve",
     "request_data":{
         "id":1,
@@ -475,24 +505,23 @@ Vedasi commits/approve
 }
 ```
 
-## sendRequests/install
-
+### sendRequests/install
 Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gruppo client. Il campo 'feedback' è facoltativo, mentre il campo "install_status" può avere valore 1 (installazione avvenuta con successo) o -1 (installazione fallita).
 
-#### Richiesta
+##### Richiesta
 ```json
-
-	"module":"sendRequest",
+{
+	"module":"sendRequests",
 	"action":"install",
 	"request_data": {
 		"id":4,
-        "install_status":1,
+    "install_status":1,
 		"feedback":"Test Feedback"
 	}
 }
 ```
 
-#### Risposta
+##### Risposte
 
 * Inserimento andato a buon fine
 ```json
@@ -502,18 +531,38 @@ Segnala l'avvenuta installazione di una patch. Eseguibile solo da utenti del gru
 }
 ```
 
-## sendRequests/installType
-Restituisce i tipi di installazione
-
-#### Richiesta
+* ID non valido
 ```json
 {
-	"module":"data",
+    "response_data":{},
+    "error":"ERROR_INVALID_ID",
+    "message":"id doesn't refer to a valid element!",
+    "status_code":400
+}
+```
+
+* Aggiornamento non inviato al cliente
+```json
+{
+    "response_data":{},
+    "error":"ERROR_WRONG_APP_STATUS",
+    "message":"The current send request was not sent to the client",
+    "status_code":400
+}
+```
+
+### sendRequests/installType
+Restituisce i tipi di installazione
+
+##### Richiesta
+```json
+{
+	"module":"sendRequests",
 	"action":"installType"
 }
 ```
 
-#### Risposta
+##### Risposta
 ```json
 {
   "response_data": [
@@ -530,17 +579,16 @@ Restituisce i tipi di installazione
 }
 ```
 
-## sendRequests/list
-
-Il funzionamento è uguale a quello di *commits/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a 'client' (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico, mentre se è impostato a 'revisionOfficeManager' (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
+### sendRequests/list
+Il funzionamento è uguale a quello di *commits/list*, eccezione fatta per il campo obbligatorio 'role' nella richiesta. Se tale campo è impostato a *client* (cliente), l'endpoint ritornerà la lista delle richieste di invio a suo carico; se è impostato a *revisionOfficeManager* (ufficio revisioni), l'endpoint ritornerà solamente richieste già approvate. Per qualsiasi altro valore, l'endpoint ritornerà la lista delle richieste in modo simile a quello dei commit.
 
 L'elenco dei campi di filtraggio ammessi prevede anche send_timestamp (data di invio della patch ai clienti), install_type (tipo di installazione, 0 per a freddo ed 1 per a caldo), install_link (link di installazione).
 Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprastanti, anche install_timestamp (data di installazione della patch da parte del cliente), install_status (stato di installazione; 0 non installato, 1 installato e -1 errore nell'installazione); install_comment (feedback rilasciato dal cliente). 
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-    "module":"sendRequest",
+    "module":"sendRequests",
     "access":"list",
     "request_data":{
         "limit":5,
@@ -552,16 +600,15 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
         },
         "filter":{
             "attribute":"",
-            "valueMatches":"",
-            "valueDifferentFrom":"",
+            "valueDifferentFrom":""
         }
     }
 }
 ```
 
-#### Risposte
+##### Risposte
 
-##### Risposta con role=client
+* Risposta con role=client
 
 ```json
 {
@@ -593,7 +640,7 @@ Se 'role' è uguale a 'client', allora sono ammessi, oltre ai tre campi soprasta
 }
 ```
 
-##### Risposta con role!=client
+* Risposta con role!=client
 Uguale a *commits/list* con l'eccezione di *approval_status*: è uguale a *0* se la richiesta deve essere ancora valutata, *1* se è stata approvata e *-1* se è stata respinta e **2** se è stata inviata ai clienti.
 ```json
 {
@@ -643,15 +690,13 @@ Uguale a *commits/list* con l'eccezione di *approval_status*: è uguale a *0* se
 }
 ```
 
-## sendRequests/send
-
+### sendRequests/send
 Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio revisioni possono effettuare tale azione.
 
-#### Richiesta
-
+##### Richiesta
 ```json
 {
-	"module":"sendRequest",
+	"module":"sendRequests",
 	"action":"send",
 	"request_data": {
 		"id":4,
@@ -660,7 +705,7 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 }
 ```
 
-#### Risposte
+##### Risposte
 
 * Invio andato a buon fine 
 ```json
@@ -670,11 +715,31 @@ Invia una richiesta di invio ai clienti designati. Solo i membri dell'ufficio re
 }
 ```
 
-## sendRequests/update
+* Richiesta di invio non approvata dal referente area tecnica
+```json
+{
+    "response_data":{},
+    "error":"ERROR_WRONG_APP_STATUS",
+    "message":"The send request hasn't been approved by a tech area member",
+    "status_code":400
+}
+```
+
+* ID non valido
+```json
+{
+    "response_data":{},
+    "error":"ERROR_INVALID_ID",
+    "message":"id doesn't refer to a valid element!",
+    "status_code":400
+}
+```
+
+### sendRequests/update
 
 Vedasi *commits/update*. I parametri ammessi in 'section' sono *developer*, *technicalAreaManager*, *revisionOfficeManager*, *client*.
 
-#### Richiesta
+##### Richiesta
 ```json
 {
     "module":"sendRequest",
@@ -686,11 +751,11 @@ Vedasi *commits/update*. I parametri ammessi in 'section' sono *developer*, *tec
 }
 ```
 
-## user/add
+### user/add
 
 Aggiunge un nuovo utente al database. E' necessario specificare username, nome completo, email, ruolo/i ed in modo facoltativo l'identificativo dell'area di riferimento. La password sarà impostata di default a 'cambiami'; sarà quindi necessario cambiarla al primo accesso.
 
-#### Richiesta
+##### Richiesta
 ```json
 {
     "module":"user",
@@ -707,7 +772,7 @@ Aggiunge un nuovo utente al database. E' necessario specificare username, nome c
 }
 ```
 
-#### Risposte
+##### Risposte
 
 * Aggiunta andata a buon fine 
 ```json
@@ -717,10 +782,10 @@ Aggiunge un nuovo utente al database. E' necessario specificare username, nome c
 }
 ```
 
-## user/areas
+### user/areas
 Restituisce l'elenco delle aree funzionali
 
-#### Richiesta
+##### Richiesta
 ```json
 {
 	"module":"data",
@@ -728,7 +793,7 @@ Restituisce l'elenco delle aree funzionali
 }
 ```
 
-#### Risposta
+##### Risposta
 ```json
 {
   "response_data": [
@@ -742,12 +807,12 @@ Restituisce l'elenco delle aree funzionali
 }
 ```
 
-## user/changePsw
+### user/changePsw
 
 Cambia la password di un utente. Se l'utente attualmente connesso è un amministratore (ruolo Power User), egli ha la possibilità di modificare le password di altri utenti (campo username) senza inserire la vecchia password (campo old_password).
 Un utente normale può invece modificare la sua password (new_password) solo inserendo la vecchia password (old_password).
 
-#### Richiesta
+##### Richiesta
 ```json
 {
     "module":"user",
@@ -760,7 +825,7 @@ Un utente normale può invece modificare la sua password (new_password) solo ins
 }
 ```
 
-#### Risposte
+##### Risposte
 
 * Modifica andata a buon fine 
 ```json
@@ -770,7 +835,7 @@ Un utente normale può invece modificare la sua password (new_password) solo ins
 }
 ```
 
-## user/info
+### user/info
 
 Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornate le informazioni dell'utente proprietario del token inviato nella richiesta. 
 
@@ -785,9 +850,9 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
 }
 ```
 
-#### Risposte
+##### Risposte
 
-* Utente trovato
+* Utente trovato. Resp contiene l'elenco dei referenti area tecnica per l'utente corrente.
 ```json
 {
   "response_data": {
@@ -796,7 +861,7 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
     "name": "Test Admin",
     "email": "admin@aum.com",
     "role": [1,2,3,4],
-    "role_name": [ "ROLE_DEVELOPER", "ROLE_TECHAREA", "ROLE_REVOFFICE", "ROLE_CLIENT"],
+    "role_name": ["ROLE_DEVELOPER", "ROLE_TECHAREA", "ROLE_REVOFFICE", "ROLE_CLIENT"],
     "resp": [
       {
         "user_id": 1,
@@ -820,24 +885,24 @@ Otteiene i dati di un'utente. Se user_id non viene specificato, vengono ritornat
     "response_data":{
         
     },
-    "error":"ERROR_USER_INFO_NOT_FOUND",
+    "error":"ERROR_USER_NOT_FOUND",
     "error_message":"Utente non trovato",
     "status_code":404
 }
 ```
 
-## user/roles
+### user/roles
 Restituisce l'elenco dei ruoli in uso
 
-#### Richiesta
+##### Richiesta
 ```json
 {
-	"module":"data",
+	"module":"user",
 	"action":"roles"
 }
 ```
 
-#### Risposta
+##### Risposta
 ```json
 {
   "response_data": [
