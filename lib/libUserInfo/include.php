@@ -52,7 +52,7 @@ function getUserInfo(int $user_id) : array {
     }
 
     //A tech area member is automatically a developer
-    if (in_array(ROLE_TECHAREA, $out['role_name'])) {
+    if (in_array(ROLE_TECHAREA, $out['role_name']) && !in_array(ROLE_DEVELOPER, $out['role_name'])) {
         $out['role'][] = 1;
         $out['role_name'][] = ROLE_DEVELOPER;
     }

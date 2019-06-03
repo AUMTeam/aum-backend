@@ -19,7 +19,7 @@ $exec = function (array $data, array $data_init) : array {
         $feedback = $data['feedback'];
 
     //Check if the ID is valid
-    $req = $db->preparedQuery("SELECT request_id, install_status, approval_status FROM requests_clients WHERE request_id=? AND client_user_id=?", [$data['id'], $user['user_id']]);
+    $req = $db->preparedQuery("SELECT r.request_id, install_status, approval_status FROM requests_clients, requests as r WHERE r.request_id=? AND client_user_id=? AND r.request_id=requests_clients.request_id", [$data['id'], $user['user_id']]);
     if (count($req) == 0)
         throw new InvalidRequestException("Send request not found", "ERROR_INVALID_ID");
     else if ($req[0]['approval_status'] != 2)
