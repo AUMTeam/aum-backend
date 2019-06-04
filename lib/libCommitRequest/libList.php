@@ -176,8 +176,8 @@ function getInternalQuery(array $data, int $cur_user_id, array $cur_user_role, a
     $query;
     
     //Base query - $listType is safe and prepared statements could not be used in FROM anyway
-    $query = "SELECT author.email as au_email, author.name as au_name,
-    approver.email as ap_email, approver.name as ap_name, $listType.*, branch_name
+    $query = "SELECT author.email as au_email, author.name as au_name, author.user_id as au_id,
+    approver.email as ap_email, approver.name as ap_name, approver.user_id as ap_id, $listType.*, branch_name
     FROM $listType LEFT JOIN users as approver ON $listType.approver_user_id=approver.user_id, users as author, branches
     WHERE $listType.author_user_id=author.user_id AND branches.branch_id=$listType.branch_id";
 
@@ -292,7 +292,8 @@ function get_list(string $type, array $data) : array {
                 'approval_status' => $entry['approval_status'],
                 'author' => [
                     'name' => $entry['au_name'],
-                    'email' => $entry['au_email']
+                    'email' => $entry['au_email'],
+                    'id' => $entry['au_id']
                 ]
             ];
 
@@ -301,7 +302,8 @@ function get_list(string $type, array $data) : array {
                 $temp += [
                     'approver' => [
                         'name' => $entry['ap_name'],
-                        'email' => $entry['ap_email']
+                        'email' => $entry['ap_email'],
+                        'id' => $entry['ap_id']
                     ],
             ];
 
