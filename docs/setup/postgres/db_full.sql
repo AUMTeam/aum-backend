@@ -412,7 +412,6 @@ ALTER TABLE ONLY my_aum.users ALTER COLUMN user_id SET DEFAULT nextval('my_aum.u
 
 COPY my_aum.areas (area_id, area_name) FROM stdin;
 1	Area 1
-2	Area 2
 \.
 
 
@@ -879,7 +878,7 @@ COPY my_aum.roles (role_id, role_name, role_string) FROM stdin;
 
 COPY my_aum.users (user_id, username, hash_pass, email, name, area_id) FROM stdin;
 1	admin	$2y$10$autYx1CjNHiMTaMst4d/3u801S17cocdlVRle217eNjJh2b7Mff.K	admin@aum.com	Test Admin	1
-2	dev.test	$2y$10$Gg0OqF4eAldpoVWXXUmYhOIKLrTPb16Fi6ep/abA1WRDyTFIG5XO6	dev@aum.com	Test Developer	2
+2	dev.test	$2y$10$Gg0OqF4eAldpoVWXXUmYhOIKLrTPb16Fi6ep/abA1WRDyTFIG5XO6	dev@aum.com	Test Developer	1
 3	client.test	$2y$10$dsomsW5qwK/zouHftaRCw.JsdQZbPDhikljNc/TYPjF7TXjXY2BP2	client@aum.com	Test Client User	\N
 4	repTech.test	$2y$10$RjgQcskq7ud8/VRQCb5Ecu7Wc.gBIBYqPNaXpKFWDTep72R8wVJdy	repTech@aum.com	Test Tech Area User	1
 5	rev.test	$2y$10$OUHuTMosbb0ICAPoy9xcfeznZ2Wdnt7cPg53Z6kDvxtuec.t8WVrG	revOffice@aum.com	Revision Office Test	1
@@ -915,7 +914,7 @@ COPY my_aum.users_tokens (token, user_id, token_expire) FROM stdin;
 -- Name: areas_area_id_seq; Type: SEQUENCE SET; Schema: my_aum; Owner: postgres
 --
 
-SELECT pg_catalog.setval('my_aum.areas_area_id_seq', 2, true);
+SELECT pg_catalog.setval('my_aum.areas_area_id_seq', 1, true);
 
 
 --
