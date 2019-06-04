@@ -1,6 +1,22 @@
-# Lista codici errore
+# Elenco degli errori
 
-Lista codici errore. I codici errore possono essere trovati qua:
+## Codici errore HTTP
+
+I seguenti codici sono riportati sia tramite HTTP che nel campo `status_code` della risposta codificata in JSON.
+
+* `200` - `OK`: Valore di default, la richiesta è andata a buon fine.
+* `400` - `Bad Request`: La richiesta non è conforme all’esecuzione. Questo è possibile se la richiesta è stata strutturata in un modo totalmente differente a quella dettata, oppure se mancano uno o più parametri.
+* `401` - `Unauthorized`: La richiesta non può essere eseguita per assenza di privilegi. Questo errore viene generato se il token inviato al server non è valido o assente e quando l’username o la password sono errati.
+* `403` - `Forbidden`: La richiesta non può essere esaudita per mancanza di privilegi. Questo capita quando un’utente tenta di accedere ad un entry point che solo un particolare gruppo di utenti può utilizzare.
+* `404` - `Not Found`, ovvero la richiesta non può essere esaudita perché tale azione non è stata implementata.
+* `405` - `Method Not Allowed`: La richiesta è stata effettuata utilizzando metodi HTTP diversi da POST e OPTIONS.
+* `500` - `Internal Server Error`: Il server ha riscontrato un problema nel processare l’azione. Se la risposta è codificata in formato JSON, significa che è un errore previsto dall'API; si rimanda alla sezione sottostante per ulteriori spiegazioni. Se la risposta non è un JSON, si tratta di un errore non gestito del sistema.
+* `503` - `Service Unavailable`: Il server non è al momento disponibile perché è in stato di manutenzione.
+
+
+## Codici errore interni
+
+Le API utilizzano un sistema di errori codificati sotto forma di stringa per poter gestire in modo efficiente le eccezioni che possono generarsi nell'esecuzione di un endpoint. In particolare, il codice di errore è contenuto nel campo `error` della risposta:
 
 ```json
 {
@@ -11,6 +27,8 @@ Lista codici errore. I codici errore possono essere trovati qua:
 }
 ```
 
+Di seguito viene fornito l'elenco di tutti i possibili codici di errore. 
+
 ## Errori globali
 * `100` = `ERROR_GLOBAL_MISSING_TOKEN` - Il token identificativo è assente
 * `101` = `ERROR_GLOBAL_INVALID_TOKEN` - Il token identificativo è invalido
@@ -20,7 +38,7 @@ Lista codici errore. I codici errore possono essere trovati qua:
 * `105` = `ERROR_GLOBAL_DB` - Errore interno nella comunicazione con il DB (errore nella connessione o nell'esecuzione di una query)
 * `106` = `ERROR_REQUEST_NOT_JSON` - La richiesta non è formattata in JSON
 * `107` = `ERROR_INVALID_ID` - L'ID specificato non è valido
-* `108` = `ERROR_SRV_IN_MANITEANCE` - Server in manutenzione
+* `108` = `ERROR_SRV_IN_MAINTENANCE` - Server in manutenzione
 
 ## Modulo `auth/*`
 * `200` = `ERROR_LOGIN_INVALID_CREDENTIALS` - Credenziali errate (username o password)
