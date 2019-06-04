@@ -30,7 +30,7 @@ function remove(string $type, array $data) : void {
     if (count($elem) == 0)
         throw new InvalidRequestException("ID not found or element already approved", "ERROR_INVALID_ID");
     else if ($elem[0]['approval_status'] != 0)
-        throw new InvalidRequestException("Element already approved: you cannot remove it", "ERROR_WRONG_APP_STATUS");
+        throw new InvalidRequestException("Element already approved: you cannot remove it", "ERROR_REMOVE_ALREADY_APPROVED");
 
     //If the element is a commit, check if it hasn't already been included in a send request
     if ($type == TYPE_COMMIT) {

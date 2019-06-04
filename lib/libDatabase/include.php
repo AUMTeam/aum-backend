@@ -20,7 +20,7 @@ class DatabaseWrapper {
                 $this->handler = new PDO("{$db_type}:host={$config['server']}; port={$config['port']}; dbname={$config['db_name']};
                     user={$config['username']}; password={$config['password']}", $config['username'], $config['password'], $options);
         } catch (PDOException $e) {
-            throw new InvalidRequestException("Error connecting to the database using PDO: " . $e->getMessage());
+            throw new DBException("Error connecting to the database using PDO: " . $e->getMessage());
         }
         $this->handler->exec("SET NAMES 'utf8';");
     }

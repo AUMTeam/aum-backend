@@ -23,7 +23,7 @@ $exec = function (array $data, array $data_init) : array {
     if (count($req) == 0)
         throw new InvalidRequestException("Send request not found", "ERROR_INVALID_ID");
     else if ($req[0]['approval_status'] != 2)
-        throw new InvalidRequestException("The current send request was not sent to the client", "ERROR_WRONG_APP_STATUS");
+        throw new InvalidRequestException("The current send request was not sent to the client", "ERROR_INSTALL_PATCH_NOT_SENT");
     
     //Update the DB
     $db->preparedQuery("UPDATE requests_clients SET comment=?, install_timestamp=now(), install_status=?

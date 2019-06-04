@@ -21,7 +21,7 @@ $exec = function (array $data, array $data_init) : array {
     if (count($entry) == 0)
         throw new InvalidRequestException("id not found", "ERROR_INVALID_ID");
     else if ($entry[0]['approval_status'] != 1)
-        throw new InvalidRequestException("The send request hasn't been approved by a tech area member", "ERROR_WRONG_APP_STATUS");
+        throw new InvalidRequestException("The send request hasn't been approved by a tech area member", "ERROR_SEND_NOT_APPROVED");
 
     $db->preparedQuery("UPDATE requests SET approval_status='2', install_link=?, send_timestamp=now(), sender_user_id=?
         WHERE request_id=?", [$data['install_link'], $user['user_id'], $data['id']]);

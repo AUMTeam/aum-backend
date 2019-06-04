@@ -40,7 +40,7 @@ function approve(array $data, string $type) : void {
     if (count($query) == 0)
         throw new InvalidRequestException("id doesn't refer to a valid element!", "ERROR_INVALID_ID");
     else if ($query[0]['approval_status'] != 0)
-        throw new InvalidRequestException("Already approved!", "ERROR_WRONG_APP_STATUS");
+        throw new InvalidRequestException("Already approved!", "ERROR_APPROVE_ALREADY_APPROVED");
 
 
     //Execute the query
