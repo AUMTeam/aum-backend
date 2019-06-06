@@ -1,20 +1,22 @@
 -- phpMyAdmin SQL Dump
--- version 4.1.7
--- http://www.phpmyadmin.net
+-- version 4.8.4
+-- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: May 15, 2019 at 10:57 AM
--- Server version: 5.6.33-log
--- PHP Version: 5.3.10
+-- Host: 127.0.0.1
+-- Generation Time: Jun 05, 2019 at 09:50 AM
+-- Server version: 10.1.37-MariaDB
+-- PHP Version: 7.3.0
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
+/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `my_aum`
@@ -26,18 +28,18 @@ SET time_zone = "+00:00";
 -- Table structure for table `areas`
 --
 
-CREATE TABLE IF NOT EXISTS `areas` (
-  `area_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `areas` (
+  `area_id` smallint(5) UNSIGNED NOT NULL AUTO_INCREMENT,
   `area_name` varchar(50) NOT NULL,
   PRIMARY KEY (`area_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=3 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=2;
 
 --
 -- Dumping data for table `areas`
 --
 
 INSERT INTO `areas` (`area_id`, `area_name`) VALUES
-(1, 'Area 1');
+(1, 'Test Area');
 
 -- --------------------------------------------------------
 
@@ -45,11 +47,11 @@ INSERT INTO `areas` (`area_id`, `area_name`) VALUES
 -- Table structure for table `branches`
 --
 
-CREATE TABLE IF NOT EXISTS `branches` (
-  `branch_id` smallint(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `branches` (
+  `branch_id` smallint(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `branch_name` varchar(50) NOT NULL,
   PRIMARY KEY (`branch_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=6;
 
 --
 -- Dumping data for table `branches`
@@ -68,23 +70,23 @@ INSERT INTO `branches` (`branch_id`, `branch_name`) VALUES
 -- Table structure for table `commits`
 --
 
-CREATE TABLE IF NOT EXISTS `commits` (
-  `commit_id` mediumint(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `commits` (
+  `commit_id` mediumint(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `title` varchar(100) NOT NULL,
   `description` text NOT NULL,
-  `author_user_id` smallint(10) unsigned NOT NULL,
+  `author_user_id` smallint(10) UNSIGNED NOT NULL,
   `components` text NOT NULL,
-  `branch_id` smallint(10) unsigned NOT NULL,
+  `branch_id` smallint(10) UNSIGNED NOT NULL,
   `approval_status` enum('0','1','-1') NOT NULL DEFAULT '0',
   `approvation_timestamp` timestamp NULL DEFAULT NULL,
-  `approvation_comment` text,
-  `approver_user_id` smallint(10) unsigned DEFAULT NULL,
+  `approvation_comment` text DEFAULT NULL,
+  `approver_user_id` smallint(10) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`commit_id`),
   KEY `author_user_id` (`author_user_id`),
   KEY `branch_id` (`branch_id`),
   KEY `approver_user_id` (`approver_user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=101 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=101;
 
 --
 -- Dumping data for table `commits`
@@ -195,26 +197,22 @@ INSERT INTO `commits` (`commit_id`, `creation_timestamp`, `title`, `description`
 --
 -- Triggers `commits`
 --
-DROP TRIGGER IF EXISTS `commit_approve_update`;
-DELIMITER //
+DELIMITER $$
+CREATE TRIGGER `commit_approve_insert` BEFORE INSERT ON `commits` FOR EACH ROW BEGIN
+    IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
+    THEN SET NEW.approvation_timestamp = NOW();
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
 CREATE TRIGGER `commit_approve_update` BEFORE UPDATE ON `commits`
  FOR EACH ROW BEGIN
     IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
     THEN SET NEW.approvation_timestamp = NOW();
     END IF;
 END
-//
-DELIMITER ;
-
-DROP TRIGGER IF EXISTS `commit_approve_insert`;
-DELIMITER //
-CREATE TRIGGER `commit_approve_insert` BEFORE INSERT ON `commits`
- FOR EACH ROW BEGIN
-    IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
-    THEN SET NEW.approvation_timestamp = NOW();
-    END IF;
-END
-//
+$$
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -223,28 +221,28 @@ DELIMITER ;
 -- Table structure for table `requests`
 --
 
-CREATE TABLE IF NOT EXISTS `requests` (
-  `request_id` mediumint(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE `requests` (
+  `request_id` mediumint(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `title` varchar(100) NOT NULL,
   `description` text NOT NULL,
   `components` text NOT NULL,
-  `branch_id` smallint(10) unsigned NOT NULL,
-  `author_user_id` smallint(10) unsigned NOT NULL,
+  `branch_id` smallint(10) UNSIGNED NOT NULL,
+  `author_user_id` smallint(10) UNSIGNED NOT NULL,
   `creation_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `approval_status` enum('-1','0','1','2') NOT NULL DEFAULT '0',
   `approvation_timestamp` timestamp NULL DEFAULT NULL,
-  `approvation_comment` text,
-  `approver_user_id` smallint(10) unsigned DEFAULT NULL,
-  `sender_user_id` smallint(10) unsigned DEFAULT NULL,
+  `approvation_comment` text DEFAULT NULL,
+  `approver_user_id` smallint(10) UNSIGNED DEFAULT NULL,
+  `sender_user_id` smallint(10) UNSIGNED DEFAULT NULL,
   `send_timestamp` timestamp NULL DEFAULT NULL,
   `install_type` enum('0','1') NOT NULL,
-  `install_link` varchar(255) DEFAULT NULL,
+  `install_link` text DEFAULT NULL,
   PRIMARY KEY (`request_id`),
   KEY `author_user_id` (`author_user_id`),
   KEY `approver_user_id` (`approver_user_id`),
   KEY `branch_id` (`branch_id`),
   KEY `sender_user_id` (`sender_user_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=101 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT = 101;
 
 --
 -- Dumping data for table `requests`
@@ -355,26 +353,25 @@ INSERT INTO `requests` (`request_id`, `title`, `description`, `components`, `bra
 --
 -- Triggers `requests`
 --
-DROP TRIGGER IF EXISTS `request_approve_update`;
-DELIMITER //
-CREATE TRIGGER `request_approve_update` BEFORE UPDATE ON `requests`
- FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `request_approve_insert` BEFORE INSERT ON `requests` FOR EACH ROW BEGIN
     IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
     THEN SET NEW.approvation_timestamp = NOW();
+	ELSEIF NEW.approval_status = '2'
+    THEN SET NEW.send_timestamp = NOW();
     END IF;
 END
-//
+$$
 DELIMITER ;
-
-DROP TRIGGER IF EXISTS `request_approve_insert`;
-DELIMITER //
-CREATE TRIGGER `request_approve_insert` BEFORE INSERT ON `requests`
- FOR EACH ROW BEGIN
+DELIMITER $$
+CREATE TRIGGER `request_approve_update` BEFORE UPDATE ON `requests` FOR EACH ROW BEGIN
     IF NEW.approval_status = '1' OR NEW.approval_status = '-1'
     THEN SET NEW.approvation_timestamp = NOW();
+	ELSEIF NEW.approval_status = '2'
+    THEN SET NEW.send_timestamp = NOW();
     END IF;
 END
-//
+$$
 DELIMITER ;
 
 -- --------------------------------------------------------
@@ -383,12 +380,12 @@ DELIMITER ;
 -- Table structure for table `requests_clients`
 --
 
-CREATE TABLE IF NOT EXISTS `requests_clients` (
-  `request_id` mediumint(10) unsigned NOT NULL,
-  `client_user_id` smallint(10) unsigned NOT NULL,
+CREATE TABLE `requests_clients` (
+  `request_id` mediumint(10) UNSIGNED NOT NULL,
+  `client_user_id` smallint(10) UNSIGNED NOT NULL,
   `install_timestamp` timestamp NULL DEFAULT NULL,
   `install_status` enum('-1','0','1') NOT NULL DEFAULT '0',
-  `comment` text,
+  `comment` text DEFAULT NULL,
   PRIMARY KEY (`request_id`,`client_user_id`),
   KEY `client_user_id` (`client_user_id`),
   KEY `request_id` (`request_id`)
@@ -412,9 +409,9 @@ INSERT INTO `requests_clients` (`request_id`, `client_user_id`, `install_timesta
 -- Table structure for table `requests_commits`
 --
 
-CREATE TABLE IF NOT EXISTS `requests_commits` (
-  `request_id` mediumint(10) unsigned NOT NULL,
-  `commit_id` mediumint(10) unsigned NOT NULL,
+CREATE TABLE `requests_commits` (
+  `request_id` mediumint(10) UNSIGNED NOT NULL,
+  `commit_id` mediumint(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`request_id`,`commit_id`),
   KEY `request_id` (`request_id`),
   KEY `commit_id` (`commit_id`)
@@ -625,12 +622,12 @@ INSERT INTO `requests_commits` (`request_id`, `commit_id`) VALUES
 -- Table structure for table `roles`
 --
 
-CREATE TABLE IF NOT EXISTS `roles` (
+CREATE TABLE `roles` (
   `role_id` smallint(1) NOT NULL AUTO_INCREMENT,
   `role_name` varchar(25) NOT NULL,
   `role_string` varchar(50) NOT NULL,
   PRIMARY KEY (`role_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=6 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=6;
 
 --
 -- Dumping data for table `roles`
@@ -649,19 +646,19 @@ INSERT INTO `roles` (`role_id`, `role_name`, `role_string`) VALUES
 -- Table structure for table `users`
 --
 
-CREATE TABLE IF NOT EXISTS `users` (
-  `user_id` smallint(10) unsigned NOT NULL AUTO_INCREMENT,
-  `username` varchar(30) NOT NULL,
-  `hash_pass` varchar(255) NOT NULL,
+CREATE TABLE `users` (
+  `user_id` smallint(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `hash_pass` char(60) NOT NULL,
   `email` varchar(50) NOT NULL,
   `name` varchar(50) NOT NULL,
-  `area_id` smallint(5) unsigned DEFAULT NULL,
+  `area_id` smallint(5) UNSIGNED DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   KEY `area_id` (`area_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=6;
 
 --
--- Dumping data for table `users`
+-- Dump dei dati per la tabella `users`
 --
 
 INSERT INTO `users` (`user_id`, `username`, `hash_pass`, `email`, `name`, `area_id`) VALUES
@@ -677,8 +674,8 @@ INSERT INTO `users` (`user_id`, `username`, `hash_pass`, `email`, `name`, `area_
 -- Table structure for table `users_roles`
 --
 
-CREATE TABLE IF NOT EXISTS `users_roles` (
-  `user_id` smallint(10) unsigned NOT NULL,
+CREATE TABLE `users_roles` (
+  `user_id` smallint(10) UNSIGNED NOT NULL,
   `role_id` smallint(1) NOT NULL,
   PRIMARY KEY (`user_id`,`role_id`),
   KEY `role_id` (`role_id`)
@@ -705,20 +702,12 @@ INSERT INTO `users_roles` (`user_id`, `role_id`) VALUES
 -- Table structure for table `users_tokens`
 --
 
-CREATE TABLE IF NOT EXISTS `users_tokens` (
-  `token` varchar(100) NOT NULL,
-  `user_id` smallint(10) unsigned NOT NULL,
+CREATE TABLE `users_tokens` (
+  `token` char(40) NOT NULL,
+  `user_id` smallint(10) UNSIGNED NOT NULL,
   `token_expire` int(10) NOT NULL,
   PRIMARY KEY (`user_id`,`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `users_tokens`
---
-
---
--- Constraints for dumped tables
---
 
 --
 -- Constraints for table `commits`
@@ -726,7 +715,8 @@ CREATE TABLE IF NOT EXISTS `users_tokens` (
 ALTER TABLE `commits`
   ADD CONSTRAINT `commits_ibfk_1` FOREIGN KEY (`author_user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `commits_ibfk_3` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`branch_id`),
-  ADD CONSTRAINT `commits_ibfk_4` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `commits_ibfk_4` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`user_id`),
+  ADD CHECK (`approval_status` != '0' AND `approver_user_id` IS NOT NULL);
 
 --
 -- Constraints for table `requests`
@@ -734,15 +724,18 @@ ALTER TABLE `commits`
 ALTER TABLE `requests`
   ADD CONSTRAINT `requests_ibfk_1` FOREIGN KEY (`author_user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `requests_ibfk_2` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `requests_ibfk_4` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`branch_id`),
-  ADD CONSTRAINT `requests_ibfk_5` FOREIGN KEY (`sender_user_id`) REFERENCES `users` (`user_id`);
+  ADD CONSTRAINT `requests_ibfk_3` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`branch_id`),
+  ADD CONSTRAINT `requests_ibfk_4` FOREIGN KEY (`sender_user_id`) REFERENCES `users` (`user_id`),
+  ADD CHECK ((`approval_status` = '1' OR `approval_status` = '-1') AND `approver_user_id` IS NOT NULL),
+  ADD CHECK (`approval_status` = '2' AND `approver_user_id` IS NOT NULL AND `sender_user_id` IS NOT NULL AND `install_link` IS NOT NULL);
 
 --
 -- Constraints for table `requests_clients`
 --
 ALTER TABLE `requests_clients`
   ADD CONSTRAINT `requests_clients_ibfk_1` FOREIGN KEY (`client_user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `requests_clients_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `requests_clients_ibfk_2` FOREIGN KEY (`request_id`) REFERENCES `requests` (`request_id`) ON DELETE CASCADE,
+  ADD CHECK (`install_status` != '0' AND `install_timestamp` IS NOT NULL);
 
 --
 -- Constraints for table `requests_commits`
@@ -769,6 +762,7 @@ ALTER TABLE `users_roles`
 --
 ALTER TABLE `users_tokens`
   ADD CONSTRAINT `users_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
